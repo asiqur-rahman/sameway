@@ -5,6 +5,7 @@ import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_placeholders.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
+import 'package:sameway/core/theme/app_typography.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_text_field.dart';
@@ -20,9 +21,8 @@ class AddStopScreen extends StatelessWidget {
     return SamewayScreen(
       child: Column(
         children: [
-          MobilePageHeader(
+          const MobilePageHeader(
             title: 'Add a Stop',
-            subtitle: 'Optional — pick up riders along the way',
             backFallback: AppRoutes.pickEnd,
           ),
           Expanded(
@@ -36,7 +36,10 @@ class AddStopScreen extends StatelessWidget {
               children: [
                 const MapPlaceholder(
                   height: 400,
-                  hint: 'Tap map to add an optional stop',
+                  postRideShell: true,
+                  hint: 'Drag to adjust pin',
+                  interactive: true,
+                  showZoomControls: true,
                 ),
                 const SizedBox(height: 16),
                 SamewayTextField(
@@ -46,10 +49,9 @@ class AddStopScreen extends StatelessWidget {
                   controller: _searchController,
                 ),
                 const SizedBox(height: 16),
-                const InfoBanner(
-                  emoji: '💡',
+                const RouteTipBanner(
                   text:
-                      'Stops help riders join along your route. You can skip this and add stops later.',
+                      'Adding a stop means riders boarding here will also see your ride. The stop is added to your route.',
                 ),
               ],
             ),
@@ -81,8 +83,9 @@ class AddStopScreen extends StatelessWidget {
               AppSpacing.screenHorizontal,
               24,
             ),
-            child: SamewayPrimaryButton(
+            child: SamewayDarkButton(
               label: 'Confirm Stop & Review Route',
+              textStyle: AppTypography.buttonDark,
               onPressed: () => context.push(AppRoutes.routeConfirmed),
             ),
           ),

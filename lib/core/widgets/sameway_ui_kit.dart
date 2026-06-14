@@ -68,6 +68,8 @@ class MapPlaceholder extends StatelessWidget {
     this.endLabel,
     this.interactive = false,
     this.showZoomControls = false,
+    this.postRideShell = false,
+    this.distanceLabel,
   });
 
   final double height;
@@ -77,24 +79,48 @@ class MapPlaceholder extends StatelessWidget {
   final String? endLabel;
   final bool interactive;
   final bool showZoomControls;
+  final bool postRideShell;
+  final String? distanceLabel;
 
   @override
   Widget build(BuildContext context) {
+    final shellColor = postRideShell ? AppColors.mapShell : const Color(0xFFE8EDF2);
+    final radius = postRideShell ? AppRadius.xl : AppRadius.md;
+
     return ClipRRect(
-      borderRadius: BorderRadius.circular(AppRadius.md),
+      borderRadius: BorderRadius.circular(radius),
       child: Container(
         height: height,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: const Color(0xFFE8EDF2),
-          border: Border.all(color: AppColors.border),
+          color: shellColor,
+          border: postRideShell ? null : Border.all(color: AppColors.border),
         ),
         child: Stack(
           children: [
             CustomPaint(
               size: Size.infinite,
-              painter: _MapGridPainter(showRoute: showRoute),
+              painter: _MapGridPainter(showRoute: showRoute, shellColor: shellColor),
             ),
+            if (distanceLabel != null)
+              Positioned(
+                top: 48,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryDark,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      distanceLabel!,
+                      style: AppTypography.badge(color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
             if (interactive)
               Center(
                 child: Column(
@@ -112,7 +138,7 @@ class MapPlaceholder extends StatelessWidget {
                   ],
                 ),
               ),
-            if (showRoute)
+            if (showRoute && !postRideShell)
               Positioned(
                 top: 12,
                 right: 12,
@@ -151,24 +177,29 @@ class MapPlaceholder extends StatelessWidget {
                 ),
               ),
             Positioned(
-              left: 12,
-              bottom: 10,
-              right: 12,
+              left: postRideShell ? 22 : 12,
+              bottom: postRideShell ? 18 : 10,
+              right: postRideShell ? 22 : 12,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                padding: EdgeInsets.symmetric(
+                  horizontal: postRideShell ? 16 : 10,
+                  vertical: postRideShell ? 8 : 8,
+                ),
                 decoration: BoxDecoration(
-                  color: AppColors.surface.withValues(alpha: 0.92),
+                  color: AppColors.surface.withValues(alpha: postRideShell ? 0.85 : 0.92),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppColors.border),
+                  border: postRideShell ? null : Border.all(color: AppColors.border),
                 ),
                 child: Text(
                   showRoute && startLabel != null && endLabel != null
                       ? '$startLabel → $endLabel'
                       : hint,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                  ),
+                  style: postRideShell
+                      ? AppTypography.fieldHintSm.copyWith(fontSize: 13)
+                      : GoogleFonts.inter(
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                        ),
                 ),
               ),
             ),
@@ -207,15 +238,16 @@ class _ZoomButton extends StatelessWidget {
 }
 
 class _MapGridPainter extends CustomPainter {
-  const _MapGridPainter({required this.showRoute});
+  const _MapGridPainter({required this.showRoute, this.shellColor = const Color(0xFFE8EDF2)});
 
   final bool showRoute;
+  final Color shellColor;
 
   @override
   void paint(Canvas canvas, Size size) {
     canvas.drawRect(
       Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = const Color(0xFFE8EDF2),
+      Paint()..color = shellColor,
     );
 
     final blockPaint = Paint()..color = const Color(0xFFF5F7FA);
@@ -530,6 +562,482 @@ class RouteFieldTile extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Compact map preview for Post a Ride empty state (Figma: 100px, #eef2f7 shell).
+class PostRideMapPreview extends StatelessWidget {
+  const PostRideMapPreview({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(AppRadius.xl),
+      child: Container(
+        height: 100,
+        width: double.infinity,
+        color: AppColors.mapShell,
+        alignment: Alignment.bottomCenter,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(22, 0, 22, 18),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppColors.surface.withValues(alpha: 0.85),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              'Route map will appear after locations are set',
+              style: AppTypography.fieldHintSm.copyWith(fontSize: 13),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Start / end location field on Post a Ride (Figma: muted 48px tile).
+class PostRideRouteField extends StatelessWidget {
+  const PostRideRouteField({
+    super.key,
+    required this.label,
+    required this.icon,
+    required this.hint,
+    required this.onTap,
+  });
+
+  final String label;
+  final String icon;
+  final String hint;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: AppTypography.routeSectionLabel),
+        const SizedBox(height: 5),
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            height: 48,
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceMuted,
+              borderRadius: BorderRadius.circular(AppRadius.md),
+            ),
+            child: Row(
+              children: [
+                Text(icon, style: const TextStyle(fontSize: 16)),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(hint, style: AppTypography.fieldHintSm),
+                ),
+                const Icon(Icons.chevron_right, size: 16, color: AppColors.textMuted),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Centered "+ Add a stop" pill between start and end (Figma connector row).
+class RouteAddStopRow extends StatelessWidget {
+  const RouteAddStopRow({super.key, required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 37,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 8,
+            child: Center(
+              child: Container(
+                width: 2,
+                height: 20,
+                color: AppColors.border,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(height: 1, color: AppColors.border),
+          ),
+          GestureDetector(
+            onTap: onTap,
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              height: 29,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('+', style: AppTypography.addStopPlus),
+                  const SizedBox(width: 4),
+                  Text('Add a stop', style: AppTypography.addStopLabel),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(height: 1, color: AppColors.border),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Route builder: start → add stop → end.
+class PostRideRouteBuilder extends StatelessWidget {
+  const PostRideRouteBuilder({
+    super.key,
+    required this.onPickStart,
+    required this.onPickEnd,
+    required this.onAddStop,
+  });
+
+  final VoidCallback onPickStart;
+  final VoidCallback onPickEnd;
+  final VoidCallback onAddStop;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        PostRideRouteField(
+          label: 'START (FROM)',
+          icon: '📍',
+          hint: 'Tap to set your home / start location',
+          onTap: onPickStart,
+        ),
+        RouteAddStopRow(onTap: onAddStop),
+        PostRideRouteField(
+          label: 'END (TO / OFFICE)',
+          icon: '🏢',
+          hint: 'Tap to set your office / destination',
+          onTap: onPickEnd,
+        ),
+      ],
+    );
+  }
+}
+
+class RouteTipBanner extends StatelessWidget {
+  const RouteTipBanner({
+    super.key,
+    this.text =
+        'Set your route first — Google Maps will geocode each point so riders anywhere along your path get matched automatically.',
+    this.emoji = '💡',
+  });
+
+  final String text;
+  final String emoji;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceMuted,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(emoji, style: const TextStyle(fontSize: 14)),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: AppTypography.infoBanner.copyWith(
+                color: AppColors.textMuted,
+                height: 19.2 / 12,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PostRideDisabledField extends StatelessWidget {
+  const PostRideDisabledField({
+    super.key,
+    required this.label,
+    required this.emoji,
+  });
+
+  final String label;
+  final String emoji;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: AppTypography.routeSectionLabel),
+        const SizedBox(height: 5),
+        Container(
+          height: 46,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceMuted,
+            borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
+          child: Row(
+            children: [
+              Text(emoji, style: const TextStyle(fontSize: 16)),
+              const SizedBox(width: 10),
+              Text('Set after route', style: AppTypography.fieldHintSm),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class PostRideDisabledButton extends StatelessWidget {
+  const PostRideDisabledButton({super.key, required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 49,
+      width: double.infinity,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: AppColors.surfaceMuted,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+      ),
+      child: Text(
+        label,
+        style: AppTypography.buttonDisabled,
+      ),
+    );
+  }
+}
+
+/// Read-only route point with optional GPS subtitle (Route Confirmed / Filled).
+class PostRideRoutePoint extends StatelessWidget {
+  const PostRideRoutePoint({
+    super.key,
+    required this.sectionLabel,
+    required this.title,
+    this.subtitle,
+    this.showGpsBadge = false,
+  });
+
+  final String sectionLabel;
+  final String title;
+  final String? subtitle;
+  final bool showGpsBadge;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(sectionLabel, style: AppTypography.routeSectionLabel),
+        const SizedBox(height: 5),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceMuted,
+            borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: AppTypography.fieldValue),
+              if (subtitle != null) ...[
+                const SizedBox(height: 2),
+                Text(subtitle!, style: AppTypography.caption),
+              ],
+              if (showGpsBadge) ...[
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryTint7,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    'GPS',
+                    style: AppTypography.badge(color: AppColors.primary),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Filled / editable field row (Date, Time, Seats).
+class PostRideValueField extends StatelessWidget {
+  const PostRideValueField({
+    super.key,
+    required this.label,
+    required this.emoji,
+    required this.value,
+  });
+
+  final String label;
+  final String emoji;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: AppTypography.routeSectionLabel),
+        const SizedBox(height: 5),
+        Container(
+          height: 46,
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceMuted,
+            borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
+          child: Row(
+            children: [
+              Text(emoji, style: const TextStyle(fontSize: 16)),
+              const SizedBox(width: 10),
+              Text(value, style: AppTypography.fieldValue.copyWith(fontSize: 15)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class PostRideRepeatChip extends StatelessWidget {
+  const PostRideRepeatChip({
+    super.key,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 37,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: selected ? AppColors.primaryDark : AppColors.surfaceMuted,
+          borderRadius: BorderRadius.circular(AppRadius.md),
+        ),
+        child: Text(
+          label,
+          style: AppTypography.filterSegmentChip(selected: selected),
+        ),
+      ),
+    );
+  }
+}
+
+class PostRideSeatsStepper extends StatelessWidget {
+  const PostRideSeatsStepper({
+    super.key,
+    required this.value,
+    required this.onDecrement,
+    required this.onIncrement,
+  });
+
+  final int value;
+  final VoidCallback onDecrement;
+  final VoidCallback onIncrement;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('EMPTY SEATS', style: AppTypography.routeSectionLabel),
+        const SizedBox(height: 5),
+        Container(
+          height: 46,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceMuted,
+            borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
+          child: Row(
+            children: [
+              _StepperButton(label: '−', onTap: onDecrement),
+              Expanded(
+                child: Center(
+                  child: Text(
+                    '$value',
+                    style: AppTypography.greetingTitle.copyWith(fontSize: 28),
+                  ),
+                ),
+              ),
+              _StepperButton(label: '+', onTap: onIncrement),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _StepperButton extends StatelessWidget {
+  const _StepperButton({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 38,
+        height: 38,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Text(
+          label,
+          style: AppTypography.fieldValue.copyWith(fontSize: 20),
+        ),
+      ),
     );
   }
 }

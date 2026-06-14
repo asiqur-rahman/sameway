@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_placeholders.dart';
+import 'package:sameway/core/theme/app_typography.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_text_field.dart';
 import 'package:sameway/core/widgets/web_scaffold.dart';
@@ -84,12 +85,9 @@ class WebPostRideScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  SamewayPrimaryButton(
+                  SamewayDarkButton(
                     label: 'Post Ride',
-                    backgroundColor: AppColors.primaryDark,
-                    height: 49,
-                    borderRadius: 12,
-                    fontSize: 16,
+                    textStyle: AppTypography.buttonDark,
                     onPressed: () {},
                   ),
                 ],

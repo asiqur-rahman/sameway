@@ -5,6 +5,7 @@ import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_placeholders.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
+import 'package:sameway/core/theme/app_typography.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_text_field.dart';
@@ -26,9 +27,8 @@ class PickEndLocationScreen extends StatelessWidget {
     return SamewayScreen(
       child: Column(
         children: [
-          MobilePageHeader(
-            title: 'Pick Destination',
-            subtitle: 'Where are you heading?',
+          const MobilePageHeader(
+            title: 'Choose End Location',
             backFallback: AppRoutes.pickStart,
           ),
           Expanded(
@@ -42,7 +42,8 @@ class PickEndLocationScreen extends StatelessWidget {
               children: [
                 const MapPlaceholder(
                   height: 400,
-                  hint: 'Set your office or drop-off point',
+                  postRideShell: true,
+                  hint: 'Drag to adjust pin',
                   interactive: true,
                   showZoomControls: true,
                 ),
@@ -85,8 +86,9 @@ class PickEndLocationScreen extends StatelessWidget {
               AppSpacing.screenHorizontal,
               24,
             ),
-            child: SamewayPrimaryButton(
+            child: SamewayDarkButton(
               label: 'Confirm Destination',
+              textStyle: AppTypography.buttonDark,
               onPressed: () => context.push(AppRoutes.addStop),
             ),
           ),

@@ -13,4 +13,6 @@ abstract final class AppColors {
   static const error = Color(0xFFEF4444);
   static const primaryTint12 = Color(0x2010B981);
   static const primaryTint7 = Color(0x1210B981);
+  static const accentBlue = Color(0xFF3B82F6);
+  static const mapShell = Color(0xFFEEF2F7);
 }

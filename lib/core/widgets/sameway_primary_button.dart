@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sameway/core/theme/app_colors.dart';
+import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/theme/app_typography.dart';
 
 class SamewayPrimaryButton extends StatelessWidget {
@@ -59,11 +60,13 @@ class SamewayDarkButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.height = 49,
+    this.textStyle,
   });
 
   final String label;
   final VoidCallback onPressed;
   final double height;
+  final TextStyle? textStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -72,8 +75,8 @@ class SamewayDarkButton extends StatelessWidget {
       onPressed: onPressed,
       backgroundColor: AppColors.primaryDark,
       height: height,
-      borderRadius: 14,
-      textStyle: AppTypography.buttonPrimary,
+      borderRadius: AppRadius.lg,
+      textStyle: textStyle ?? AppTypography.buttonPrimary,
     );
   }
 }

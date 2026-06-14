@@ -119,6 +119,27 @@ abstract final class AppTypography {
         height: 19 / 16,
       );
 
+  /// Figma dark CTA — #0F172A fill, Inter Regular 16 white (Post Ride, Search Rides).
+  static TextStyle get buttonDark => searchButton;
+
+  /// Figma dark CTA — Roboto Regular 16 white (Confirm & Continue).
+  static TextStyle get buttonDarkRobotoRegular => GoogleFonts.roboto(
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        letterSpacing: -0.3,
+        color: Colors.white,
+        height: 19 / 16,
+      );
+
+  /// Figma disabled CTA — #F1F5F9 fill, Inter Regular 16 #0F172A text.
+  static TextStyle get buttonDisabled => GoogleFonts.inter(
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        letterSpacing: -0.3,
+        color: AppColors.textPrimary,
+        height: 19 / 16,
+      );
+
   static TextStyle get buttonPrimary => GoogleFonts.roboto(
         fontSize: 16,
         fontWeight: FontWeight.w600,
@@ -184,6 +205,28 @@ abstract final class AppTypography {
         letterSpacing: 0.5,
         color: AppColors.textMuted,
         height: 13 / 11,
+      );
+
+  static TextStyle get routeSectionLabel => GoogleFonts.inter(
+        fontSize: 11,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 0.8,
+        color: AppColors.textMuted,
+        height: 13 / 11,
+      );
+
+  static TextStyle get addStopPlus => GoogleFonts.inter(
+        fontSize: 17,
+        fontWeight: FontWeight.w700,
+        color: AppColors.accentBlue,
+        height: 17 / 17,
+      );
+
+  static TextStyle get addStopLabel => GoogleFonts.inter(
+        fontSize: 12,
+        fontWeight: FontWeight.w400,
+        color: AppColors.textSecondary,
+        height: 15 / 12,
       );
 
   // --- Cards / list rows ---

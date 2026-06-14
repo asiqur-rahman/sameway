@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_placeholders.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
+import 'package:sameway/core/theme/app_typography.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_text_field.dart';
@@ -100,8 +101,9 @@ class _SearchFiltersScreenState extends State<SearchFiltersScreen> {
               AppSpacing.screenHorizontal,
               24,
             ),
-            child: SamewayPrimaryButton(
+            child: SamewayDarkButton(
               label: 'Search Rides',
+              textStyle: AppTypography.buttonDark,
               onPressed: () => context.push(AppRoutes.searchResults),
             ),
           ),

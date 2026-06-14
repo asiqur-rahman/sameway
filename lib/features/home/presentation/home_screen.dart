@@ -255,19 +255,7 @@ class _FindTabContent extends StatelessWidget {
                 style: AppTypography.sectionOverline,
               ),
               const SizedBox(height: 8),
-              const Wrap(
-                spacing: 6,
-                runSpacing: 6,
-                children: [
-                  PreferenceChip(
-                    label: '🚗 Car',
-                    selected: true,
-                    useRoboto: true,
-                  ),
-                  PreferenceChip(label: '🏍 Bike ok'),
-                  PreferenceChip(label: 'Any gender', selected: true),
-                ],
-              ),
+              const FindPreferencesRow(),
               const SizedBox(height: 8),
               SizedBox(
                 width: double.infinity,

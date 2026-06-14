@@ -169,17 +169,19 @@ class PreferenceChip extends StatelessWidget {
     required this.label,
     this.selected = false,
     this.useRoboto = false,
+    this.onTap,
   });
 
   final String label;
   final bool selected;
   final bool useRoboto;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final chip = Container(
       height: 21,
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
         color: selected ? AppColors.primaryDark : AppColors.surfaceMuted,
         borderRadius: BorderRadius.circular(20),
@@ -192,6 +194,54 @@ class PreferenceChip extends StatelessWidget {
           roboto: useRoboto,
         ),
       ),
+    );
+
+    if (onTap == null) return chip;
+
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: chip,
+    );
+  }
+}
+
+/// Home Find tab — compact multi-select preference pills in one row (Figma).
+class FindPreferencesRow extends StatefulWidget {
+  const FindPreferencesRow({super.key});
+
+  @override
+  State<FindPreferencesRow> createState() => _FindPreferencesRowState();
+}
+
+class _FindPreferencesRowState extends State<FindPreferencesRow> {
+  bool _carSelected = true;
+  bool _bikeSelected = false;
+  bool _anyGenderSelected = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        PreferenceChip(
+          label: '🚗 Car',
+          selected: _carSelected,
+          useRoboto: true,
+          onTap: () => setState(() => _carSelected = !_carSelected),
+        ),
+        const SizedBox(width: 6),
+        PreferenceChip(
+          label: '🏍 Bike ok',
+          selected: _bikeSelected,
+          onTap: () => setState(() => _bikeSelected = !_bikeSelected),
+        ),
+        const SizedBox(width: 6),
+        PreferenceChip(
+          label: 'Any gender',
+          selected: _anyGenderSelected,
+          onTap: () => setState(() => _anyGenderSelected = !_anyGenderSelected),
+        ),
+      ],
     );
   }
 }
