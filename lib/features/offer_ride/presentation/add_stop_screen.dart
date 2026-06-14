@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
+import 'package:sameway/core/theme/app_placeholders.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
@@ -22,7 +23,7 @@ class AddStopScreen extends StatelessWidget {
           MobilePageHeader(
             title: 'Add a Stop',
             subtitle: 'Optional — pick up riders along the way',
-            onBack: () => context.pop(),
+            backFallback: AppRoutes.pickEnd,
           ),
           Expanded(
             child: ListView(
@@ -40,7 +41,7 @@ class AddStopScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 SamewayTextField(
                   label: 'Search',
-                  hint: 'Search stop location',
+                  hint: AppPlaceholders.searchStop,
                   icon: '🔍',
                   controller: _searchController,
                 ),

@@ -10,23 +10,46 @@ class RouteMatchIllustration extends StatelessWidget {
     return SizedBox(
       height: 148,
       child: CustomPaint(
-        painter: _RouteMatchPainter(),
-        child: Center(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              '92% match',
-              style: GoogleFonts.inter(
-                color: Colors.white,
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
+        painter: const _RouteMatchPainter(),
+        child: Stack(
+          children: [
+            Positioned(
+              left: 12,
+              top: 10,
+              child: Text(
+                '±500m buffer',
+                style: GoogleFonts.inter(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textMuted,
+                ),
               ),
             ),
-          ),
+            Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.25),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  '92% match',
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -34,22 +57,29 @@ class RouteMatchIllustration extends StatelessWidget {
 }
 
 class _RouteMatchPainter extends CustomPainter {
+  const _RouteMatchPainter();
+
   @override
   void paint(Canvas canvas, Size size) {
+    final start = Offset(size.width * 0.08, size.height * 0.82);
+    final end = Offset(size.width * 0.92, size.height * 0.18);
+
+    final bufferPaint = Paint()
+      ..color = AppColors.primary.withValues(alpha: 0.08)
+      ..strokeWidth = 44
+      ..strokeCap = StrokeCap.round;
+    canvas.drawLine(start, end, bufferPaint);
+
     final trackPaint = Paint()
       ..color = AppColors.surfaceMuted
       ..strokeWidth = 28
       ..strokeCap = StrokeCap.round;
+    canvas.drawLine(start, end, trackPaint);
 
     final linePaint = Paint()
       ..color = AppColors.textPrimary
       ..strokeWidth = 2.5
       ..strokeCap = StrokeCap.round;
-
-    final start = Offset(size.width * 0.08, size.height * 0.82);
-    final end = Offset(size.width * 0.92, size.height * 0.18);
-
-    canvas.drawLine(start, end, trackPaint);
     canvas.drawLine(start, end, linePaint);
 
     final dotPaint = Paint()..color = AppColors.primary;
@@ -65,11 +95,13 @@ class _RouteMatchPainter extends CustomPainter {
       endCap,
     );
 
-    final carCenter = Offset(size.width * 0.28, size.height * 0.62);
-    _drawCar(canvas, carCenter);
+    _drawCar(canvas, Offset(size.width * 0.28, size.height * 0.62));
+    _drawBike(canvas, Offset(size.width * 0.72, size.height * 0.34));
 
-    final bikeCenter = Offset(size.width * 0.72, size.height * 0.34);
-    _drawBike(canvas, bikeCenter);
+    final overlapPaint = Paint()
+      ..color = AppColors.primary.withValues(alpha: 0.18)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(Offset(size.width * 0.5, size.height * 0.48), 22, overlapPaint);
   }
 
   void _drawCar(Canvas canvas, Offset center) {

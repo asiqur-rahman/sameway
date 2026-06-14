@@ -34,6 +34,7 @@ import 'package:sameway/features/ride_day/presentation/let_driver_know_screen.da
 import 'package:sameway/features/ride_day/presentation/notification_centre_screen.dart';
 import 'package:sameway/features/ride_day/presentation/pickup_in_screen.dart';
 import 'package:sameway/features/ride_day/presentation/reminder_settings_screen.dart';
+import 'package:sameway/features/ride_day/presentation/tap_to_notify_riders_screen.dart';
 import 'package:sameway/features/web/presentation/web_dashboard_screen.dart';
 import 'package:sameway/features/web/presentation/web_find_ride_screen.dart';
 import 'package:sameway/features/web/presentation/web_landing_screen.dart';
@@ -48,7 +49,7 @@ final appRouter = GoRouter(
     GoRoute(path: AppRoutes.splash, builder: (_, _) => const SplashScreen()),
     GoRoute(path: AppRoutes.signUp, builder: (_, _) => SignUpScreen()),
     GoRoute(path: AppRoutes.profileSetup, builder: (_, _) => const ProfileSetupScreen()),
-    GoRoute(path: AppRoutes.vehicle, builder: (_, _) => VehicleScreen()),
+    GoRoute(path: AppRoutes.vehicle, builder: (_, _) => const VehicleScreen()),
     GoRoute(path: AppRoutes.workLocation, builder: (_, _) => WorkLocationScreen()),
     GoRoute(path: AppRoutes.officeId, builder: (_, _) => const OfficeIdScreen()),
     GoRoute(path: AppRoutes.home, builder: (_, _) => const HomeScreen()),
@@ -71,6 +72,7 @@ final appRouter = GoRouter(
     GoRoute(path: AppRoutes.regularRoutes, builder: (_, _) => const RegularRoutesScreen()),
     GoRoute(path: AppRoutes.reminderSettings, builder: (_, _) => const ReminderSettingsScreen()),
     GoRoute(path: AppRoutes.departureIn, builder: (_, _) => const DepartureInScreen()),
+    GoRoute(path: AppRoutes.tapToNotify, builder: (_, _) => const TapToNotifyRidersScreen()),
     GoRoute(path: AppRoutes.afterHeadingOut, builder: (_, _) => const AfterHeadingOutScreen()),
     GoRoute(path: AppRoutes.pickupIn, builder: (_, _) => const PickupInScreen()),
     GoRoute(path: AppRoutes.letDriverKnow, builder: (_, _) => const LetDriverKnowScreen()),

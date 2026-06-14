@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sameway/core/theme/app_colors.dart';
+import 'package:sameway/core/theme/app_placeholders.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/widgets/admin_scaffold.dart';
 import 'package:sameway/core/widgets/sameway_text_field.dart';
@@ -13,7 +14,7 @@ class AdminConfigScreen extends StatefulWidget {
 }
 
 class _AdminConfigScreenState extends State<AdminConfigScreen> {
-  final _domainController = TextEditingController(text: 'grameenphone.com');
+  final _domainController = TextEditingController();
   bool _autoVerify = true;
   bool _maintenanceMode = false;
 
@@ -56,7 +57,7 @@ class _AdminConfigScreenState extends State<AdminConfigScreen> {
                 children: [
                   SamewayTextField(
                     label: 'Add domain',
-                    hint: 'company.com',
+                    hint: AppPlaceholders.domain,
                     controller: _domainController,
                   ),
                   const SizedBox(height: 12),

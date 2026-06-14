@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sameway/core/theme/app_colors.dart';
+import 'package:sameway/core/theme/app_placeholders.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_text_field.dart';
 import 'package:sameway/core/widgets/web_scaffold.dart';
@@ -8,9 +9,9 @@ import 'package:sameway/core/widgets/web_scaffold.dart';
 class WebProfileScreen extends StatelessWidget {
   WebProfileScreen({super.key});
 
-  final _nameController = TextEditingController(text: 'Rafiq Ahmed');
-  final _emailController = TextEditingController(text: 'rafiq@grameenphone.com');
-  final _phoneController = TextEditingController(text: '+880 17XX XXXXXX');
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -71,18 +72,21 @@ class WebProfileScreen extends StatelessWidget {
                         SamewayTextField(
                           label: 'Full Name',
                           icon: '👤',
+                          hint: AppPlaceholders.fullName,
                           controller: _nameController,
                         ),
                         const SizedBox(height: 16),
                         SamewayTextField(
                           label: 'Work Email',
                           icon: '✉️',
+                          hint: AppPlaceholders.workEmail,
                           controller: _emailController,
                         ),
                         const SizedBox(height: 16),
                         SamewayTextField(
                           label: 'Phone',
                           icon: '📱',
+                          hint: AppPlaceholders.phone,
                           controller: _phoneController,
                           keyboardType: TextInputType.phone,
                         ),

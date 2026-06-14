@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
+import 'package:sameway/core/theme/app_elevation.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_ui_kit.dart';
@@ -39,7 +39,7 @@ class IncomingRequestsScreen extends StatelessWidget {
           MobilePageHeader(
             title: 'Incoming Requests',
             subtitle: 'Uttara → Motijheel · Today 8:30 AM',
-            onBack: () => context.go(AppRoutes.home),
+            backFallback: AppRoutes.home,
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
@@ -95,11 +95,7 @@ class _RequestCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        border: Border.all(color: AppColors.border),
-      ),
+      decoration: SamewayDecorations.card(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
+import 'package:sameway/core/theme/app_elevation.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_ui_kit.dart';
@@ -43,7 +44,7 @@ class SearchResultsScreen extends StatelessWidget {
           MobilePageHeader(
             title: 'Search Results',
             subtitle: 'Uttara → Motijheel · Today',
-            onBack: () => context.pop(),
+            backFallback: AppRoutes.home,
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
@@ -106,11 +107,7 @@ class _RideResultCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(AppRadius.xl),
-          border: Border.all(color: AppColors.border),
-        ),
+        decoration: SamewayDecorations.card(),
         child: Row(
           children: [
             Container(

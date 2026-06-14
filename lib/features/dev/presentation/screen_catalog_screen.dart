@@ -36,6 +36,7 @@ class ScreenCatalogScreen extends StatelessWidget {
     _CatalogEntry('Regular Routes', AppRoutes.regularRoutes),
     _CatalogEntry('Reminder Settings', AppRoutes.reminderSettings),
     _CatalogEntry('Departure In', AppRoutes.departureIn),
+    _CatalogEntry('Tap to Notify', AppRoutes.tapToNotify),
     _CatalogEntry('After Heading Out', AppRoutes.afterHeadingOut),
     _CatalogEntry('Pickup In', AppRoutes.pickupIn),
     _CatalogEntry('Let Driver Know', AppRoutes.letDriverKnow),

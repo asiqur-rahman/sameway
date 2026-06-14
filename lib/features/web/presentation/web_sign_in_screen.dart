@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
+import 'package:sameway/core/theme/app_placeholders.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_text_field.dart';
 import 'package:sameway/core/widgets/web_scaffold.dart';
@@ -10,7 +11,7 @@ import 'package:sameway/core/widgets/web_scaffold.dart';
 class WebSignInScreen extends StatelessWidget {
   WebSignInScreen({super.key});
 
-  final _emailController = TextEditingController(text: 'rafiq@grameenphone.com');
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
   @override
@@ -51,12 +52,14 @@ class WebSignInScreen extends StatelessWidget {
               SamewayTextField(
                 label: 'Work Email',
                 icon: '✉️',
+                hint: AppPlaceholders.workEmail,
                 controller: _emailController,
               ),
               const SizedBox(height: 12),
               SamewayTextField(
                 label: 'Password',
                 icon: '🔒',
+                hint: AppPlaceholders.passwordSignIn,
                 controller: _passwordController,
                 obscureText: true,
               ),

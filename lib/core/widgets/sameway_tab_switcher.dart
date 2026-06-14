@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sameway/core/theme/app_colors.dart';
+import 'package:sameway/core/theme/app_elevation.dart';
+import 'package:sameway/core/theme/app_typography.dart';
 
 class SamewayTabSwitcher extends StatelessWidget {
   const SamewayTabSwitcher({
@@ -19,10 +20,7 @@ class SamewayTabSwitcher extends StatelessWidget {
     return Container(
       height: 44,
       padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceMuted,
-        borderRadius: BorderRadius.circular(14),
-      ),
+      decoration: SamewayDecorations.track(),
       child: Row(
         children: List.generate(tabs.length, (index) {
           final selected = index == selectedIndex;
@@ -35,14 +33,16 @@ class SamewayTabSwitcher extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: selected ? AppColors.surface : Colors.transparent,
                   borderRadius: BorderRadius.circular(10),
+                  boxShadow: selected ? AppShadows.soft : null,
+                  border: selected
+                      ? Border.all(color: AppColors.border.withValues(alpha: 0.8))
+                      : null,
                 ),
                 child: Text(
                   tabs[index],
-                  style: GoogleFonts.roboto(
-                    fontSize: 14,
-                    fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                    color: selected ? AppColors.textPrimary : AppColors.textMuted,
-                  ),
+                  style: selected
+                      ? AppTypography.tabSelected()
+                      : AppTypography.tabUnselected(),
                 ),
               ),
             ),

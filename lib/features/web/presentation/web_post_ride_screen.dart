@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sameway/core/theme/app_colors.dart';
+import 'package:sameway/core/theme/app_placeholders.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_text_field.dart';
 import 'package:sameway/core/widgets/web_scaffold.dart';
@@ -8,10 +9,10 @@ import 'package:sameway/core/widgets/web_scaffold.dart';
 class WebPostRideScreen extends StatelessWidget {
   WebPostRideScreen({super.key});
 
-  final _fromController = TextEditingController(text: 'Uttara Sector 4, Dhaka');
-  final _toController = TextEditingController(text: 'Motijheel, Dhaka');
-  final _timeController = TextEditingController(text: '8:30 AM');
-  final _seatsController = TextEditingController(text: '2');
+  final _fromController = TextEditingController();
+  final _toController = TextEditingController();
+  final _timeController = TextEditingController();
+  final _seatsController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +47,7 @@ class WebPostRideScreen extends StatelessWidget {
                         child: SamewayTextField(
                           label: 'From',
                           icon: '📍',
+                          hint: AppPlaceholders.from,
                           controller: _fromController,
                         ),
                       ),
@@ -54,6 +56,7 @@ class WebPostRideScreen extends StatelessWidget {
                         child: SamewayTextField(
                           label: 'To',
                           icon: '🏢',
+                          hint: AppPlaceholders.to,
                           controller: _toController,
                         ),
                       ),
@@ -65,6 +68,7 @@ class WebPostRideScreen extends StatelessWidget {
                       Expanded(
                         child: SamewayTextField(
                           label: 'Departure time',
+                          hint: AppPlaceholders.departureTime,
                           controller: _timeController,
                         ),
                       ),
@@ -72,6 +76,7 @@ class WebPostRideScreen extends StatelessWidget {
                       Expanded(
                         child: SamewayTextField(
                           label: 'Available seats',
+                          hint: AppPlaceholders.seats,
                           controller: _seatsController,
                           keyboardType: TextInputType.number,
                         ),

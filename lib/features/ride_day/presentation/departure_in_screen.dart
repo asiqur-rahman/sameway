@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
@@ -73,9 +75,9 @@ class DepartureInScreen extends StatelessWidget {
           ),
           const Spacer(),
           SamewayPrimaryButton(
-            label: '📢 Notify riders I\'m heading out',
+            label: 'Continue to notify riders',
             backgroundColor: AppColors.primaryDark,
-            onPressed: () {},
+            onPressed: () => context.push(AppRoutes.tapToNotify),
           ),
         ],
       ),

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
+import 'package:sameway/core/theme/app_elevation.dart';
+import 'package:sameway/core/theme/app_placeholders.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
+import 'package:sameway/core/theme/app_typography.dart';
 import 'package:sameway/core/widgets/sameway_bottom_nav.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_tab_switcher.dart';
@@ -31,8 +33,10 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Container(
             height: 66,
-            decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: AppColors.border)),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              border: const Border(bottom: BorderSide(color: AppColors.border)),
+              boxShadow: AppShadows.soft,
             ),
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
             child: Row(
@@ -44,19 +48,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Text(
                         '$dateLabel · Uttara, Dhaka',
-                        style: GoogleFonts.inter(
-                          fontSize: 13,
-                          color: AppColors.textMuted,
-                        ),
+                        style: AppTypography.greetingMeta,
                       ),
                       Text(
                         'Good morning, Rafiq!',
-                        style: GoogleFonts.inter(
-                          fontSize: 22,
-                          letterSpacing: -0.6,
-                          color: AppColors.textPrimary,
-                          height: 26.625 / 22,
-                        ),
+                        style: AppTypography.greetingTitle,
                       ),
                     ],
                   ),
@@ -64,15 +60,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    Container(
-                      width: 42,
-                      height: 42,
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceMuted,
-                        borderRadius: BorderRadius.circular(14),
+                    GestureDetector(
+                      onTap: () => context.push(AppRoutes.notificationCentre),
+                      child: Container(
+                        width: 42,
+                        height: 42,
+                        decoration: SamewayDecorations.iconButton(),
+                        alignment: Alignment.center,
+                        child: const Text('🔔', style: TextStyle(fontSize: 20)),
                       ),
-                      alignment: Alignment.center,
-                      child: const Text('🔔', style: TextStyle(fontSize: 20)),
                     ),
                     Positioned(
                       right: 0,
@@ -129,10 +125,7 @@ class _OfferTabContent extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.all(AppSpacing.cardPadding),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(AppRadius.xl),
-          ),
+          decoration: SamewayDecorations.card(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -147,7 +140,7 @@ class _OfferTabContent extends StatelessWidget {
                 width: double.infinity,
                 height: 49,
                 child: FilledButton(
-                  onPressed: () => context.push(AppRoutes.incomingRequests),
+                  onPressed: () => context.push(AppRoutes.postRideEmpty),
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.primaryDark,
                     shape: RoundedRectangleBorder(
@@ -156,12 +149,7 @@ class _OfferTabContent extends StatelessWidget {
                   ),
                   child: Text(
                     '🚗 Post for Today — 1 tap',
-                    style: GoogleFonts.roboto(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: -0.3,
-                      color: Colors.white,
-                    ),
+                    style: AppTypography.buttonPrimary,
                   ),
                 ),
               ),
@@ -173,7 +161,7 @@ class _OfferTabContent extends StatelessWidget {
                   onTap: () => context.push(AppRoutes.postRideEmpty),
                   child: Text(
                     '＋ Create a different / new ride',
-                    style: GoogleFonts.inter(fontSize: 13, color: AppColors.primary),
+                    style: AppTypography.link,
                   ),
                 ),
               ),
@@ -182,7 +170,7 @@ class _OfferTabContent extends StatelessWidget {
                 child: Text(
                   'Goes to full Post a Ride screen — new route, new time',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(fontSize: 11, color: AppColors.textMuted),
+                  style: AppTypography.caption,
                 ),
               ),
             ],
@@ -191,17 +179,13 @@ class _OfferTabContent extends StatelessWidget {
         const SizedBox(height: 16),
         Text(
           'ACTIVE RIDES',
-          style: GoogleFonts.inter(
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1.2,
-            color: AppColors.textMuted,
-          ),
+          style: AppTypography.sectionOverline,
         ),
         const SizedBox(height: 8),
         const ActiveRideCard(
           timeLabel: 'Tomorrow · 8:30 AM',
           routeLabel: 'Uttara → Motijheel · 2 riders confirmed',
+          onTapRoute: AppRoutes.departureIn,
         ),
       ],
     );
@@ -211,15 +195,13 @@ class _OfferTabContent extends StatelessWidget {
 class _FindTabContent extends StatelessWidget {
   const _FindTabContent();
 
-  static final _fromController = TextEditingController(text: 'Uttara Sector 4, Dhaka');
-  static final _toController = TextEditingController(text: 'Motijheel, Dhaka');
+  static final _fromController = TextEditingController();
+  static final _toController = TextEditingController();
   static final _dateController = TextEditingController();
-  static final _timeController = TextEditingController(text: '9:30 AM');
+  static final _timeController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    _dateController.text = 'Today, ${DateFormat('MMM d').format(DateTime.now())}';
-
     return ListView(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.screenHorizontal,
@@ -230,22 +212,21 @@ class _FindTabContent extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.all(AppSpacing.cardPadding),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(AppRadius.xl),
-          ),
+          decoration: SamewayDecorations.card(),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SamewayTextField(
                 label: 'From',
                 icon: '📍',
+                hint: AppPlaceholders.from,
                 controller: _fromController,
               ),
               const SizedBox(height: 8),
               SamewayTextField(
                 label: 'To',
                 icon: '🏢',
+                hint: AppPlaceholders.to,
                 controller: _toController,
               ),
               const SizedBox(height: 8),
@@ -254,6 +235,7 @@ class _FindTabContent extends StatelessWidget {
                   Expanded(
                     child: SamewayTextField(
                       label: 'Date',
+                      hint: AppPlaceholders.date,
                       controller: _dateController,
                     ),
                   ),
@@ -261,6 +243,7 @@ class _FindTabContent extends StatelessWidget {
                   Expanded(
                     child: SamewayTextField(
                       label: 'Arrive by',
+                      hint: AppPlaceholders.arriveBy,
                       controller: _timeController,
                     ),
                   ),
@@ -269,24 +252,23 @@ class _FindTabContent extends StatelessWidget {
               const SizedBox(height: 12),
               Text(
                 'PREFERENCES',
-                style: GoogleFonts.inter(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1.2,
-                  color: AppColors.textMuted,
-                ),
+                style: AppTypography.sectionOverline,
               ),
               const SizedBox(height: 8),
               const Wrap(
                 spacing: 6,
                 runSpacing: 6,
                 children: [
-                  PreferenceChip(label: '🚗 Car', selected: true),
+                  PreferenceChip(
+                    label: '🚗 Car',
+                    selected: true,
+                    useRoboto: true,
+                  ),
                   PreferenceChip(label: '🏍 Bike ok'),
                   PreferenceChip(label: 'Any gender', selected: true),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               SizedBox(
                 width: double.infinity,
                 height: 49,
@@ -300,11 +282,7 @@ class _FindTabContent extends StatelessWidget {
                   ),
                   child: Text(
                     'Search Rides',
-                    style: GoogleFonts.inter(
-                      fontSize: 16,
-                      letterSpacing: -0.3,
-                      color: Colors.white,
-                    ),
+                    style: AppTypography.searchButton,
                   ),
                 ),
               ),
@@ -314,12 +292,7 @@ class _FindTabContent extends StatelessWidget {
         const SizedBox(height: 16),
         Text(
           'RECENT SEARCHES',
-          style: GoogleFonts.inter(
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1.2,
-            color: AppColors.textMuted,
-          ),
+          style: AppTypography.sectionOverline,
         ),
         const SizedBox(height: 8),
         const RecentSearchRow(

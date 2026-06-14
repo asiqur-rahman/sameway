@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
+import 'package:sameway/core/theme/app_placeholders.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
@@ -28,7 +29,7 @@ class PickStartLocationScreen extends StatelessWidget {
           MobilePageHeader(
             title: 'Pick Start',
             subtitle: 'Where will you leave from?',
-            onBack: () => context.pop(),
+            backFallback: AppRoutes.postRideEmpty,
           ),
           Expanded(
             child: ListView(
@@ -39,11 +40,16 @@ class PickStartLocationScreen extends StatelessWidget {
                 24,
               ),
               children: [
-                const MapPlaceholder(height: 400, hint: 'Drag pin or search below'),
+                const MapPlaceholder(
+                  height: 400,
+                  hint: 'Drag pin or search below',
+                  interactive: true,
+                  showZoomControls: true,
+                ),
                 const SizedBox(height: 16),
                 SamewayTextField(
                   label: 'Search',
-                  hint: 'Search start location',
+                  hint: AppPlaceholders.searchStart,
                   icon: '🔍',
                   controller: _searchController,
                 ),

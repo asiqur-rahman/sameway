@@ -71,7 +71,7 @@ class SplashScreen extends StatelessWidget {
             const SizedBox(height: 69),
             SamewayPrimaryButton(
               label: 'Get Started',
-              onPressed: () => context.go(AppRoutes.signUp),
+              onPressed: () => context.push(AppRoutes.signUp),
             ),
             const SizedBox(height: 10),
             SamewaySecondaryButton(

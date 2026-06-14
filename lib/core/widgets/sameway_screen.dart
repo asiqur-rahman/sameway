@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sameway/core/theme/app_colors.dart';
-import 'package:sameway/core/widgets/sameway_status_bar.dart';
 
 class SamewayScreen extends StatelessWidget {
   const SamewayScreen({
@@ -19,17 +18,11 @@ class SamewayScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       bottomNavigationBar: bottomNavigationBar,
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SafeArea(bottom: false, child: SamewayStatusBar()),
-          Expanded(
-            child: Padding(
-              padding: padding ?? EdgeInsets.zero,
-              child: child,
-            ),
-          ),
-        ],
+      body: SafeArea(
+        child: Padding(
+          padding: padding ?? EdgeInsets.zero,
+          child: child,
+        ),
       ),
     );
   }

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
+import 'package:sameway/core/theme/app_elevation.dart';
+import 'package:sameway/core/theme/app_typography.dart';
 
 class SectionLabel extends StatelessWidget {
   const SectionLabel({
@@ -28,12 +31,7 @@ class SectionLabel extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           label,
-          style: GoogleFonts.inter(
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.8,
-            color: color,
-          ),
+          style: AppTypography.sectionAccent(color: color),
         ),
       ],
     );
@@ -52,7 +50,7 @@ class OrDivider extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 8),
           child: Text(
             'or',
-            style: GoogleFonts.inter(fontSize: 12, color: AppColors.textMuted),
+            style: AppTypography.routeMeta,
           ),
         ),
         const Expanded(child: Divider(height: 1)),
@@ -67,21 +65,22 @@ class ActiveRideCard extends StatelessWidget {
     required this.timeLabel,
     required this.routeLabel,
     this.status = 'Active',
+    this.onTapRoute,
   });
 
   final String timeLabel;
   final String routeLabel;
   final String status;
+  final String? onTapRoute;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onTap: onTapRoute != null ? () => context.push(onTapRoute!) : null,
+      child: Container(
       height: 83,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: SamewayDecorations.card(radius: 16),
       child: Row(
         children: [
           Container(
@@ -102,20 +101,12 @@ class ActiveRideCard extends StatelessWidget {
               children: [
                 Text(
                   timeLabel,
-                  style: GoogleFonts.inter(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                  ),
+                  style: AppTypography.cardTitle,
                 ),
                 const SizedBox(height: 2),
                 Text(
                   routeLabel,
-                  style: GoogleFonts.roboto(
-                    fontSize: 13,
-                    color: AppColors.textMuted,
-                    height: 15.23 / 13,
-                  ),
+                  style: AppTypography.cardSubtitle,
                 ),
               ],
             ),
@@ -128,14 +119,11 @@ class ActiveRideCard extends StatelessWidget {
             ),
             child: Text(
               status,
-              style: GoogleFonts.inter(
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-                color: AppColors.primary,
-              ),
+              style: AppTypography.badge(),
             ),
           ),
         ],
+      ),
       ),
     );
   }
@@ -148,13 +136,12 @@ class RecentSearchRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onTap: () => context.push(AppRoutes.searchResults),
+      child: Container(
       height: 45,
       padding: const EdgeInsets.symmetric(horizontal: 14),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: SamewayDecorations.card(radius: 16),
       child: Row(
         children: [
           const Text('🕐', style: TextStyle(fontSize: 16)),
@@ -162,20 +149,15 @@ class RecentSearchRow extends StatelessWidget {
           Expanded(
             child: Text(
               label,
-              style: GoogleFonts.roboto(
-                fontSize: 14,
-                color: AppColors.textPrimary,
-              ),
+              style: AppTypography.listRowTitle,
             ),
           ),
           Text(
             '↗',
-            style: GoogleFonts.roboto(
-              fontSize: 18,
-              color: AppColors.textMuted,
-            ),
+            style: AppTypography.cardSubtitle.copyWith(fontSize: 18),
           ),
         ],
+      ),
       ),
     );
   }
@@ -186,6 +168,39 @@ class PreferenceChip extends StatelessWidget {
     super.key,
     required this.label,
     this.selected = false,
+    this.useRoboto = false,
+  });
+
+  final String label;
+  final bool selected;
+  final bool useRoboto;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 21,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: selected ? AppColors.primaryDark : AppColors.surfaceMuted,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        label,
+        style: AppTypography.preferenceChipCompact(
+          selected: selected,
+          roboto: useRoboto,
+        ),
+      ),
+    );
+  }
+}
+
+class FilterSegmentChip extends StatelessWidget {
+  const FilterSegmentChip({
+    super.key,
+    required this.label,
+    required this.selected,
   });
 
   final String label;
@@ -194,20 +209,51 @@ class PreferenceChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 21,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      height: 37,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
         color: selected ? AppColors.primaryDark : AppColors.surfaceMuted,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(12),
       ),
       alignment: Alignment.center,
       child: Text(
         label,
-        style: GoogleFonts.inter(
-          fontSize: 11,
-          fontWeight: FontWeight.w500,
-          color: selected ? Colors.white : AppColors.textSecondary,
+        textAlign: TextAlign.center,
+        style: AppTypography.filterSegmentChip(selected: selected),
+      ),
+    );
+  }
+}
+
+class GenderFilterChip extends StatelessWidget {
+  const GenderFilterChip({
+    super.key,
+    required this.label,
+    required this.selected,
+  });
+
+  final String label;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 36,
+      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 10),
+      decoration: BoxDecoration(
+        color: selected
+            ? AppColors.primary.withValues(alpha: 0.07)
+            : AppColors.surfaceMuted,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: selected ? AppColors.primary : Colors.transparent,
         ),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        label,
+        textAlign: TextAlign.center,
+        style: AppTypography.genderFilterChip(selected: selected),
       ),
     );
   }
@@ -263,18 +309,12 @@ class RouteTimeline extends StatelessWidget {
               children: [
                 Text(
                   route,
-                  style: GoogleFonts.roboto(
-                    fontSize: 15,
-                    color: AppColors.textPrimary,
-                  ),
+                  style: AppTypography.routeTitle,
                 ),
                 const SizedBox(height: 2),
                 Text(
                   schedule,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: AppColors.textMuted,
-                  ),
+                  style: AppTypography.routeMeta,
                 ),
                 const SizedBox(height: 10),
                 const Wrap(
@@ -311,11 +351,11 @@ class _TagChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.border),
       ),
       child: Text(
         label,
-        style: GoogleFonts.roboto(
-          fontSize: 12,
+        style: AppTypography.chipLabel(
           color: accent ? AppColors.primary : AppColors.textSecondary,
         ),
       ),

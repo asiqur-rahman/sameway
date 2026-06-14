@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:sameway/core/theme/app_colors.dart';
+import 'package:sameway/core/theme/app_typography.dart';
 
 class SamewayPrimaryButton extends StatelessWidget {
   const SamewayPrimaryButton({
@@ -13,6 +13,7 @@ class SamewayPrimaryButton extends StatelessWidget {
     this.borderRadius = 16,
     this.fontSize = 17,
     this.fontWeight = FontWeight.w700,
+    this.textStyle,
   });
 
   final String label;
@@ -23,6 +24,7 @@ class SamewayPrimaryButton extends StatelessWidget {
   final double borderRadius;
   final double fontSize;
   final FontWeight fontWeight;
+  final TextStyle? textStyle;
 
   @override
   Widget build(BuildContext context) {
@@ -35,15 +37,16 @@ class SamewayPrimaryButton extends StatelessWidget {
           backgroundColor: backgroundColor,
           foregroundColor: foregroundColor,
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(borderRadius)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(borderRadius),
+          ),
         ),
         child: Text(
           label,
-          style: GoogleFonts.inter(
+          style: (textStyle ?? AppTypography.buttonLarge.copyWith(
             fontSize: fontSize,
             fontWeight: fontWeight,
-            letterSpacing: -0.3,
-          ),
+          )).copyWith(color: foregroundColor),
         ),
       ),
     );
@@ -70,8 +73,7 @@ class SamewayDarkButton extends StatelessWidget {
       backgroundColor: AppColors.primaryDark,
       height: height,
       borderRadius: 14,
-      fontSize: 16,
-      fontWeight: FontWeight.w400,
+      textStyle: AppTypography.buttonPrimary,
     );
   }
 }

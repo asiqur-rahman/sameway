@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import 'package:sameway/core/theme/app_colors.dart';
+import 'package:sameway/core/theme/app_placeholders.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_text_field.dart';
@@ -10,15 +10,13 @@ import 'package:sameway/core/widgets/web_scaffold.dart';
 class WebFindRideScreen extends StatelessWidget {
   WebFindRideScreen({super.key});
 
-  final _fromController = TextEditingController(text: 'Uttara Sector 4, Dhaka');
-  final _toController = TextEditingController(text: 'Motijheel, Dhaka');
+  final _fromController = TextEditingController();
+  final _toController = TextEditingController();
   final _dateController = TextEditingController();
-  final _timeController = TextEditingController(text: '9:30 AM');
+  final _timeController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    _dateController.text = 'Today, ${DateFormat('MMM d').format(DateTime.now())}';
-
     return WebScaffold(
       activeNav: 'Find a Ride',
       child: Padding(
@@ -48,6 +46,7 @@ class WebFindRideScreen extends StatelessWidget {
                     child: SamewayTextField(
                       label: 'From',
                       icon: '📍',
+                      hint: AppPlaceholders.from,
                       controller: _fromController,
                     ),
                   ),
@@ -56,6 +55,7 @@ class WebFindRideScreen extends StatelessWidget {
                     child: SamewayTextField(
                       label: 'To',
                       icon: '🏢',
+                      hint: AppPlaceholders.to,
                       controller: _toController,
                     ),
                   ),
@@ -63,6 +63,7 @@ class WebFindRideScreen extends StatelessWidget {
                   Expanded(
                     child: SamewayTextField(
                       label: 'Date',
+                      hint: AppPlaceholders.date,
                       controller: _dateController,
                     ),
                   ),
@@ -70,6 +71,7 @@ class WebFindRideScreen extends StatelessWidget {
                   Expanded(
                     child: SamewayTextField(
                       label: 'Arrive by',
+                      hint: AppPlaceholders.arriveBy,
                       controller: _timeController,
                     ),
                   ),

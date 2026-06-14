@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sameway/core/routes/app_routes.dart';
+import 'package:sameway/core/theme/app_placeholders.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
@@ -12,9 +13,9 @@ import 'package:sameway/core/widgets/sameway_text_field.dart';
 class SignUpScreen extends StatelessWidget {
   SignUpScreen({super.key});
 
-  final _nameController = TextEditingController(text: 'Rafiq Ahmed');
-  final _emailController = TextEditingController(text: 'rafiq@grameenphone.com');
-  final _phoneController = TextEditingController(text: '+880 17XX XXXXXX');
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
 
   @override
@@ -51,12 +52,14 @@ class SignUpScreen extends StatelessWidget {
             SamewayTextField(
               label: 'Full Name',
               icon: '👤',
+              hint: AppPlaceholders.fullName,
               controller: _nameController,
             ),
             const SizedBox(height: 4),
             SamewayTextField(
               label: 'Work Email',
               icon: '✉️',
+              hint: AppPlaceholders.workEmail,
               controller: _emailController,
               helper: 'We verify your company email domain automatically',
             ),
@@ -64,6 +67,7 @@ class SignUpScreen extends StatelessWidget {
             SamewayTextField(
               label: 'Phone Number',
               icon: '📱',
+              hint: AppPlaceholders.phone,
               controller: _phoneController,
               keyboardType: TextInputType.phone,
             ),
@@ -71,7 +75,7 @@ class SignUpScreen extends StatelessWidget {
             SamewayTextField(
               label: 'Password',
               icon: '🔒',
-              hint: 'Create a strong password',
+              hint: AppPlaceholders.passwordCreate,
               controller: _passwordController,
               obscureText: true,
             ),
@@ -103,7 +107,7 @@ class SignUpScreen extends StatelessWidget {
             const SizedBox(height: 24),
               SamewayDarkButton(
                 label: 'Create Account',
-                onPressed: () => context.go(AppRoutes.profileSetup),
+                onPressed: () => context.push(AppRoutes.profileSetup),
               ),
             const SizedBox(height: 16),
             Row(

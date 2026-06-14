@@ -19,7 +19,7 @@ class PostRideEmptyScreen extends StatelessWidget {
           MobilePageHeader(
             title: 'Post a Ride',
             subtitle: 'Set your route first',
-            onBack: () => context.pop(),
+            backFallback: AppRoutes.home,
           ),
           Expanded(
             child: ListView(

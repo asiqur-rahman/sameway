@@ -41,6 +41,7 @@ abstract final class AppRoutes {
   // Ride day
   static const reminderSettings = '/reminders';
   static const departureIn = '/ride-day/departure';
+  static const tapToNotify = '/ride-day/tap-to-notify';
   static const afterHeadingOut = '/ride-day/heading-out';
   static const pickupIn = '/ride-day/pickup';
   static const letDriverKnow = '/ride-day/let-driver-know';

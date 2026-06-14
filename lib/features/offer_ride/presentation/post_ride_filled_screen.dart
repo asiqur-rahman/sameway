@@ -18,7 +18,7 @@ class PostRideFilledScreen extends StatelessWidget {
           MobilePageHeader(
             title: 'Post a Ride',
             subtitle: 'Almost ready to publish',
-            onBack: () => context.pop(),
+            backFallback: AppRoutes.routeConfirmed,
           ),
           Expanded(
             child: ListView(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:sameway/core/theme/app_colors.dart';
+import 'package:sameway/core/theme/app_elevation.dart';
+import 'package:sameway/core/theme/app_typography.dart';
 
 class SamewayTextField extends StatelessWidget {
   const SamewayTextField({
@@ -12,6 +12,8 @@ class SamewayTextField extends StatelessWidget {
     this.controller,
     this.obscureText = false,
     this.keyboardType,
+    this.readOnly = false,
+    this.onTap,
   });
 
   final String label;
@@ -21,32 +23,26 @@ class SamewayTextField extends StatelessWidget {
   final TextEditingController? controller;
   final bool obscureText;
   final TextInputType? keyboardType;
+  final bool readOnly;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: GoogleFonts.inter(
-            fontSize: 12,
-            color: AppColors.textSecondary,
-            letterSpacing: 0.1,
-          ),
-        ),
+        Text(label, style: AppTypography.fieldLabel),
         const SizedBox(height: 5),
         Container(
           height: 47,
-          decoration: BoxDecoration(
-            color: AppColors.surfaceMuted,
-            borderRadius: BorderRadius.circular(12),
-          ),
+          decoration: SamewayDecorations.insetField(radius: 12),
           padding: const EdgeInsets.symmetric(horizontal: 14),
+          alignment: Alignment.centerLeft,
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               if (icon != null) ...[
-                Text(icon!, style: const TextStyle(fontSize: 16)),
+                Text(icon!, style: const TextStyle(fontSize: 16, height: 1)),
                 const SizedBox(width: 10),
               ],
               Expanded(
@@ -54,19 +50,20 @@ class SamewayTextField extends StatelessWidget {
                   controller: controller,
                   obscureText: obscureText,
                   keyboardType: keyboardType,
-                  style: GoogleFonts.inter(
-                    fontSize: 15,
-                    color: AppColors.textPrimary,
-                  ),
+                  readOnly: readOnly,
+                  onTap: onTap,
+                  textAlignVertical: TextAlignVertical.center,
+                  style: AppTypography.fieldValue.copyWith(height: 1.2),
                   decoration: InputDecoration(
                     hintText: hint,
+                    hintMaxLines: 1,
                     border: InputBorder.none,
-                    isDense: true,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    disabledBorder: InputBorder.none,
+                    isCollapsed: true,
                     contentPadding: EdgeInsets.zero,
-                    hintStyle: GoogleFonts.inter(
-                      fontSize: 15,
-                      color: AppColors.textMuted,
-                    ),
+                    hintStyle: AppTypography.fieldHint.copyWith(height: 1.2),
                   ),
                 ),
               ),
@@ -75,13 +72,7 @@ class SamewayTextField extends StatelessWidget {
         ),
         if (helper != null) ...[
           const SizedBox(height: 5),
-          Text(
-            helper!,
-            style: GoogleFonts.inter(
-              fontSize: 11,
-              color: AppColors.textMuted,
-            ),
-          ),
+          Text(helper!, style: AppTypography.caption),
         ],
       ],
     );

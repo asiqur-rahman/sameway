@@ -32,6 +32,15 @@ class ChatBubble extends StatelessWidget {
             bottomRight: Radius.circular(isMine ? 4 : 16),
           ),
           border: isMine ? null : Border.all(color: AppColors.border),
+          boxShadow: isMine
+              ? [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,13 +72,36 @@ class ChatBubble extends StatelessWidget {
   }
 }
 
-class ChatInputBar extends StatelessWidget {
+class ChatInputBar extends StatefulWidget {
   const ChatInputBar({super.key, this.onSend});
 
-  final VoidCallback? onSend;
+  final ValueChanged<String>? onSend;
+
+  @override
+  State<ChatInputBar> createState() => _ChatInputBarState();
+}
+
+class _ChatInputBarState extends State<ChatInputBar> {
+  final _controller = TextEditingController();
+
+  void _submit() {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+    widget.onSend?.call(text);
+    _controller.clear();
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final canSend = _controller.text.trim().isNotEmpty;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
       decoration: const BoxDecoration(
@@ -79,34 +111,43 @@ class ChatInputBar extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Container(
-              height: 44,
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceMuted,
-                borderRadius: BorderRadius.circular(22),
-              ),
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Type a message…',
-                style: GoogleFonts.inter(
+            child: TextField(
+              controller: _controller,
+              onChanged: (_) => setState(() {}),
+              onSubmitted: (_) => _submit(),
+              style: GoogleFonts.inter(fontSize: 15, color: AppColors.textPrimary),
+              decoration: InputDecoration(
+                hintText: 'Type a message…',
+                hintStyle: GoogleFonts.inter(
                   fontSize: 15,
                   color: AppColors.textMuted,
+                ),
+                filled: true,
+                fillColor: AppColors.surfaceMuted,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(22),
+                  borderSide: BorderSide.none,
                 ),
               ),
             ),
           ),
           const SizedBox(width: 10),
           GestureDetector(
-            onTap: onSend,
-            child: Container(
+            onTap: canSend ? _submit : null,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
               width: 44,
               height: 44,
-              decoration: const BoxDecoration(
-                color: AppColors.primary,
+              decoration: BoxDecoration(
+                color: canSend ? AppColors.primary : AppColors.border,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+              child: Icon(
+                Icons.send_rounded,
+                color: canSend ? Colors.white : AppColors.textMuted,
+                size: 20,
+              ),
             ),
           ),
         ],
@@ -153,21 +194,29 @@ class ChatListTile extends StatelessWidget {
         name,
         style: GoogleFonts.inter(
           fontSize: 15,
-          fontWeight: FontWeight.w600,
+          fontWeight: unread ? FontWeight.w700 : FontWeight.w600,
         ),
       ),
       subtitle: Text(
         preview,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: GoogleFonts.inter(fontSize: 13, color: AppColors.textMuted),
+        style: GoogleFonts.inter(
+          fontSize: 13,
+          color: unread ? AppColors.textSecondary : AppColors.textMuted,
+          fontWeight: unread ? FontWeight.w500 : FontWeight.w400,
+        ),
       ),
       trailing: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             time,
-            style: GoogleFonts.inter(fontSize: 11, color: AppColors.textMuted),
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              color: unread ? AppColors.primary : AppColors.textMuted,
+              fontWeight: unread ? FontWeight.w600 : FontWeight.w400,
+            ),
           ),
           if (unread)
             Container(

@@ -19,7 +19,7 @@ class RouteConfirmedScreen extends StatelessWidget {
           MobilePageHeader(
             title: 'Route Confirmed',
             subtitle: 'Review before posting',
-            onBack: () => context.pop(),
+            backFallback: AppRoutes.addStop,
           ),
           Expanded(
             child: ListView(

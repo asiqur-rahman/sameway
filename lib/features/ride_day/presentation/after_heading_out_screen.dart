@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sameway/core/theme/app_colors.dart';
+import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
+import 'package:sameway/core/widgets/sameway_ui_kit.dart';
 
 class AfterHeadingOutScreen extends StatelessWidget {
   const AfterHeadingOutScreen({super.key});
@@ -12,13 +14,18 @@ class AfterHeadingOutScreen extends StatelessWidget {
     return SamewayScreen(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.screenHorizontal,
-        24,
+        8,
         AppSpacing.screenHorizontal,
         24,
       ),
       child: Column(
         children: [
-          const SizedBox(height: 24),
+          MobilePageHeader(
+            title: 'After Heading Out',
+            subtitle: 'RIDE DAY · DRIVER',
+            backFallback: AppRoutes.tapToNotify,
+          ),
+          const SizedBox(height: 16),
           Container(
             width: 80,
             height: 80,

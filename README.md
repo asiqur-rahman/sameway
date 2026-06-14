@@ -7,6 +7,8 @@ Community carpool app for verified office commuters in Bangladesh.
 ```bash
 flutter pub get
 flutter run
+flutter run -d 192.168.31.68:42805
+flutter run -d chrome --web-port=7357
 ```
 
 **QA navigation:** Open `/catalog` in the app (Screen Catalog) to jump to any screen.

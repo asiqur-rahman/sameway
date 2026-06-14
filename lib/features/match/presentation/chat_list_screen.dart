@@ -14,7 +14,7 @@ class ChatListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SamewayScreen(
-      bottomNavigationBar: const SamewayBottomNav(currentIndex: 2),
+      bottomNavigationBar: const SamewayBottomNav(currentIndex: 2, chatUnread: true),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -42,21 +42,21 @@ class ChatListScreen extends StatelessWidget {
                   preview: 'I\'ll be at the pickup point at 8:25',
                   time: '9:12 AM',
                   unread: true,
-                  onTap: () => context.go(AppRoutes.chatConversation),
+                  onTap: () => context.push(AppRoutes.chatConversation),
                 ),
                 const Divider(height: 1, color: AppColors.border),
                 ChatListTile(
                   name: 'Sadia Khan',
                   preview: 'Thanks for the ride yesterday!',
                   time: 'Yesterday',
-                  onTap: () => context.go(AppRoutes.chatConversation),
+                  onTap: () => context.push(AppRoutes.chatConversation),
                 ),
                 const Divider(height: 1, color: AppColors.border),
                 ChatListTile(
                   name: 'Tanvir Hossain',
                   preview: 'Can we split the toll cost?',
                   time: 'Mon',
-                  onTap: () => context.go(AppRoutes.chatConversation),
+                  onTap: () => context.push(AppRoutes.chatConversation),
                 ),
               ],
             ),

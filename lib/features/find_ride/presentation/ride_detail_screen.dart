@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
+import 'package:sameway/core/theme/app_elevation.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
@@ -24,7 +25,7 @@ class RideDetailScreen extends StatelessWidget {
         children: [
           MobilePageHeader(
             title: 'Ride Detail',
-            onBack: () => context.pop(),
+            backFallback: AppRoutes.searchResults,
           ),
           Expanded(
             child: ListView(
@@ -36,7 +37,7 @@ class RideDetailScreen extends StatelessWidget {
               ),
               children: [
                 const MapPlaceholder(
-                  height: 180,
+                  height: 200,
                   showRoute: true,
                   startLabel: 'Uttara',
                   endLabel: 'Motijheel',
@@ -91,10 +92,7 @@ class _DriverHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-      ),
+      decoration: SamewayDecorations.card(),
       child: Row(
         children: [
           Container(
@@ -190,10 +188,7 @@ class _ReviewTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceMuted,
-        borderRadius: BorderRadius.circular(AppRadius.md),
-      ),
+      decoration: SamewayDecorations.mutedInset(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
