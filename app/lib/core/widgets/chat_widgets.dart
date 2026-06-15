@@ -73,9 +73,16 @@ class ChatBubble extends StatelessWidget {
 }
 
 class ChatInputBar extends StatefulWidget {
-  const ChatInputBar({super.key, this.onSend});
+  const ChatInputBar({
+    super.key,
+    this.onSend,
+    this.onSendAsync,
+    this.isSending = false,
+  });
 
   final ValueChanged<String>? onSend;
+  final Future<void> Function(String)? onSendAsync;
+  final bool isSending;
 
   @override
   State<ChatInputBar> createState() => _ChatInputBarState();
@@ -84,12 +91,16 @@ class ChatInputBar extends StatefulWidget {
 class _ChatInputBarState extends State<ChatInputBar> {
   final _controller = TextEditingController();
 
-  void _submit() {
+  Future<void> _submit() async {
     final text = _controller.text.trim();
-    if (text.isEmpty) return;
-    widget.onSend?.call(text);
+    if (text.isEmpty || widget.isSending) return;
+    if (widget.onSendAsync != null) {
+      await widget.onSendAsync!(text);
+    } else {
+      widget.onSend?.call(text);
+    }
     _controller.clear();
-    setState(() {});
+    if (mounted) setState(() {});
   }
 
   @override
@@ -100,7 +111,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
 
   @override
   Widget build(BuildContext context) {
-    final canSend = _controller.text.trim().isNotEmpty;
+    final canSend = _controller.text.trim().isNotEmpty && !widget.isSending;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
@@ -134,7 +145,7 @@ class _ChatInputBarState extends State<ChatInputBar> {
           ),
           const SizedBox(width: 10),
           GestureDetector(
-            onTap: canSend ? _submit : null,
+            onTap: canSend ? () => _submit() : null,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 150),
               width: 44,
@@ -143,11 +154,19 @@ class _ChatInputBarState extends State<ChatInputBar> {
                 color: canSend ? AppColors.primary : AppColors.border,
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                Icons.send_rounded,
-                color: canSend ? Colors.white : AppColors.textMuted,
-                size: 20,
-              ),
+              child: widget.isSending
+                  ? const Padding(
+                      padding: EdgeInsets.all(11),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Icon(
+                      Icons.send_rounded,
+                      color: canSend ? Colors.white : AppColors.textMuted,
+                      size: 20,
+                    ),
             ),
           ),
         ],

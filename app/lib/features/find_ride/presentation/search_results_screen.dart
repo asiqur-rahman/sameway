@@ -6,6 +6,7 @@ import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/widgets/sameway_bottom_nav.dart';
+import 'package:sameway/core/widgets/sameway_loading.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_ui_kit.dart';
 import 'package:sameway/features/find_ride/find_ride_flow.dart';
@@ -23,6 +24,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
   String _vehicleFilter = 'All';
   List<FindRideListing> _listings = [];
   bool _loading = true;
+  bool _refreshing = false;
   String? _error;
 
   List<FindRideListing> get _filtered {
@@ -42,9 +44,13 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
     _loadResults();
   }
 
-  Future<void> _loadResults() async {
+  Future<void> _loadResults({bool refresh = false}) async {
     setState(() {
-      _loading = true;
+      if (refresh) {
+        _refreshing = true;
+      } else {
+        _loading = true;
+      }
       _error = null;
     });
     final flow = FindRideFlow.instance;
@@ -82,13 +88,15 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
       setState(() {
         _listings = results;
         _loading = false;
+        _refreshing = false;
       });
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = e.toString();
+        _error = 'Could not search rides. Pull down to retry.';
         _listings = sampleFindRideListings;
         _loading = false;
+        _refreshing = false;
       });
     }
   }
@@ -97,7 +105,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
   Widget build(BuildContext context) {
     final flow = FindRideFlow.instance;
     final results = _filtered;
-    final countLabel = _loading
+    final countLabel = _loading && !_refreshing
         ? 'Searching…'
         : '${results.length} Ride${results.length == 1 ? '' : 's'} Found';
 
@@ -130,60 +138,107 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
               ),
             ),
           ),
-          if (_error != null)
+          if (_error != null && !_loading)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
               child: Text(
-                'Using demo results — $_error',
+                _error!,
                 style: GoogleFonts.inter(fontSize: 12, color: AppColors.textMuted),
               ),
             ),
           Expanded(
-            child: _loading
-                ? const Center(child: CircularProgressIndicator())
-                : ListView(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.screenHorizontal,
-                      12,
-                      AppSpacing.screenHorizontal,
-                      88,
-                    ),
-                    children: [
-                      const FindResultsMapStrip(),
-                      const SizedBox(height: 12),
-                      FindSortFilterRow(
-                        vehicleFilter: _vehicleFilter,
-                        onFilterChanged: (f) => setState(() {
-                          _vehicleFilter = f;
-                          FindRideFlow.instance.vehicleFilter = f;
-                        }),
+            child: RefreshIndicator(
+              color: AppColors.primary,
+              onRefresh: () => _loadResults(refresh: true),
+              child: _loading && !_refreshing
+                  ? ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.screenHorizontal,
+                        12,
+                        AppSpacing.screenHorizontal,
+                        88,
                       ),
-                      const SizedBox(height: 12),
-                      if (results.isEmpty)
-                        Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Text(
-                            'No rides match your route yet. Try adjusting filters.',
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.inter(fontSize: 14, color: AppColors.textMuted),
-                          ),
+                      children: const [
+                        FindResultsMapStrip(),
+                        SizedBox(height: 12),
+                        RideListingSkeleton(),
+                        SizedBox(height: 12),
+                        RideListingSkeleton(),
+                        SizedBox(height: 12),
+                        RideListingSkeleton(),
+                      ],
+                    )
+                  : ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.screenHorizontal,
+                        12,
+                        AppSpacing.screenHorizontal,
+                        88,
+                      ),
+                      children: [
+                        const FindResultsMapStrip(),
+                        const SizedBox(height: 12),
+                        FindSortFilterRow(
+                          vehicleFilter: _vehicleFilter,
+                          onFilterChanged: (f) => setState(() {
+                            _vehicleFilter = f;
+                            FindRideFlow.instance.vehicleFilter = f;
+                          }),
                         ),
-                      for (final listing in results)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: FindRideResultCard(
-                            listing: listing,
-                            onTap: () {
-                              FindRideFlow.instance.selectedRide = listing;
-                              context.push(AppRoutes.rideDetail);
-                            },
+                        const SizedBox(height: 12),
+                        if (results.isEmpty)
+                          const Padding(
+                            padding: EdgeInsets.all(24),
+                            child: EmptyStateInline(
+                              icon: '🚗',
+                              message: 'No rides match your route yet. Try adjusting filters.',
+                            ),
                           ),
-                        ),
-                    ],
-                  ),
+                        for (final listing in results)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: FindRideResultCard(
+                              listing: listing,
+                              onTap: () {
+                                FindRideFlow.instance.selectedRide = listing;
+                                context.push(AppRoutes.rideDetail);
+                              },
+                            ),
+                          ),
+                      ],
+                    ),
+            ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class EmptyStateInline extends StatelessWidget {
+  const EmptyStateInline({
+    super.key,
+    required this.icon,
+    required this.message,
+  });
+
+  final String icon;
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(icon, style: const TextStyle(fontSize: 32)),
+        const SizedBox(height: 8),
+        Text(
+          message,
+          textAlign: TextAlign.center,
+          style: GoogleFonts.inter(fontSize: 14, color: AppColors.textMuted),
+        ),
+      ],
     );
   }
 }

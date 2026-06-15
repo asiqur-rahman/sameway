@@ -17,9 +17,12 @@ class AppSession extends ChangeNotifier {
   static final AppSession instance = AppSession._();
 
   bool _ready = false;
-  UserProfile? _currentUser;
+  bool _isAuthenticating = false;
 
   bool get isReady => _ready;
+  bool get isAuthenticating => _isAuthenticating;
+  UserProfile? _currentUser;
+
   bool get isLoggedIn => _currentUser != null;
   UserProfile? get currentUser => _currentUser;
 
@@ -71,6 +74,8 @@ class AppSession extends ChangeNotifier {
     if (emailErr != null) return emailErr;
 
     try {
+      _isAuthenticating = true;
+      notifyListeners();
       _currentUser = await AuthRepository.instance.signup(
         fullName: fullName,
         workEmail: email,
@@ -85,6 +90,9 @@ class AppSession extends ChangeNotifier {
       return e.message;
     } catch (e) {
       return 'Could not create account. Is the backend running?';
+    } finally {
+      _isAuthenticating = false;
+      notifyListeners();
     }
   }
 
@@ -93,6 +101,8 @@ class AppSession extends ChangeNotifier {
     required String password,
   }) async {
     try {
+      _isAuthenticating = true;
+      notifyListeners();
       _currentUser = await AuthRepository.instance.signin(
         workEmail: workEmail,
         password: password,
@@ -105,12 +115,16 @@ class AppSession extends ChangeNotifier {
       return e.message;
     } catch (_) {
       return 'Could not sign in. Is the backend running?';
+    } finally {
+      _isAuthenticating = false;
+      notifyListeners();
     }
   }
 
   Future<void> signOut() async {
     await AuthRepository.instance.signOut();
     _currentUser = null;
+    AppDataStore.instance.clearOnSignOut();
     OnboardingState.instance.reset();
     notifyListeners();
   }

@@ -5,6 +5,7 @@ import 'package:sameway/core/session/app_data_store.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/widgets/chat_widgets.dart';
+import 'package:sameway/core/widgets/sameway_loading.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -21,9 +22,9 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      AppDataStore.instance.loadConversation(widget.threadId);
-      AppDataStore.instance.markChatRead(widget.threadId);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await AppDataStore.instance.loadConversation(widget.threadId);
+      await AppDataStore.instance.markChatRead(widget.threadId);
     });
   }
 
@@ -32,8 +33,11 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
     return ListenableBuilder(
       listenable: AppDataStore.instance,
       builder: (context, _) {
-        final thread = AppDataStore.instance.threadById(widget.threadId);
-        if (thread == null) {
+        final store = AppDataStore.instance;
+        final thread = store.threadById(widget.threadId);
+        final loadingMessages = store.isLoadingConversationFor(widget.threadId);
+
+        if (thread == null && !loadingMessages) {
           return SamewayScreen(
             child: Center(
               child: Text(
@@ -44,8 +48,9 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
           );
         }
 
-        final initial = thread.peerName.isNotEmpty
-            ? thread.peerName.characters.first.toUpperCase()
+        final peerName = thread?.peerName ?? '…';
+        final initial = peerName.isNotEmpty
+            ? peerName.characters.first.toUpperCase()
             : '?';
 
         return SamewayScreen(
@@ -99,7 +104,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                thread.peerName,
+                                peerName,
                                 style: GoogleFonts.inter(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
@@ -117,50 +122,56 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceMuted,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        children: [
-                          const Text('🚗', style: TextStyle(fontSize: 14)),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              thread.rideContext,
-                              style: GoogleFonts.inter(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.textSecondary,
+                    if (thread != null) ...[
+                      const SizedBox(height: 10),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceMuted,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          children: [
+                            const Text('🚗', style: TextStyle(fontSize: 14)),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                thread.rideContext,
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.textSecondary,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
               ),
               Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.all(AppSpacing.screenHorizontal),
-                  children: [
-                    for (final message in thread.messages)
-                      ChatBubble(
-                        message: message.text,
-                        isMine: message.isMine,
-                        time: message.timeLabel,
+                child: loadingMessages
+                    ? const Center(child: SamewayLoader())
+                    : ListView(
+                        padding: const EdgeInsets.all(AppSpacing.screenHorizontal),
+                        children: [
+                          if (thread != null)
+                            for (final message in thread.messages)
+                              ChatBubble(
+                                message: message.text,
+                                isMine: message.isMine,
+                                time: message.timeLabel,
+                              ),
+                        ],
                       ),
-                  ],
-                ),
               ),
               ChatInputBar(
-                onSend: (text) =>
-                    AppDataStore.instance.sendChatMessage(widget.threadId, text),
+                isSending: store.isSendingMessage,
+                onSendAsync: (text) =>
+                    store.sendChatMessage(widget.threadId, text),
               ),
             ],
           ),

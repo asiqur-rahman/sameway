@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sameway/core/maps/map_config.dart';
+import 'package:sameway/core/maps/map_route_resolver.dart';
+import 'package:sameway/core/maps/sameway_map_view.dart';
 import 'package:sameway/core/models/map_location.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
@@ -46,6 +49,23 @@ class _PickOfficeMapScreenState extends State<PickOfficeMapScreen> {
       _selected = location;
       _searchController.text = location.address;
     });
+    AppDataStore.instance.updatePostRideDraft((d) {
+      d.startLat = location.lat;
+      d.startLng = location.lng;
+      d.startAddress = location.address;
+    });
+  }
+
+  void _onMapPicked(MapLocation location) {
+    setState(() {
+      _selected = location.address;
+      _searchController.text = location.address;
+    });
+    AppDataStore.instance.updatePostRideDraft((d) {
+      d.startLat = location.lat;
+      d.startLng = location.lng;
+      d.startAddress = location.address;
+    });
   }
 
   void _confirm() {
@@ -86,14 +106,22 @@ class _PickOfficeMapScreenState extends State<PickOfficeMapScreen> {
                       'Office address must be pinned on the map. Typing alone is not enough — drag the pin or pick a location below.',
                 ),
                 const SizedBox(height: 16),
+                const MapKeyBanner(),
                 MapPlaceholder(
                   height: 320,
                   postRideShell: true,
                   hint: _selected == null
-                      ? 'Tap a suggested office or search below'
+                      ? 'Drag the map to place your office pin'
                       : 'Office pin placed',
-                  interactive: true,
-                  showZoomControls: true,
+                  pickerMode: true,
+                  pickerInitial: _selected,
+                  showMyLocation: true,
+                  onMapPicked: (location) {
+                    setState(() {
+                      _selected = location;
+                      _searchController.text = location.address;
+                    });
+                  },
                 ),
                 if (_selected != null) ...[
                   const SizedBox(height: 12),

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sameway/core/maps/map_config.dart';
+import 'package:sameway/core/maps/map_route_resolver.dart';
+import 'package:sameway/core/maps/sameway_map_view.dart';
+import 'package:sameway/core/models/map_location.dart';
 import 'package:sameway/core/navigation/sameway_navigation.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_elevation.dart';
@@ -69,6 +73,95 @@ class MapPlaceholder extends StatelessWidget {
     this.interactive = false,
     this.showZoomControls = false,
     this.postRideShell = false,
+    this.distanceLabel,
+    this.mapStart,
+    this.mapEnd,
+    this.liveMarkers = false,
+    this.pickerMode = false,
+    this.onMapPicked,
+    this.pickerInitial,
+    this.showMyLocation = false,
+  });
+
+  final double height;
+  final String hint;
+  final bool showRoute;
+  final String? startLabel;
+  final String? endLabel;
+  final bool interactive;
+  final bool showZoomControls;
+  final bool postRideShell;
+  final String? distanceLabel;
+  final MapLocation? mapStart;
+  final MapLocation? mapEnd;
+  final bool liveMarkers;
+  final bool pickerMode;
+  final ValueChanged<MapLocation>? onMapPicked;
+  final MapLocation? pickerInitial;
+  final bool showMyLocation;
+
+  @override
+  Widget build(BuildContext context) {
+    if (MapConfig.useNativeMaps &&
+        (showRoute || interactive || pickerMode || mapStart != null)) {
+      final resolverStart = MapRouteResolver.searchStart;
+      final resolverEnd = MapRouteResolver.searchEnd;
+      final start = mapStart ??
+          (showRoute
+              ? MapLocation(
+                  address: startLabel ?? resolverStart.address,
+                  lat: resolverStart.lat,
+                  lng: resolverStart.lng,
+                )
+              : null);
+      final end = mapEnd ??
+          (showRoute
+              ? MapLocation(
+                  address: endLabel ?? resolverEnd.address,
+                  lat: resolverEnd.lat,
+                  lng: resolverEnd.lng,
+                )
+              : null);
+
+      return SamewayMapView(
+        height: height,
+        start: start,
+        end: end,
+        initialCenter: pickerInitial ?? (pickerMode ? start : null),
+        pickerMode: pickerMode || interactive,
+        liveMarkers: liveMarkers || (showRoute && !pickerMode && !interactive),
+        showMyLocation: showMyLocation || interactive,
+        hint: hint,
+        borderRadius: postRideShell ? AppRadius.xl : AppRadius.md,
+        onPickerChanged: onMapPicked,
+        pickerAddress: pickerInitial?.address,
+      );
+    }
+
+    return _LegacyMapPlaceholder(
+      height: height,
+      hint: hint,
+      showRoute: showRoute,
+      startLabel: startLabel,
+      endLabel: endLabel,
+      interactive: interactive,
+      showZoomControls: showZoomControls,
+      postRideShell: postRideShell,
+      distanceLabel: distanceLabel,
+    );
+  }
+}
+
+class _LegacyMapPlaceholder extends StatelessWidget {
+  const _LegacyMapPlaceholder({
+    required this.height,
+    required this.hint,
+    required this.showRoute,
+    this.startLabel,
+    this.endLabel,
+    required this.interactive,
+    required this.showZoomControls,
+    required this.postRideShell,
     this.distanceLabel,
   });
 

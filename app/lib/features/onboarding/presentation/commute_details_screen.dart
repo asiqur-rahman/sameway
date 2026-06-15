@@ -33,6 +33,7 @@ class _CommuteDetailsScreenState extends State<CommuteDetailsScreen> {
   String _walkingPace = 'Normal';
   TimeOfDay? _leaveBy;
   TimeOfDay? _arriveBy;
+  bool _saving = false;
 
   @override
   void initState() {
@@ -51,26 +52,36 @@ class _CommuteDetailsScreenState extends State<CommuteDetailsScreen> {
     }
   }
 
-  void _continue() async {
+  Future<void> _continue() async {
     if (_mode == CommuteType.drive) {
       final form = _vehicleFormKey.currentState;
       if (form == null || !form.validate(context)) return;
       final vehicle = form.collectVehicle();
-      await AppSession.instance.updateCurrent((user) {
-        user.commuteType = _mode;
-        user.vehicle = vehicle;
-        user.phase = OnboardingPhase.commuteDone;
-      });
-      await AppSession.instance.syncVehicle(vehicle);
+      setState(() => _saving = true);
+      try {
+        await AppSession.instance.updateCurrent((user) {
+          user.commuteType = _mode;
+          user.vehicle = vehicle;
+          user.phase = OnboardingPhase.commuteDone;
+        });
+        await AppSession.instance.syncVehicle(vehicle);
+      } finally {
+        if (mounted) setState(() => _saving = false);
+      }
     } else {
       final prefs = _buildPreferences();
-      await AppSession.instance.updateCurrent((user) {
-        user.commuteType = _mode;
-        user.commutePreferences = prefs;
-        user.vehicle = null;
-        user.phase = OnboardingPhase.commuteDone;
-      });
-      await AppSession.instance.syncCommutePreferences(prefs);
+      setState(() => _saving = true);
+      try {
+        await AppSession.instance.updateCurrent((user) {
+          user.commuteType = _mode;
+          user.commutePreferences = prefs;
+          user.vehicle = null;
+          user.phase = OnboardingPhase.commuteDone;
+        });
+        await AppSession.instance.syncCommutePreferences(prefs);
+      } finally {
+        if (mounted) setState(() => _saving = false);
+      }
     }
     if (!mounted) return;
     context.push(AppRoutes.workVerification);
@@ -145,7 +156,8 @@ class _CommuteDetailsScreenState extends State<CommuteDetailsScreen> {
         const SizedBox(height: 24),
         OnboardingButtonRow(
           primaryLabel: 'Continue → Step 3',
-          onPrimary: _continue,
+          onPrimary: _saving ? null : _continue,
+          isLoading: _saving,
         ),
         const SizedBox(height: 24),
       ],

@@ -8,6 +8,7 @@ class SamewayPrimaryButton extends StatelessWidget {
     super.key,
     required this.label,
     required this.onPressed,
+    this.isLoading = false,
     this.backgroundColor = AppColors.primary,
     this.foregroundColor = Colors.white,
     this.height = 53,
@@ -18,7 +19,8 @@ class SamewayPrimaryButton extends StatelessWidget {
   });
 
   final String label;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
+  final bool isLoading;
   final Color backgroundColor;
   final Color foregroundColor;
   final double height;
@@ -33,21 +35,37 @@ class SamewayPrimaryButton extends StatelessWidget {
       width: double.infinity,
       height: height,
       child: FilledButton(
-        onPressed: onPressed,
+        onPressed: isLoading ? null : onPressed,
         style: FilledButton.styleFrom(
           backgroundColor: backgroundColor,
           foregroundColor: foregroundColor,
+          disabledBackgroundColor: backgroundColor.withValues(alpha: 0.7),
+          disabledForegroundColor: foregroundColor.withValues(alpha: 0.9),
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),
           ),
         ),
-        child: Text(
-          label,
-          style: (textStyle ?? AppTypography.buttonLarge.copyWith(
-            fontSize: fontSize,
-            fontWeight: fontWeight,
-          )).copyWith(color: foregroundColor),
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          child: isLoading
+              ? SizedBox(
+                  key: const ValueKey('loading'),
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.5,
+                    color: foregroundColor,
+                  ),
+                )
+              : Text(
+                  key: const ValueKey('label'),
+                  label,
+                  style: (textStyle ?? AppTypography.buttonLarge.copyWith(
+                    fontSize: fontSize,
+                    fontWeight: fontWeight,
+                  )).copyWith(color: foregroundColor),
+                ),
         ),
       ),
     );
@@ -59,12 +77,14 @@ class SamewayDarkButton extends StatelessWidget {
     super.key,
     required this.label,
     required this.onPressed,
+    this.isLoading = false,
     this.height = 49,
     this.textStyle,
   });
 
   final String label;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
+  final bool isLoading;
   final double height;
   final TextStyle? textStyle;
 
@@ -73,6 +93,7 @@ class SamewayDarkButton extends StatelessWidget {
     return SamewayPrimaryButton(
       label: label,
       onPressed: onPressed,
+      isLoading: isLoading,
       backgroundColor: AppColors.primaryDark,
       height: height,
       borderRadius: AppRadius.lg,

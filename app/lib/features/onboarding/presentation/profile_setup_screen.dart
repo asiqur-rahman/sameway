@@ -24,6 +24,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   late final TextEditingController _nameController;
   CommuteType _commuteType = CommuteType.drive;
   String? _photoPath;
+  bool _saving = false;
 
   @override
   void initState() {
@@ -53,13 +54,18 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
 
   Future<void> _continue() async {
     if (!_formKey.currentState!.validate()) return;
-    await AppSession.instance.updateCurrent((user) {
-      user.fullName = _nameController.text.trim();
-      user.commuteType = _commuteType;
-      user.phase = OnboardingPhase.profileDone;
-    });
-    if (!mounted) return;
-    context.push(AppRoutes.commuteDetails);
+    setState(() => _saving = true);
+    try {
+      await AppSession.instance.updateCurrent((user) {
+        user.fullName = _nameController.text.trim();
+        user.commuteType = _commuteType;
+        user.phase = OnboardingPhase.profileDone;
+      });
+      if (!mounted) return;
+      context.push(AppRoutes.commuteDetails);
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
   }
 
   @override
@@ -129,7 +135,8 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
               ),
               SamewayDarkButton(
                 label: 'Continue → Step 2',
-                onPressed: _continue,
+                isLoading: _saving,
+                onPressed: _saving ? null : _continue,
               ),
               const SizedBox(height: 24),
             ],

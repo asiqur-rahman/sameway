@@ -207,7 +207,9 @@ class _PostRideFilledScreenState extends State<PostRideFilledScreen> {
                 child: SamewayDarkButton(
                   label: 'Post Ride',
                   textStyle: AppTypography.buttonDark,
-                  onPressed: _postRide,
+                  isLoading: AppDataStore.instance.isPublishing,
+                  onPressed:
+                      AppDataStore.instance.isPublishing ? null : _postRide,
                 ),
               ),
             ],

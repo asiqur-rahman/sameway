@@ -70,11 +70,13 @@ class OnboardingButtonRow extends StatelessWidget {
     required this.primaryLabel,
     required this.onPrimary,
     this.onBack,
+    this.isLoading = false,
   });
 
   final String primaryLabel;
-  final VoidCallback onPrimary;
+  final VoidCallback? onPrimary;
   final VoidCallback? onBack;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -92,7 +94,8 @@ class OnboardingButtonRow extends StatelessWidget {
         Expanded(
           child: SamewayDarkButton(
             label: primaryLabel,
-            onPressed: onPrimary,
+            isLoading: isLoading,
+            onPressed: isLoading ? null : onPrimary,
           ),
         ),
       ],

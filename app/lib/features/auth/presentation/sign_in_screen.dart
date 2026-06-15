@@ -20,7 +20,6 @@ class _SignInScreenState extends State<SignInScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _loading = false;
 
   @override
   void dispose() {
@@ -31,13 +30,11 @@ class _SignInScreenState extends State<SignInScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() => _loading = true);
     final err = await AppSession.instance.signIn(
       workEmail: _emailController.text,
       password: _passwordController.text,
     );
     if (!mounted) return;
-    setState(() => _loading = false);
     if (err != null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
       return;
@@ -49,69 +46,76 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SamewayScreen(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.signUpHorizontal,
-        AppSpacing.signUpTop,
-        AppSpacing.signUpHorizontal,
-        24,
-      ),
-      child: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Sign in', style: AppTypography.screenHeroTitle),
-              const SizedBox(height: 4),
-              Text(
-                'Use the email you signed up with',
-                style: AppTypography.screenHeroSubtitle,
-              ),
-              const SizedBox(height: 32),
-              SamewayTextField(
-                label: 'Email',
-                icon: '✉️',
-                hint: 'you@gmail.com',
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                validator: FormValidators.workEmail,
-              ),
-              SamewayTextField(
-                label: 'Password',
-                icon: '🔒',
-                hint: 'Your password',
-                controller: _passwordController,
-                obscureText: true,
-                validator: FormValidators.password,
-              ),
-              const SizedBox(height: 8),
-              SamewayDarkButton(
-                label: _loading ? 'Signing in…' : 'Sign In',
-                onPressed: _loading ? () {} : _submit,
-              ),
-              const SizedBox(height: 20),
-              Center(
-                child: GestureDetector(
-                  onTap: () => context.push(AppRoutes.signUp),
-                  child: Text.rich(
-                    TextSpan(
-                      style: AppTypography.caption.copyWith(fontSize: 13),
-                      children: [
-                        const TextSpan(text: 'No account? '),
+    return ListenableBuilder(
+      listenable: AppSession.instance,
+      builder: (context, _) {
+        final loading = AppSession.instance.isAuthenticating;
+        return SamewayScreen(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.signUpHorizontal,
+            AppSpacing.signUpTop,
+            AppSpacing.signUpHorizontal,
+            24,
+          ),
+          child: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Sign in', style: AppTypography.screenHeroTitle),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Use the email you signed up with',
+                    style: AppTypography.screenHeroSubtitle,
+                  ),
+                  const SizedBox(height: 32),
+                  SamewayTextField(
+                    label: 'Email',
+                    icon: '✉️',
+                    hint: 'you@gmail.com',
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    validator: FormValidators.workEmail,
+                  ),
+                  SamewayTextField(
+                    label: 'Password',
+                    icon: '🔒',
+                    hint: 'Your password',
+                    controller: _passwordController,
+                    obscureText: true,
+                    validator: FormValidators.password,
+                  ),
+                  const SizedBox(height: 8),
+                  SamewayDarkButton(
+                    label: 'Sign In',
+                    isLoading: loading,
+                    onPressed: loading ? null : _submit,
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: GestureDetector(
+                      onTap: () => context.push(AppRoutes.signUp),
+                      child: Text.rich(
                         TextSpan(
-                          text: 'Create one',
-                          style: AppTypography.linkAction,
+                          style: AppTypography.caption.copyWith(fontSize: 13),
+                          children: [
+                            const TextSpan(text: 'No account? '),
+                            TextSpan(
+                              text: 'Create one',
+                              style: AppTypography.linkAction,
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

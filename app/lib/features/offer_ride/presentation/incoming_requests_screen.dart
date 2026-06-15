@@ -6,6 +6,7 @@ import 'package:sameway/core/session/app_data_store.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_elevation.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
+import 'package:sameway/core/widgets/sameway_loading.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_ui_kit.dart';
 
@@ -33,6 +34,8 @@ class _IncomingRequestsScreenState extends State<IncomingRequestsScreen> {
         final requests = AppDataStore.instance.pendingJoinRequests;
         final activeRide = AppDataStore.instance.activePostedRide;
         final subtitle = activeRide?.timeLabel ?? 'Your posted ride';
+        final store = AppDataStore.instance;
+        final isLoading = store.isLoadingRequests && !store.isRefreshingRequests;
 
         return SamewayScreen(
           child: Column(
@@ -52,28 +55,56 @@ class _IncomingRequestsScreenState extends State<IncomingRequestsScreen> {
               ),
               const SizedBox(height: 16),
               Expanded(
-                child: requests.isEmpty
-                    ? Center(
-                        child: Text(
-                          'No pending requests',
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            color: AppColors.textMuted,
+                child: RefreshIndicator(
+                  color: AppColors.primary,
+                  onRefresh: () => store.refreshJoinRequests(refresh: true),
+                  child: isLoading
+                      ? ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.fromLTRB(
+                            AppSpacing.screenHorizontal,
+                            0,
+                            AppSpacing.screenHorizontal,
+                            24,
                           ),
-                        ),
-                      )
-                    : ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(
-                          AppSpacing.screenHorizontal,
-                          0,
-                          AppSpacing.screenHorizontal,
-                          24,
-                        ),
-                        itemCount: requests.length,
-                        separatorBuilder: (_, index) => const SizedBox(height: 12),
-                        itemBuilder: (context, index) =>
-                            _RequestCard(request: requests[index]),
-                      ),
+                          children: const [
+                            RideCardSkeleton(),
+                            SizedBox(height: 12),
+                            RideCardSkeleton(),
+                          ],
+                        )
+                      : requests.isEmpty
+                          ? ListView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              children: [
+                                SizedBox(
+                                  height: MediaQuery.sizeOf(context).height * 0.2,
+                                ),
+                                Center(
+                                  child: Text(
+                                    'No pending requests',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 14,
+                                      color: AppColors.textMuted,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          : ListView.separated(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: const EdgeInsets.fromLTRB(
+                                AppSpacing.screenHorizontal,
+                                0,
+                                AppSpacing.screenHorizontal,
+                                24,
+                              ),
+                              itemCount: requests.length,
+                              separatorBuilder: (_, index) => const SizedBox(height: 12),
+                              itemBuilder: (context, index) =>
+                                  _RequestCard(request: requests[index]),
+                            ),
+                ),
               ),
             ],
           ),
@@ -83,14 +114,25 @@ class _IncomingRequestsScreenState extends State<IncomingRequestsScreen> {
   }
 }
 
-class _RequestCard extends StatelessWidget {
+class _RequestCard extends StatefulWidget {
   const _RequestCard({required this.request});
 
   final JoinRequest request;
 
   @override
+  State<_RequestCard> createState() => _RequestCardState();
+}
+
+class _RequestCardState extends State<_RequestCard> {
+  JoinRequest get request => widget.request;
+
+  @override
   Widget build(BuildContext context) {
-    return Container(
+    return ListenableBuilder(
+      listenable: AppDataStore.instance,
+      builder: (context, _) {
+        final processing = AppDataStore.instance.isProcessingRequest(request.id);
+        return Container(
       padding: const EdgeInsets.all(16),
       decoration: SamewayDecorations.card(),
       child: Column(
@@ -171,8 +213,9 @@ class _RequestCard extends StatelessWidget {
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () =>
-                      AppDataStore.instance.declineJoinRequest(request.id),
+                  onPressed: processing
+                      ? null
+                      : () => AppDataStore.instance.declineJoinRequest(request.id),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.textSecondary,
                     side: const BorderSide(color: AppColors.border),
@@ -190,8 +233,9 @@ class _RequestCard extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: FilledButton(
-                  onPressed: () =>
-                      AppDataStore.instance.acceptJoinRequest(request.id),
+                  onPressed: processing
+                      ? null
+                      : () => AppDataStore.instance.acceptJoinRequest(request.id),
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     shape: RoundedRectangleBorder(
@@ -199,19 +243,30 @@ class _RequestCard extends StatelessWidget {
                     ),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
-                  child: Text(
-                    'Accept',
-                    style: GoogleFonts.inter(
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
+                  child: processing
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Text(
+                          'Accept',
+                          style: GoogleFonts.inter(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
                 ),
               ),
             ],
           ),
         ],
       ),
+    );
+      },
     );
   }
 }

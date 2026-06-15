@@ -35,6 +35,9 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _tabIndex = AppSession.instance.currentUser?.defaultHomeTab ??
         OnboardingState.instance.defaultHomeTab;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AppDataStore.instance.refreshBookings();
+    });
   }
 
   Future<void> _onTabChanged(int index) async {

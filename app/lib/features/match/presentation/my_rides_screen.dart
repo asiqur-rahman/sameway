@@ -5,6 +5,7 @@ import 'package:sameway/core/session/app_data_store.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/widgets/sameway_bottom_nav.dart';
+import 'package:sameway/core/widgets/sameway_loading.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_tab_switcher.dart';
 
@@ -31,9 +32,11 @@ class _MyRidesScreenState extends State<MyRidesScreen> {
     return ListenableBuilder(
       listenable: AppDataStore.instance,
       builder: (context, _) {
-        final upcoming = AppDataStore.instance.upcomingRides;
-        final completed = AppDataStore.instance.completedRides;
+        final store = AppDataStore.instance;
+        final upcoming = store.upcomingRides;
+        final completed = store.completedRides;
         final rides = _tabIndex == 0 ? upcoming : completed;
+        final isLoading = store.isLoadingBookings && !store.isRefreshingBookings;
 
         return SamewayScreen(
           bottomNavigationBar: const SamewayBottomNav(currentIndex: 1),
@@ -69,29 +72,58 @@ class _MyRidesScreenState extends State<MyRidesScreen> {
                 ),
               ),
               Expanded(
-                child: rides.isEmpty
-                    ? Center(
-                        child: Text(
-                          _tabIndex == 0
-                              ? 'No upcoming rides yet'
-                              : 'No completed rides yet',
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            color: AppColors.textMuted,
+                child: RefreshIndicator(
+                  color: AppColors.primary,
+                  onRefresh: () => store.refreshBookings(refresh: true),
+                  child: isLoading
+                      ? ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          padding: const EdgeInsets.fromLTRB(
+                            AppSpacing.screenHorizontal,
+                            16,
+                            AppSpacing.screenHorizontal,
+                            24,
                           ),
-                        ),
-                      )
-                    : ListView.separated(
-                        padding: const EdgeInsets.fromLTRB(
-                          AppSpacing.screenHorizontal,
-                          16,
-                          AppSpacing.screenHorizontal,
-                          24,
-                        ),
-                        itemCount: rides.length,
-                        separatorBuilder: (_, index) => const SizedBox(height: 12),
-                        itemBuilder: (context, index) => _RideCard(ride: rides[index]),
-                      ),
+                          children: const [
+                            RideCardSkeleton(),
+                            SizedBox(height: 12),
+                            RideCardSkeleton(),
+                            SizedBox(height: 12),
+                            RideCardSkeleton(),
+                          ],
+                        )
+                      : rides.isEmpty
+                          ? ListView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              children: [
+                                SizedBox(
+                                  height: MediaQuery.sizeOf(context).height * 0.28,
+                                ),
+                                AsyncContent(
+                                  isLoading: false,
+                                  isEmpty: true,
+                                  emptyIcon: _tabIndex == 0 ? '🗓️' : '✅',
+                                  emptyMessage: _tabIndex == 0
+                                      ? 'No upcoming rides yet.\nSearch or post a ride to get started.'
+                                      : 'No completed rides yet.',
+                                  child: const SizedBox.shrink(),
+                                ),
+                              ],
+                            )
+                          : ListView.separated(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              padding: const EdgeInsets.fromLTRB(
+                                AppSpacing.screenHorizontal,
+                                16,
+                                AppSpacing.screenHorizontal,
+                                24,
+                              ),
+                              itemCount: rides.length,
+                              separatorBuilder: (_, index) => const SizedBox(height: 12),
+                              itemBuilder: (context, index) =>
+                                  _RideCard(ride: rides[index]),
+                            ),
+                ),
               ),
             ],
           ),

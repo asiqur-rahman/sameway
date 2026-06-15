@@ -7,6 +7,7 @@ import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/widgets/chat_widgets.dart';
 import 'package:sameway/core/widgets/sameway_bottom_nav.dart';
+import 'package:sameway/core/widgets/sameway_loading.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 
 class ChatListScreen extends StatefulWidget {
@@ -30,8 +31,10 @@ class _ChatListScreenState extends State<ChatListScreen> {
     return ListenableBuilder(
       listenable: AppDataStore.instance,
       builder: (context, _) {
-        final threads = AppDataStore.instance.chatThreads;
-        final hasUnread = AppDataStore.instance.unreadChatCount > 0;
+        final store = AppDataStore.instance;
+        final threads = store.chatThreads;
+        final hasUnread = store.unreadChatCount > 0;
+        final isLoading = store.isLoadingChats && !store.isRefreshingChats;
 
         return SamewayScreen(
           bottomNavigationBar: SamewayBottomNav(
@@ -58,35 +61,53 @@ class _ChatListScreenState extends State<ChatListScreen> {
                 ),
               ),
               Expanded(
-                child: threads.isEmpty
-                    ? Center(
-                        child: Text(
-                          'No messages yet.\nRequest a ride to start chatting.',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            color: AppColors.textMuted,
-                            height: 1.5,
-                          ),
-                        ),
-                      )
-                    : ListView.separated(
-                        itemCount: threads.length,
-                        separatorBuilder: (_, index) =>
-                            const Divider(height: 1, color: AppColors.border),
-                        itemBuilder: (context, index) {
-                          final thread = threads[index];
-                          return ChatListTile(
-                            name: thread.peerName,
-                            preview: thread.preview,
-                            time: thread.previewTime,
-                            unread: thread.unread,
-                            onTap: () => context.push(
-                              '${AppRoutes.chatConversation}?threadId=${thread.id}',
+                child: RefreshIndicator(
+                  color: AppColors.primary,
+                  onRefresh: () => store.refreshChats(refresh: true),
+                  child: isLoading
+                      ? ListView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          children: const [ChatListSkeleton()],
+                        )
+                      : threads.isEmpty
+                          ? ListView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              children: [
+                                SizedBox(
+                                  height: MediaQuery.sizeOf(context).height * 0.28,
+                                ),
+                                Center(
+                                  child: Text(
+                                    'No messages yet.\nChat opens when a ride is confirmed.',
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 14,
+                                      color: AppColors.textMuted,
+                                      height: 1.5,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          : ListView.separated(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              itemCount: threads.length,
+                              separatorBuilder: (_, index) =>
+                                  const Divider(height: 1, color: AppColors.border),
+                              itemBuilder: (context, index) {
+                                final thread = threads[index];
+                                return ChatListTile(
+                                  name: thread.peerName,
+                                  preview: thread.preview,
+                                  time: thread.previewTime,
+                                  unread: thread.unread,
+                                  onTap: () => context.push(
+                                    '${AppRoutes.chatConversation}?threadId=${thread.id}',
+                                  ),
+                                );
+                              },
                             ),
-                          );
-                        },
-                      ),
+                ),
               ),
             ],
           ),

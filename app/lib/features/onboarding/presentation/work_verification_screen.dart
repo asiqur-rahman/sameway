@@ -29,6 +29,7 @@ class _WorkVerificationScreenState extends State<WorkVerificationScreen> {
   MapLocation? _office;
   IdVisibility _idVisibility = IdVisibility.adminOnly;
   String? _idCardPath;
+  bool _saving = false;
 
   @override
   void initState() {
@@ -88,6 +89,8 @@ class _WorkVerificationScreenState extends State<WorkVerificationScreen> {
       );
       return;
     }
+    setState(() => _saving = true);
+    try {
     await AppSession.instance.updateCurrent((user) {
       user.companyName = _companyController.text.trim();
       user.officeAddress = _office!.address;
@@ -128,6 +131,9 @@ class _WorkVerificationScreenState extends State<WorkVerificationScreen> {
     } catch (_) {}
     if (!mounted) return;
     context.go(AppRoutes.home);
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
   }
 
   @override
@@ -278,7 +284,8 @@ class _WorkVerificationScreenState extends State<WorkVerificationScreen> {
         const SizedBox(height: 24),
         OnboardingButtonRow(
           primaryLabel: '🎉 Finish Setup',
-          onPrimary: _finish,
+          onPrimary: _saving ? null : _finish,
+          isLoading: _saving,
         ),
         const SizedBox(height: 24),
       ],
