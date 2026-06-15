@@ -2,7 +2,7 @@
 abstract final class AppPlaceholders {
   // Account
   static const fullName = 'Enter your full name';
-  static const workEmail = 'name@company.com';
+  static const workEmail = 'you@gmail.com';
   static const phone = '01XXXXXXXXX';
   static const passwordCreate = 'Minimum 8 characters';
   static const passwordSignIn = 'Enter your password';
@@ -18,14 +18,18 @@ abstract final class AppPlaceholders {
 
   // Ride scheduling
   static const date = 'Pick a date';
-  static const arriveBy = '9:30 AM';
-  static const departureTime = '8:30 AM';
+  static const arriveBy = 'e.g. 9:30 AM';
+  static const departureTime = 'e.g. 8:30 AM';
   static const seats = 'Number of seats';
 
   // Vehicle
   static const makeModel = 'e.g. Toyota Allion 2019';
   static const licensePlate = 'e.g. Dhaka Metro GA-1234';
+  static const vehicleColor = 'e.g. White, Silver';
+  static const usuallyLeave = 'e.g. 8:00 AM';
+  static const latestDepart = 'e.g. 9:00 AM';
   static const seatCount = '1–3';
+  static const designation = 'e.g. Software Engineer, Manager';
 
   // Admin
   static const domain = 'company.com';

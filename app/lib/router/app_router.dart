@@ -1,9 +1,11 @@
 import 'package:go_router/go_router.dart';
 import 'package:sameway/core/routes/app_routes.dart';
+import 'package:sameway/core/session/app_session.dart';
 import 'package:sameway/features/admin/presentation/admin_config_screen.dart';
 import 'package:sameway/features/admin/presentation/admin_dashboard_screen.dart';
 import 'package:sameway/features/admin/presentation/admin_users_screen.dart';
 import 'package:sameway/features/admin/presentation/admin_verification_screen.dart';
+import 'package:sameway/features/auth/presentation/sign_in_screen.dart';
 import 'package:sameway/features/dev/presentation/screen_catalog_screen.dart';
 import 'package:sameway/features/find_ride/presentation/ride_detail_screen.dart';
 import 'package:sameway/features/find_ride/presentation/search_filters_screen.dart';
@@ -22,11 +24,15 @@ import 'package:sameway/features/offer_ride/presentation/pick_start_location_scr
 import 'package:sameway/features/offer_ride/presentation/post_ride_empty_screen.dart';
 import 'package:sameway/features/offer_ride/presentation/post_ride_filled_screen.dart';
 import 'package:sameway/features/offer_ride/presentation/route_confirmed_screen.dart';
+import 'package:sameway/core/models/map_location.dart';
 import 'package:sameway/features/onboarding/presentation/office_id_screen.dart';
+import 'package:sameway/features/onboarding/presentation/pick_office_map_screen.dart';
 import 'package:sameway/features/onboarding/presentation/profile_setup_screen.dart';
 import 'package:sameway/features/onboarding/presentation/sign_up_screen.dart';
 import 'package:sameway/features/onboarding/presentation/splash_screen.dart';
+import 'package:sameway/features/onboarding/presentation/commute_details_screen.dart';
 import 'package:sameway/features/onboarding/presentation/vehicle_screen.dart';
+import 'package:sameway/features/onboarding/presentation/work_verification_screen.dart';
 import 'package:sameway/features/onboarding/presentation/work_location_screen.dart';
 import 'package:sameway/features/ride_day/presentation/after_heading_out_screen.dart';
 import 'package:sameway/features/ride_day/presentation/departure_in_screen.dart';
@@ -43,14 +49,70 @@ import 'package:sameway/features/web/presentation/web_post_ride_screen.dart';
 import 'package:sameway/features/web/presentation/web_profile_screen.dart';
 import 'package:sameway/features/web/presentation/web_sign_in_screen.dart';
 
+final _session = AppSession.instance;
+
 final appRouter = GoRouter(
   initialLocation: AppRoutes.splash,
+  refreshListenable: _session,
+  redirect: (context, state) {
+    if (!_session.isReady) return null;
+
+    final loc = state.matchedLocation;
+    const publicRoutes = {
+      AppRoutes.splash,
+      AppRoutes.signUp,
+      AppRoutes.signIn,
+      AppRoutes.catalog,
+      AppRoutes.webLanding,
+      AppRoutes.webSignIn,
+    };
+
+    if (loc.startsWith('/admin') || loc.startsWith('/web')) return null;
+
+    if (!_session.isLoggedIn) {
+      if (publicRoutes.contains(loc)) return null;
+      return AppRoutes.splash;
+    }
+
+    final user = _session.currentUser!;
+    if (!user.onboardingComplete) {
+      const onboardingRoutes = {
+        AppRoutes.profileSetup,
+        AppRoutes.commuteDetails,
+        AppRoutes.workVerification,
+        AppRoutes.pickOfficeMap,
+      };
+      if (onboardingRoutes.contains(loc) || loc == AppRoutes.signUp) {
+        return null;
+      }
+      return _session.onboardingRouteForCurrentUser();
+    }
+
+    if (loc == AppRoutes.signUp ||
+        loc == AppRoutes.signIn ||
+        loc == AppRoutes.profileSetup ||
+        loc == AppRoutes.commuteDetails ||
+        loc == AppRoutes.workVerification) {
+      return AppRoutes.home;
+    }
+
+    return null;
+  },
   routes: [
     GoRoute(path: AppRoutes.splash, builder: (_, _) => const SplashScreen()),
-    GoRoute(path: AppRoutes.signUp, builder: (_, _) => SignUpScreen()),
+    GoRoute(path: AppRoutes.signUp, builder: (_, _) => const SignUpScreen()),
+    GoRoute(path: AppRoutes.signIn, builder: (_, _) => const SignInScreen()),
     GoRoute(path: AppRoutes.profileSetup, builder: (_, _) => const ProfileSetupScreen()),
+    GoRoute(path: AppRoutes.commuteDetails, builder: (_, _) => const CommuteDetailsScreen()),
+    GoRoute(path: AppRoutes.workVerification, builder: (_, _) => const WorkVerificationScreen()),
     GoRoute(path: AppRoutes.vehicle, builder: (_, _) => const VehicleScreen()),
-    GoRoute(path: AppRoutes.workLocation, builder: (_, _) => WorkLocationScreen()),
+    GoRoute(path: AppRoutes.workLocation, builder: (_, _) => const WorkLocationScreen()),
+    GoRoute(
+      path: AppRoutes.pickOfficeMap,
+      builder: (_, state) => PickOfficeMapScreen(
+        initial: state.extra as MapLocation?,
+      ),
+    ),
     GoRoute(path: AppRoutes.officeId, builder: (_, _) => const OfficeIdScreen()),
     GoRoute(path: AppRoutes.home, builder: (_, _) => const HomeScreen()),
     GoRoute(path: AppRoutes.rides, builder: (_, _) => const MyRidesScreen()),

@@ -1,8 +1,8 @@
-# SameWay — Flutter App
+# Same Way — Flutter App
 
 Community carpool app for verified office commuters in Bangladesh.
 
-Part of the SameWay monorepo. API lives in `../backend/`, browser admin in `../web/`.
+Part of the Same Way monorepo. API lives in `../backend/`, browser admin in `../web/`.
 
 ## Run
 

@@ -1,6 +1,6 @@
-# SameWay
+# Same Way
 
-Monorepo for **SameWay** — verified office carpool for commuters in Bangladesh.
+Monorepo for **Same Way** — verified office carpool for commuters in Bangladesh.
 
 ```
 Project_Sameway/
@@ -71,6 +71,7 @@ See `app/README.md` for Flutter structure and flows.
 
 ## Integration status
 
+- **Work verification (3 steps):** work email → office on map (required) → employee ID
 - **Flutter ↔ API:** UI complete; wire `dio`/`http` to `backend/` next
 - **Admin web ↔ API:** Connected to `/api/v1/admin/*`
 - **Maps / chat:** Placeholders in Flutter; backend has REST + stubs for real-time

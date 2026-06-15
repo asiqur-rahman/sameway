@@ -64,12 +64,8 @@ class WebSignInScreen extends StatelessWidget {
                 obscureText: true,
               ),
               const SizedBox(height: 24),
-              SamewayPrimaryButton(
+              SamewayDarkButton(
                 label: 'Sign In',
-                backgroundColor: AppColors.primaryDark,
-                height: 49,
-                borderRadius: 12,
-                fontSize: 16,
                 onPressed: () => context.go(AppRoutes.webDashboard),
               ),
             ],

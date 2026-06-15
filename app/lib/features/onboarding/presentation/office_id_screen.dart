@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sameway/core/routes/app_routes.dart';
+import 'package:sameway/core/theme/app_placeholders.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_ui_kit.dart';
+import 'package:sameway/core/widgets/sameway_text_field.dart';
+import 'package:sameway/core/widgets/work_verification_steps.dart';
+import 'package:sameway/features/onboarding/onboarding_state.dart';
 
 enum VerificationMethod { adminOnly, selfVerify }
 
@@ -18,7 +22,14 @@ class OfficeIdScreen extends StatefulWidget {
 }
 
 class _OfficeIdScreenState extends State<OfficeIdScreen> {
+  final _designationController = TextEditingController();
   VerificationMethod _method = VerificationMethod.selfVerify;
+
+  @override
+  void dispose() {
+    _designationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +40,7 @@ class _OfficeIdScreenState extends State<OfficeIdScreen> {
           children: [
             MobilePageHeader(
               title: 'Office ID',
-              subtitle: 'Get your verified badge',
+              subtitle: 'Work verification · Step 3 of 3',
               backFallback: AppRoutes.workLocation,
             ),
             Padding(
@@ -39,7 +50,21 @@ class _OfficeIdScreenState extends State<OfficeIdScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const WorkVerificationSteps(
+                    currentStep: 3,
+                    emailDone: true,
+                    officeDone: true,
+                  ),
+                  const SizedBox(height: 20),
                   const SectionHeader('OFFICE ID VERIFICATION'),
+                  const SizedBox(height: 12),
+                  SamewayTextField(
+                    label: 'Designation (optional)',
+                    icon: '💼',
+                    hint: AppPlaceholders.designation,
+                    controller: _designationController,
+                    helper: 'Your job title helps co-riders recognize you at work',
+                  ),
                   const SizedBox(height: 12),
                   const _UploadIdCard(),
                   const SizedBox(height: 20),
@@ -69,7 +94,12 @@ class _OfficeIdScreenState extends State<OfficeIdScreen> {
                   const SizedBox(height: 32),
                   SamewayDarkButton(
                     label: 'Continue',
-                    onPressed: () => context.go(AppRoutes.home),
+                    onPressed: () {
+                      final designation = _designationController.text.trim();
+                      OnboardingState.instance.designation =
+                          designation.isEmpty ? null : designation;
+                      context.go(AppRoutes.home);
+                    },
                   ),
                   const SizedBox(height: 24),
                 ],
@@ -193,4 +223,4 @@ class _VerificationOptionTile extends StatelessWidget {
     );
   }
 }
-
+

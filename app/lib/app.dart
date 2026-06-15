@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sameway/core/constants/app_brand.dart';
 import 'package:sameway/core/theme/app_theme.dart';
 import 'package:sameway/router/app_router.dart';
 
@@ -8,7 +9,7 @@ class SameWayApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'SameWay',
+      title: kAppName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       routerConfig: appRouter,

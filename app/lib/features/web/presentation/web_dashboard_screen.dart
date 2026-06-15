@@ -111,12 +111,8 @@ class _QuickPostCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          SamewayPrimaryButton(
+          SamewayDarkButton(
             label: '🚗 Post for Today',
-            backgroundColor: AppColors.primaryDark,
-            height: 44,
-            borderRadius: 10,
-            fontSize: 14,
             onPressed: onPost,
           ),
         ],

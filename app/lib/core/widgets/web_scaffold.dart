@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sameway/core/constants/app_brand.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 
 class WebScaffold extends StatelessWidget {
@@ -38,7 +39,7 @@ class WebScaffold extends StatelessWidget {
               child: Row(
                 children: [
                   Text(
-                    'SameWay',
+                    kAppName,
                     style: GoogleFonts.inter(
                       fontSize: 20,
                       fontWeight: FontWeight.w600,

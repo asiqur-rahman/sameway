@@ -3,178 +3,122 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
-import 'package:sameway/core/theme/app_elevation.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
+import 'package:sameway/core/widgets/sameway_bottom_nav.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_ui_kit.dart';
+import 'package:sameway/features/find_ride/find_ride_flow.dart';
+import 'package:sameway/features/find_ride/presentation/widgets/find_ride_widgets.dart';
 
-class SearchResultsScreen extends StatelessWidget {
+/// Wireframe v2 — ScreenSearchResults.
+class SearchResultsScreen extends StatefulWidget {
   const SearchResultsScreen({super.key});
 
-  static const _results = [
-    _SearchResult(
-      driver: 'Karim R.',
-      route: 'Uttara Sector 4 → Motijheel',
-      time: 'Today · 8:30 AM',
-      vehicle: '🚗 Toyota Allion',
-      match: '92%',
-    ),
-    _SearchResult(
-      driver: 'Nusrat A.',
-      route: 'Uttara → Farmgate → Motijheel',
-      time: 'Today · 8:45 AM',
-      vehicle: '🚗 Honda City',
-      match: '87%',
-    ),
-    _SearchResult(
-      driver: 'Imran H.',
-      route: 'Azampur → Motijheel',
-      time: 'Today · 9:00 AM',
-      vehicle: '🚗 Toyota Axio',
-      match: '81%',
-    ),
-  ];
+  @override
+  State<SearchResultsScreen> createState() => _SearchResultsScreenState();
+}
+
+class _SearchResultsScreenState extends State<SearchResultsScreen> {
+  String _vehicleFilter = 'All';
+
+  List<FindRideListing> get _filtered {
+    final listings = sampleFindRideListings;
+    if (_vehicleFilter == 'Car') {
+      return listings.where((l) => !l.isBike).toList();
+    }
+    if (_vehicleFilter == 'Bike') {
+      return listings.where((l) => l.isBike).toList();
+    }
+    return listings;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _vehicleFilter = FindRideFlow.instance.vehicleFilter;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final flow = FindRideFlow.instance;
+    final results = _filtered;
+    final countLabel = '${results.length + 5} Rides Found';
+
     return SamewayScreen(
+      bottomNavigationBar: const SamewayBottomNav(currentIndex: 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           MobilePageHeader(
-            title: 'Search Results',
-            subtitle: 'Uttara → Motijheel · Today',
-            backFallback: AppRoutes.home,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
-            child: const SectionHeader('MATCHING ROUTES'),
-          ),
-          const SizedBox(height: 12),
-          Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.screenHorizontal,
-                0,
-                AppSpacing.screenHorizontal,
-                24,
-              ),
-              itemCount: _results.length,
-              separatorBuilder: (_, index) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                final result = _results[index];
-                return _RideResultCard(
-                  result: result,
-                  onTap: () => context.push(AppRoutes.rideDetail),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SearchResult {
-  const _SearchResult({
-    required this.driver,
-    required this.route,
-    required this.time,
-    required this.vehicle,
-    required this.match,
-  });
-
-  final String driver;
-  final String route;
-  final String time;
-  final String vehicle;
-  final String match;
-}
-
-class _RideResultCard extends StatelessWidget {
-  const _RideResultCard({
-    required this.result,
-    required this.onTap,
-  });
-
-  final _SearchResult result;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: SamewayDecorations.card(),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.125),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              alignment: Alignment.center,
-              child: const Text('🚗', style: TextStyle(fontSize: 22)),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        result.driver,
-                        style: GoogleFonts.inter(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      const Text('✓', style: TextStyle(fontSize: 11, color: AppColors.primary)),
-                    ],
+            title: countLabel,
+            subtitle: flow.routeSubtitle,
+            backFallback: AppRoutes.searchFilters,
+            trailing: GestureDetector(
+              onTap: () => context.push(AppRoutes.searchFilters),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceMuted,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Text(
+                  'Filter',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    result.route,
-                    style: GoogleFonts.roboto(
-                      fontSize: 13,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${result.time} · ${result.vehicle}',
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      color: AppColors.textMuted,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: AppColors.primaryTint7,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                result.match,
-                style: GoogleFonts.inter(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.screenHorizontal,
+                12,
+                AppSpacing.screenHorizontal,
+                88,
+              ),
+              children: [
+                const FindResultsMapStrip(),
+                const SizedBox(height: 12),
+                FindSortFilterRow(
+                  vehicleFilter: _vehicleFilter,
+                  onFilterChanged: (f) => setState(() {
+                    _vehicleFilter = f;
+                    FindRideFlow.instance.vehicleFilter = f;
+                  }),
+                ),
+                const SizedBox(height: 12),
+                for (final listing in results)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: FindRideResultCard(
+                      listing: listing,
+                      onTap: () {
+                        FindRideFlow.instance.selectedRide = listing;
+                        context.push(AppRoutes.rideDetail);
+                      },
+                    ),
+                  ),
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceMuted,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    '+ 5 more rides · Load more',
+                    style: GoogleFonts.inter(fontSize: 14, color: AppColors.textMuted),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

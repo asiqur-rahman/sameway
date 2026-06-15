@@ -17,7 +17,7 @@ export function AdminLayout() {
       <aside className="admin-sidebar">
         <div className="admin-brand">
           <span className="admin-brand-dot" />
-          SameWay Admin
+          Same Way Admin
         </div>
         <nav className="admin-nav">
           {nav.map((item) => (

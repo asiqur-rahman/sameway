@@ -76,7 +76,9 @@ class SamewayDarkButton extends StatelessWidget {
       backgroundColor: AppColors.primaryDark,
       height: height,
       borderRadius: AppRadius.lg,
-      textStyle: textStyle ?? AppTypography.buttonPrimary,
+      fontSize: 16,
+      fontWeight: FontWeight.w600,
+      textStyle: textStyle ?? AppTypography.buttonDark,
     );
   }
 }

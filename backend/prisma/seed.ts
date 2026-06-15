@@ -2,9 +2,14 @@ import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 import { PrismaClient } from "../src/generated/prisma/client";
+import { buildDatabaseUrl } from "../src/lib/database-url";
 import { hashPassword } from "../src/lib/auth/password";
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const ssl = process.env.DB_SSL === "true";
+const pool = new Pool({
+  connectionString: buildDatabaseUrl(),
+  ssl: ssl ? { rejectUnauthorized: false } : undefined,
+});
 const adapter = new PrismaPg(pool);
 const db = new PrismaClient({ adapter });
 
@@ -41,6 +46,9 @@ async function main() {
       role: "ADMIN",
       verificationStatus: "VERIFIED",
       companyDomain: "sameway.local",
+      workEmailVerified: true,
+      officeLocationVerified: true,
+      employeeIdVerified: true,
       reminderSettings: { create: {} },
     },
     update: {},
@@ -58,6 +66,9 @@ async function main() {
       verificationStatus: "VERIFIED",
       companyDomain: "sameway.local",
       commuteType: "BOTH",
+      workEmailVerified: true,
+      officeLocationVerified: true,
+      employeeIdVerified: true,
       reminderSettings: { create: {} },
     },
     update: {},

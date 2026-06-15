@@ -19,8 +19,16 @@ export const vehicleSchema = z.object({
 export const placeSchema = z.object({
   label: z.enum(["HOME", "OFFICE", "CUSTOM"]),
   address: z.string().min(1),
-  lat: z.number(),
-  lng: z.number(),
+  lat: z.number().min(-90).max(90),
+  lng: z.number().min(-180).max(180),
+}).superRefine((data, ctx) => {
+  if (data.label === "OFFICE" && data.lat === 0 && data.lng === 0) {
+    ctx.addIssue({
+      code: "custom",
+      message: "Office address must be selected on the map",
+      path: ["lat"],
+    });
+  }
 });
 
 export const verificationSchema = z.object({

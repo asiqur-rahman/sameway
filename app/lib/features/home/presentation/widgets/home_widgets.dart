@@ -137,7 +137,7 @@ class RecentSearchRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push(AppRoutes.searchResults),
+      onTap: () => context.push(AppRoutes.searchFilters),
       child: Container(
       height: 45,
       padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -408,6 +408,271 @@ class _TagChip extends StatelessWidget {
         style: AppTypography.chipLabel(
           color: accent ? AppColors.primary : AppColors.textSecondary,
         ),
+      ),
+    );
+  }
+}
+
+/// Map-first Find tab preview — wireframes v2.
+class FindRideMapPreview extends StatelessWidget {
+  const FindRideMapPreview({
+    super.key,
+    this.badgeLabel = '8 rides found',
+  });
+
+  final String badgeLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(18),
+      child: SizedBox(
+        height: 180,
+        width: double.infinity,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            const ColoredBox(color: Color(0xFFE8F0F7)),
+            CustomPaint(painter: const _FindMapGridPainter()),
+            CustomPaint(painter: const _FindMapRoutePainter()),
+            Positioned(
+              top: 10,
+              right: 10,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  badgeLabel,
+                  style: AppTypography.badge(color: Colors.white),
+                ),
+              ),
+            ),
+            Positioned(
+              left: 10,
+              bottom: 8,
+              child: _GoogleMapsBadge(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _GoogleMapsBadge extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 12,
+            height: 12,
+            decoration: const BoxDecoration(
+              color: Color(0xFF4285F4),
+              shape: BoxShape.circle,
+            ),
+            alignment: Alignment.center,
+            child: const Text(
+              'G',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 8,
+                fontWeight: FontWeight.w700,
+                height: 1,
+              ),
+            ),
+          ),
+          const SizedBox(width: 5),
+          Text('Google Maps', style: AppTypography.caption),
+        ],
+      ),
+    );
+  }
+}
+
+class _FindMapGridPainter extends CustomPainter {
+  const _FindMapGridPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = const Color(0xFFD1DCE9)
+      ..strokeWidth = 1;
+    for (var i = 0; i <= 4; i++) {
+      final y = size.height * i / 4;
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+    }
+    for (var i = 0; i <= 7; i++) {
+      final x = size.width * i / 7;
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _FindMapRoutePainter extends CustomPainter {
+  const _FindMapRoutePainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final scaleX = size.width / 390;
+    final scaleY = size.height / 210;
+
+    final road = Paint()
+      ..color = const Color(0xFFB8CCDE)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 10
+      ..strokeCap = StrokeCap.round;
+
+    final path = Path()
+      ..moveTo(30 * scaleX, 185 * scaleY)
+      ..quadraticBezierTo(120 * scaleX, 140 * scaleY, 195 * scaleX, 110 * scaleY)
+      ..quadraticBezierTo(270 * scaleX, 80 * scaleY, 360 * scaleX, 38 * scaleY);
+    canvas.drawPath(path, road);
+
+    canvas.drawCircle(Offset(30 * scaleX, 185 * scaleY), 8 * scaleX, Paint()..color = AppColors.primary);
+    canvas.drawPath(
+      Path()
+        ..moveTo(360 * scaleX, 26 * scaleY)
+        ..cubicTo(360 * scaleX, 26 * scaleY, 350 * scaleX, 37 * scaleY, 360 * scaleX, 48 * scaleY)
+        ..cubicTo(370 * scaleX, 37 * scaleY, 360 * scaleX, 26 * scaleY, 360 * scaleX, 26 * scaleY),
+      Paint()..color = AppColors.textPrimary,
+    );
+    canvas.drawCircle(Offset(360 * scaleX, 36 * scaleY), 4, Paint()..color = Colors.white);
+
+    for (final (x, y, pct) in [(115.0, 143.0, '94'), (195.0, 110.0, '89'), (265.0, 78.0, '82')]) {
+      final center = Offset(x * scaleX, y * scaleY);
+      canvas.drawCircle(center, 14 * scaleX, Paint()..color = AppColors.accentBlue.withValues(alpha: 0.85));
+      final textPainter = TextPainter(
+        text: TextSpan(
+          text: '$pct%',
+          style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      textPainter.paint(
+        canvas,
+        center - Offset(textPainter.width / 2, textPainter.height / 2),
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class LocationFieldRow extends StatelessWidget {
+  const LocationFieldRow({
+    super.key,
+    required this.label,
+    required this.value,
+    required this.isOrigin,
+    this.actionLabel = '📍 Change',
+    this.onTap,
+  });
+
+  final String label;
+  final String value;
+  final bool isOrigin;
+  final String actionLabel;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+        child: Row(
+          children: [
+            Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: isOrigin ? AppColors.primary : AppColors.textPrimary,
+                borderRadius: BorderRadius.circular(isOrigin ? 5 : 2),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(label.toUpperCase(), style: AppTypography.sectionAccent(color: AppColors.textMuted)),
+                  const SizedBox(height: 2),
+                  Text(value, style: AppTypography.locationValue),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                color: isOrigin
+                    ? AppColors.primary.withValues(alpha: 0.08)
+                    : AppColors.surfaceMuted,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                actionLabel,
+                style: AppTypography.chipLabel(
+                  color: isOrigin ? AppColors.primary : AppColors.textSecondary,
+                ).copyWith(fontWeight: FontWeight.w600),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DateTimeFieldTile extends StatelessWidget {
+  const DateTimeFieldTile({
+    super.key,
+    required this.emoji,
+    required this.label,
+    required this.value,
+  });
+
+  final String emoji;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        children: [
+          Text(emoji, style: const TextStyle(fontSize: 16)),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label.toUpperCase(), style: AppTypography.sectionAccent(color: AppColors.textMuted)),
+                Text(value, style: AppTypography.dateTimeValue),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

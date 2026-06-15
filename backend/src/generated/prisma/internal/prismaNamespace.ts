@@ -1805,6 +1805,9 @@ export const UserScalarFieldEnum = {
   verificationStatus: 'verificationStatus',
   verificationMethod: 'verificationMethod',
   employeeIdImageUrl: 'employeeIdImageUrl',
+  workEmailVerified: 'workEmailVerified',
+  officeLocationVerified: 'officeLocationVerified',
+  employeeIdVerified: 'employeeIdVerified',
   rating: 'rating',
   rideCount: 'rideCount',
   role: 'role',
@@ -2166,6 +2169,13 @@ export type ListEnumVerificationMethodFieldRefInput<$PrismaModel> = FieldRefInpu
 
 
 /**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -2204,13 +2214,6 @@ export type EnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'Role[]'
  */
 export type ListEnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Role[]'>
-    
-
-
-/**
- * Reference to a field of type 'Boolean'
- */
-export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 

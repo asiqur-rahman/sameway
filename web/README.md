@@ -1,6 +1,6 @@
-# SameWay Admin (React)
+# Same Way Admin (React)
 
-Browser admin dashboard for SameWay. Talks to `../backend/` at `/api/v1`.
+Browser admin dashboard for Same Way. Talks to `../backend/` at `/api/v1`.
 
 ## Pages
 

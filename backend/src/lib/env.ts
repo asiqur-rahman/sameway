@@ -1,7 +1,20 @@
 import { z } from "zod";
+import { buildDatabaseUrl } from "./database-url";
+
+// Ensure Prisma and pg use the same URL when only DB_* vars are set.
+process.env.DATABASE_URL ??= buildDatabaseUrl();
 
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  DB_HOST: z.string().default("localhost"),
+  DB_PORT: z.coerce.number().default(5432),
+  DB_USERNAME: z.string().default("postgres"),
+  DB_PASSWORD: z.string().default(""),
+  DB_NAME: z.string().default("sameway"),
+  DB_SSL: z
+    .enum(["true", "false"])
+    .default("false")
+    .transform((v) => v === "true"),
   DATABASE_URL: z.string().min(1),
   JWT_ACCESS_SECRET: z.string().min(32),
   JWT_REFRESH_SECRET: z.string().min(32),

@@ -34,9 +34,6 @@ class SamewayTabSwitcher extends StatelessWidget {
                   color: selected ? AppColors.surface : Colors.transparent,
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: selected ? AppShadows.soft : null,
-                  border: selected
-                      ? Border.all(color: AppColors.border.withValues(alpha: 0.8))
-                      : null,
                 ),
                 child: Text(
                   tabs[index],

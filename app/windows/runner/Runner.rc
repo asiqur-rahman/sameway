@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.sameway" "\0"
-            VALUE "FileDescription", "sameway" "\0"
+            VALUE "FileDescription", "Same Way" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "sameway" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.sameway. All rights reserved." "\0"
             VALUE "OriginalFilename", "sameway.exe" "\0"
-            VALUE "ProductName", "sameway" "\0"
+            VALUE "ProductName", "Same Way" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

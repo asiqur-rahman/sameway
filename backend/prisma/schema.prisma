@@ -109,6 +109,9 @@ model User {
   verificationStatus VerificationStatus @default(PENDING)
   verificationMethod VerificationMethod?
   employeeIdImageUrl String?
+  workEmailVerified      Boolean @default(false)
+  officeLocationVerified Boolean @default(false)
+  employeeIdVerified     Boolean @default(false)
   rating             Float              @default(0)
   rideCount          Int                @default(0)
   role               Role               @default(USER)

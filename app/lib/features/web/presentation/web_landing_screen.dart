@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sameway/core/routes/app_routes.dart';
+import 'package:sameway/core/constants/app_brand.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/web_scaffold.dart';
@@ -19,7 +20,7 @@ class WebLandingScreen extends StatelessWidget {
             WebHero(
               title: 'Share your commute',
               subtitle:
-                  'SameWay connects verified office commuters in Dhaka. Split costs, reduce traffic, and ride with people from your company.',
+                  '$kAppName connects verified office commuters in Dhaka. Split costs, reduce traffic, and ride with people from your company.',
               cta: SamewayPrimaryButton(
                 label: 'Get Started — It\'s Free',
                 height: 49,

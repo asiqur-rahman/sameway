@@ -49,6 +49,9 @@ export type UserMinAggregateOutputType = {
   verificationStatus: $Enums.VerificationStatus | null
   verificationMethod: $Enums.VerificationMethod | null
   employeeIdImageUrl: string | null
+  workEmailVerified: boolean | null
+  officeLocationVerified: boolean | null
+  employeeIdVerified: boolean | null
   rating: number | null
   rideCount: number | null
   role: $Enums.Role | null
@@ -70,6 +73,9 @@ export type UserMaxAggregateOutputType = {
   verificationStatus: $Enums.VerificationStatus | null
   verificationMethod: $Enums.VerificationMethod | null
   employeeIdImageUrl: string | null
+  workEmailVerified: boolean | null
+  officeLocationVerified: boolean | null
+  employeeIdVerified: boolean | null
   rating: number | null
   rideCount: number | null
   role: $Enums.Role | null
@@ -91,6 +97,9 @@ export type UserCountAggregateOutputType = {
   verificationStatus: number
   verificationMethod: number
   employeeIdImageUrl: number
+  workEmailVerified: number
+  officeLocationVerified: number
+  employeeIdVerified: number
   rating: number
   rideCount: number
   role: number
@@ -124,6 +133,9 @@ export type UserMinAggregateInputType = {
   verificationStatus?: true
   verificationMethod?: true
   employeeIdImageUrl?: true
+  workEmailVerified?: true
+  officeLocationVerified?: true
+  employeeIdVerified?: true
   rating?: true
   rideCount?: true
   role?: true
@@ -145,6 +157,9 @@ export type UserMaxAggregateInputType = {
   verificationStatus?: true
   verificationMethod?: true
   employeeIdImageUrl?: true
+  workEmailVerified?: true
+  officeLocationVerified?: true
+  employeeIdVerified?: true
   rating?: true
   rideCount?: true
   role?: true
@@ -166,6 +181,9 @@ export type UserCountAggregateInputType = {
   verificationStatus?: true
   verificationMethod?: true
   employeeIdImageUrl?: true
+  workEmailVerified?: true
+  officeLocationVerified?: true
+  employeeIdVerified?: true
   rating?: true
   rideCount?: true
   role?: true
@@ -274,6 +292,9 @@ export type UserGroupByOutputType = {
   verificationStatus: $Enums.VerificationStatus
   verificationMethod: $Enums.VerificationMethod | null
   employeeIdImageUrl: string | null
+  workEmailVerified: boolean
+  officeLocationVerified: boolean
+  employeeIdVerified: boolean
   rating: number
   rideCount: number
   role: $Enums.Role
@@ -318,6 +339,9 @@ export type UserWhereInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFilter<"User"> | $Enums.VerificationStatus
   verificationMethod?: Prisma.EnumVerificationMethodNullableFilter<"User"> | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.StringNullableFilter<"User"> | string | null
+  workEmailVerified?: Prisma.BoolFilter<"User"> | boolean
+  officeLocationVerified?: Prisma.BoolFilter<"User"> | boolean
+  employeeIdVerified?: Prisma.BoolFilter<"User"> | boolean
   rating?: Prisma.FloatFilter<"User"> | number
   rideCount?: Prisma.IntFilter<"User"> | number
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
@@ -353,6 +377,9 @@ export type UserOrderByWithRelationInput = {
   verificationStatus?: Prisma.SortOrder
   verificationMethod?: Prisma.SortOrderInput | Prisma.SortOrder
   employeeIdImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  workEmailVerified?: Prisma.SortOrder
+  officeLocationVerified?: Prisma.SortOrder
+  employeeIdVerified?: Prisma.SortOrder
   rating?: Prisma.SortOrder
   rideCount?: Prisma.SortOrder
   role?: Prisma.SortOrder
@@ -391,6 +418,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   verificationStatus?: Prisma.EnumVerificationStatusFilter<"User"> | $Enums.VerificationStatus
   verificationMethod?: Prisma.EnumVerificationMethodNullableFilter<"User"> | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.StringNullableFilter<"User"> | string | null
+  workEmailVerified?: Prisma.BoolFilter<"User"> | boolean
+  officeLocationVerified?: Prisma.BoolFilter<"User"> | boolean
+  employeeIdVerified?: Prisma.BoolFilter<"User"> | boolean
   rating?: Prisma.FloatFilter<"User"> | number
   rideCount?: Prisma.IntFilter<"User"> | number
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
@@ -426,6 +456,9 @@ export type UserOrderByWithAggregationInput = {
   verificationStatus?: Prisma.SortOrder
   verificationMethod?: Prisma.SortOrderInput | Prisma.SortOrder
   employeeIdImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  workEmailVerified?: Prisma.SortOrder
+  officeLocationVerified?: Prisma.SortOrder
+  employeeIdVerified?: Prisma.SortOrder
   rating?: Prisma.SortOrder
   rideCount?: Prisma.SortOrder
   role?: Prisma.SortOrder
@@ -455,6 +488,9 @@ export type UserScalarWhereWithAggregatesInput = {
   verificationStatus?: Prisma.EnumVerificationStatusWithAggregatesFilter<"User"> | $Enums.VerificationStatus
   verificationMethod?: Prisma.EnumVerificationMethodNullableWithAggregatesFilter<"User"> | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  workEmailVerified?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  officeLocationVerified?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  employeeIdVerified?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
   rating?: Prisma.FloatWithAggregatesFilter<"User"> | number
   rideCount?: Prisma.IntWithAggregatesFilter<"User"> | number
   role?: Prisma.EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
@@ -476,6 +512,9 @@ export type UserCreateInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -511,6 +550,9 @@ export type UserUncheckedCreateInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -546,6 +588,9 @@ export type UserUpdateInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -581,6 +626,9 @@ export type UserUncheckedUpdateInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -616,6 +664,9 @@ export type UserCreateManyInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -637,6 +688,9 @@ export type UserUpdateManyMutationInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -658,6 +712,9 @@ export type UserUncheckedUpdateManyInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -679,6 +736,9 @@ export type UserCountOrderByAggregateInput = {
   verificationStatus?: Prisma.SortOrder
   verificationMethod?: Prisma.SortOrder
   employeeIdImageUrl?: Prisma.SortOrder
+  workEmailVerified?: Prisma.SortOrder
+  officeLocationVerified?: Prisma.SortOrder
+  employeeIdVerified?: Prisma.SortOrder
   rating?: Prisma.SortOrder
   rideCount?: Prisma.SortOrder
   role?: Prisma.SortOrder
@@ -705,6 +765,9 @@ export type UserMaxOrderByAggregateInput = {
   verificationStatus?: Prisma.SortOrder
   verificationMethod?: Prisma.SortOrder
   employeeIdImageUrl?: Prisma.SortOrder
+  workEmailVerified?: Prisma.SortOrder
+  officeLocationVerified?: Prisma.SortOrder
+  employeeIdVerified?: Prisma.SortOrder
   rating?: Prisma.SortOrder
   rideCount?: Prisma.SortOrder
   role?: Prisma.SortOrder
@@ -726,6 +789,9 @@ export type UserMinOrderByAggregateInput = {
   verificationStatus?: Prisma.SortOrder
   verificationMethod?: Prisma.SortOrder
   employeeIdImageUrl?: Prisma.SortOrder
+  workEmailVerified?: Prisma.SortOrder
+  officeLocationVerified?: Prisma.SortOrder
+  employeeIdVerified?: Prisma.SortOrder
   rating?: Prisma.SortOrder
   rideCount?: Prisma.SortOrder
   role?: Prisma.SortOrder
@@ -768,6 +834,10 @@ export type NullableEnumVerificationMethodFieldUpdateOperationsInput = {
   set?: $Enums.VerificationMethod | null
 }
 
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
+}
+
 export type FloatFieldUpdateOperationsInput = {
   set?: number
   increment?: number
@@ -786,10 +856,6 @@ export type IntFieldUpdateOperationsInput = {
 
 export type EnumRoleFieldUpdateOperationsInput = {
   set?: $Enums.Role
-}
-
-export type BoolFieldUpdateOperationsInput = {
-  set?: boolean
 }
 
 export type DateTimeFieldUpdateOperationsInput = {
@@ -1005,6 +1071,9 @@ export type UserCreateWithoutRefreshTokensInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -1039,6 +1108,9 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -1089,6 +1161,9 @@ export type UserUpdateWithoutRefreshTokensInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -1123,6 +1198,9 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -1157,6 +1235,9 @@ export type UserCreateWithoutVehiclesInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -1191,6 +1272,9 @@ export type UserUncheckedCreateWithoutVehiclesInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -1241,6 +1325,9 @@ export type UserUpdateWithoutVehiclesInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -1275,6 +1362,9 @@ export type UserUncheckedUpdateWithoutVehiclesInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -1309,6 +1399,9 @@ export type UserCreateWithoutPlacesInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -1343,6 +1436,9 @@ export type UserUncheckedCreateWithoutPlacesInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -1393,6 +1489,9 @@ export type UserUpdateWithoutPlacesInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -1427,6 +1526,9 @@ export type UserUncheckedUpdateWithoutPlacesInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -1461,6 +1563,9 @@ export type UserCreateWithoutRegularRoutesInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -1495,6 +1600,9 @@ export type UserUncheckedCreateWithoutRegularRoutesInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -1545,6 +1653,9 @@ export type UserUpdateWithoutRegularRoutesInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -1579,6 +1690,9 @@ export type UserUncheckedUpdateWithoutRegularRoutesInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -1613,6 +1727,9 @@ export type UserCreateWithoutRidesAsDriverInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -1647,6 +1764,9 @@ export type UserUncheckedCreateWithoutRidesAsDriverInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -1697,6 +1817,9 @@ export type UserUpdateWithoutRidesAsDriverInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -1731,6 +1854,9 @@ export type UserUncheckedUpdateWithoutRidesAsDriverInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -1765,6 +1891,9 @@ export type UserCreateWithoutRideRequestsInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -1799,6 +1928,9 @@ export type UserUncheckedCreateWithoutRideRequestsInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -1849,6 +1981,9 @@ export type UserUpdateWithoutRideRequestsInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -1883,6 +2018,9 @@ export type UserUncheckedUpdateWithoutRideRequestsInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -1917,6 +2055,9 @@ export type UserCreateWithoutParticipationsInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -1951,6 +2092,9 @@ export type UserUncheckedCreateWithoutParticipationsInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -2001,6 +2145,9 @@ export type UserUpdateWithoutParticipationsInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -2035,6 +2182,9 @@ export type UserUncheckedUpdateWithoutParticipationsInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -2069,6 +2219,9 @@ export type UserCreateWithoutConversationsInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -2103,6 +2256,9 @@ export type UserUncheckedCreateWithoutConversationsInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -2153,6 +2309,9 @@ export type UserUpdateWithoutConversationsInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -2187,6 +2346,9 @@ export type UserUncheckedUpdateWithoutConversationsInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -2221,6 +2383,9 @@ export type UserCreateWithoutMessagesSentInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -2255,6 +2420,9 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -2305,6 +2473,9 @@ export type UserUpdateWithoutMessagesSentInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -2339,6 +2510,9 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -2373,6 +2547,9 @@ export type UserCreateWithoutNotificationsInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -2407,6 +2584,9 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -2457,6 +2637,9 @@ export type UserUpdateWithoutNotificationsInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -2491,6 +2674,9 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -2525,6 +2711,9 @@ export type UserCreateWithoutReminderSettingsInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -2559,6 +2748,9 @@ export type UserUncheckedCreateWithoutReminderSettingsInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -2609,6 +2801,9 @@ export type UserUpdateWithoutReminderSettingsInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -2643,6 +2838,9 @@ export type UserUncheckedUpdateWithoutReminderSettingsInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -2677,6 +2875,9 @@ export type UserCreateWithoutDeviceTokensInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -2711,6 +2912,9 @@ export type UserUncheckedCreateWithoutDeviceTokensInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -2761,6 +2965,9 @@ export type UserUpdateWithoutDeviceTokensInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -2795,6 +3002,9 @@ export type UserUncheckedUpdateWithoutDeviceTokensInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -2829,6 +3039,9 @@ export type UserCreateWithoutReviewsGivenInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -2863,6 +3076,9 @@ export type UserUncheckedCreateWithoutReviewsGivenInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -2902,6 +3118,9 @@ export type UserCreateWithoutReviewsReceivedInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -2936,6 +3155,9 @@ export type UserUncheckedCreateWithoutReviewsReceivedInput = {
   verificationStatus?: $Enums.VerificationStatus
   verificationMethod?: $Enums.VerificationMethod | null
   employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: number
   rideCount?: number
   role?: $Enums.Role
@@ -2986,6 +3208,9 @@ export type UserUpdateWithoutReviewsGivenInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -3020,6 +3245,9 @@ export type UserUncheckedUpdateWithoutReviewsGivenInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -3065,6 +3293,9 @@ export type UserUpdateWithoutReviewsReceivedInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -3099,6 +3330,9 @@ export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
   verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
   employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   rating?: Prisma.FloatFieldUpdateOperationsInput | number
   rideCount?: Prisma.IntFieldUpdateOperationsInput | number
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
@@ -3272,6 +3506,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   verificationStatus?: boolean
   verificationMethod?: boolean
   employeeIdImageUrl?: boolean
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: boolean
   rideCount?: boolean
   role?: boolean
@@ -3308,6 +3545,9 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   verificationStatus?: boolean
   verificationMethod?: boolean
   employeeIdImageUrl?: boolean
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: boolean
   rideCount?: boolean
   role?: boolean
@@ -3329,6 +3569,9 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   verificationStatus?: boolean
   verificationMethod?: boolean
   employeeIdImageUrl?: boolean
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: boolean
   rideCount?: boolean
   role?: boolean
@@ -3350,6 +3593,9 @@ export type UserSelectScalar = {
   verificationStatus?: boolean
   verificationMethod?: boolean
   employeeIdImageUrl?: boolean
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
   rating?: boolean
   rideCount?: boolean
   role?: boolean
@@ -3358,7 +3604,7 @@ export type UserSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "workEmail" | "phone" | "passwordHash" | "photoUrl" | "commuteType" | "gender" | "companyDomain" | "verificationStatus" | "verificationMethod" | "employeeIdImageUrl" | "rating" | "rideCount" | "role" | "isOnline" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "workEmail" | "phone" | "passwordHash" | "photoUrl" | "commuteType" | "gender" | "companyDomain" | "verificationStatus" | "verificationMethod" | "employeeIdImageUrl" | "workEmailVerified" | "officeLocationVerified" | "employeeIdVerified" | "rating" | "rideCount" | "role" | "isOnline" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   vehicles?: boolean | Prisma.User$vehiclesArgs<ExtArgs>
   places?: boolean | Prisma.User$placesArgs<ExtArgs>
@@ -3410,6 +3656,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     verificationStatus: $Enums.VerificationStatus
     verificationMethod: $Enums.VerificationMethod | null
     employeeIdImageUrl: string | null
+    workEmailVerified: boolean
+    officeLocationVerified: boolean
+    employeeIdVerified: boolean
     rating: number
     rideCount: number
     role: $Enums.Role
@@ -3865,6 +4114,9 @@ export interface UserFieldRefs {
   readonly verificationStatus: Prisma.FieldRef<"User", 'VerificationStatus'>
   readonly verificationMethod: Prisma.FieldRef<"User", 'VerificationMethod'>
   readonly employeeIdImageUrl: Prisma.FieldRef<"User", 'String'>
+  readonly workEmailVerified: Prisma.FieldRef<"User", 'Boolean'>
+  readonly officeLocationVerified: Prisma.FieldRef<"User", 'Boolean'>
+  readonly employeeIdVerified: Prisma.FieldRef<"User", 'Boolean'>
   readonly rating: Prisma.FieldRef<"User", 'Float'>
   readonly rideCount: Prisma.FieldRef<"User", 'Int'>
   readonly role: Prisma.FieldRef<"User", 'Role'>

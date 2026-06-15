@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { NotFoundError } from "@/lib/http/errors";
+import { NotFoundError, ValidationError } from "@/lib/http/errors";
 import type {
   deviceTokenSchema,
   placeSchema,
@@ -29,11 +29,27 @@ export async function updateVehicle(
 }
 
 export async function upsertPlace(userId: string, data: z.infer<typeof placeSchema>) {
-  return db.place.upsert({
+  if (data.label === "OFFICE" && data.lat === 0 && data.lng === 0) {
+    throw new ValidationError({
+      formErrors: ["Office address must be selected on the map"],
+      fieldErrors: {},
+    });
+  }
+
+  const place = await db.place.upsert({
     where: { userId_label: { userId, label: data.label } },
     create: { ...data, userId },
     update: data,
   });
+
+  if (data.label === "OFFICE") {
+    await db.user.update({
+      where: { id: userId },
+      data: { officeLocationVerified: true },
+    });
+  }
+
+  return place;
 }
 
 export async function submitVerification(userId: string, data: z.infer<typeof verificationSchema>) {
@@ -42,9 +58,46 @@ export async function submitVerification(userId: string, data: z.infer<typeof ve
     data: {
       verificationMethod: data.verificationMethod,
       employeeIdImageUrl: data.employeeIdImageUrl,
+      employeeIdVerified: true,
       verificationStatus: data.verificationMethod === "SELF_VERIFY" ? "VERIFIED" : "PENDING",
     },
   });
+}
+
+export function getWorkVerificationStatus(user: {
+  workEmailVerified: boolean;
+  officeLocationVerified: boolean;
+  employeeIdVerified: boolean;
+}) {
+  const steps = [
+    { key: "email", title: "Work email", completed: user.workEmailVerified },
+    { key: "office", title: "Office on map", completed: user.officeLocationVerified },
+    { key: "employeeId", title: "Employee ID", completed: user.employeeIdVerified },
+  ] as const;
+
+  return {
+    steps,
+    completedCount: steps.filter((s) => s.completed).length,
+    totalSteps: steps.length,
+    isComplete: steps.every((s) => s.completed),
+  };
+}
+
+export async function getWorkVerification(userId: string) {
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: {
+      workEmailVerified: true,
+      officeLocationVerified: true,
+      employeeIdVerified: true,
+      places: { where: { label: "OFFICE" } },
+    },
+  });
+  if (!user) throw new NotFoundError("User");
+  return {
+    ...getWorkVerificationStatus(user),
+    office: user.places[0] ?? null,
+  };
 }
 
 export async function updateReminderSettings(

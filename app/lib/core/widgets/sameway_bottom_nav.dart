@@ -53,7 +53,7 @@ class SamewayBottomNav extends StatelessWidget {
                             height: 30,
                             decoration: BoxDecoration(
                               color: selected
-                                  ? AppColors.primary.withValues(alpha: 0.125)
+                                  ? AppColors.primary.withValues(alpha: 0.20)
                                   : Colors.transparent,
                               borderRadius: BorderRadius.circular(15),
                             ),

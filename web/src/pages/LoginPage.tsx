@@ -27,7 +27,7 @@ export function LoginPage() {
   return (
     <div className="login-page">
       <div className="card login-card">
-        <h1>SameWay Admin</h1>
+        <h1>Same Way Admin</h1>
         <p>Sign in with an admin account to manage users, verifications, and config.</p>
         <form onSubmit={onSubmit}>
           <label htmlFor="email">Work email</label>

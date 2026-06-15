@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sameway/core/session/app_session.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/widgets/sameway_bottom_nav.dart';
@@ -10,96 +11,106 @@ class MyProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SamewayScreen(
-      bottomNavigationBar: const SamewayBottomNav(currentIndex: 3),
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.screenHorizontal,
-          16,
-          AppSpacing.screenHorizontal,
-          24,
-        ),
-        children: [
-          Text(
-            'MY PROFILE',
-            style: GoogleFonts.inter(
-              fontSize: 11,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 1.2,
-              color: AppColors.textMuted,
+    return ListenableBuilder(
+      listenable: AppSession.instance,
+      builder: (context, _) {
+        final user = AppSession.instance.currentUser;
+        final initial = (user?.fullName.isNotEmpty == true)
+            ? user!.fullName[0].toUpperCase()
+            : '?';
+        final verifiedLabel = user?.workEmailVerified == true ? 'Verified' : 'Pending';
+        final vehicle = user?.vehicle;
+
+        return SamewayScreen(
+          bottomNavigationBar: const SamewayBottomNav(currentIndex: 3),
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.screenHorizontal,
+              16,
+              AppSpacing.screenHorizontal,
+              24,
             ),
-          ),
-          const SizedBox(height: 16),
-          Center(
-            child: Column(
-              children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundColor: AppColors.primary.withValues(alpha: 0.15),
-                  child: Text(
-                    'R',
-                    style: GoogleFonts.inter(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.primary,
+            children: [
+              Text(
+                'MY PROFILE',
+                style: GoogleFonts.inter(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.2,
+                  color: AppColors.textMuted,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 40,
+                      backgroundColor: AppColors.primary.withValues(alpha: 0.15),
+                      child: Text(
+                        initial,
+                        style: GoogleFonts.inter(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 12),
+                    Text(
+                      user?.fullName ?? 'Guest',
+                      style: GoogleFonts.inter(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    Text(
+                      '${user?.workEmail ?? ''} · $verifiedLabel',
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        color: AppColors.textMuted,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  'Rafiq Ahmed',
-                  style: GoogleFonts.inter(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                Text(
-                  'rafiq@grameenphone.com · Verified',
-                  style: GoogleFonts.inter(
-                    fontSize: 13,
-                    color: AppColors.textMuted,
-                  ),
+              ),
+              const SizedBox(height: 24),
+              const _SectionTitle(title: 'ACHIEVEMENTS'),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: const [
+                  _Badge(label: '🌟 0 rides'),
+                  _Badge(label: '⭐ New member'),
+                ],
+              ),
+              if (vehicle != null) ...[
+                const SizedBox(height: 24),
+                const _SectionTitle(title: 'MY VEHICLES'),
+                const SizedBox(height: 8),
+                _InfoCard(
+                  title: vehicle.makeModel,
+                  subtitle:
+                      '${vehicle.color} · ${vehicle.seats} seat${vehicle.seats == 1 ? '' : 's'} · ${vehicle.licensePlate}',
+                  trailing: vehicle.type == 'bike' ? '🏍️' : '🚗',
                 ),
               ],
-            ),
-          ),
-          const SizedBox(height: 24),
-          _SectionTitle(title: 'ACHIEVEMENTS'),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _Badge(label: '🌟 12 rides'),
-              _Badge(label: '⭐ 4.9 rating'),
-              _Badge(label: '🏆 Early adopter'),
+              if (user?.designation != null) ...[
+                const SizedBox(height: 24),
+                const _SectionTitle(title: 'WORK'),
+                const SizedBox(height: 8),
+                _InfoCard(
+                  title: user!.companyName ?? 'Company',
+                  subtitle: user.designation!,
+                  trailing: '🏢',
+                ),
+              ],
             ],
           ),
-          const SizedBox(height: 24),
-          _SectionTitle(title: 'MY VEHICLES'),
-          const SizedBox(height: 8),
-          _InfoCard(
-            title: 'Toyota Allion',
-            subtitle: '2018 · Silver · 4 seats',
-            trailing: '🚗',
-          ),
-          const SizedBox(height: 24),
-          _SectionTitle(title: 'RECENT REVIEWS'),
-          const SizedBox(height: 8),
-          _ReviewCard(
-            author: 'Karim Rahman',
-            rating: '⭐⭐⭐⭐⭐',
-            comment: 'Always on time and great conversation!',
-          ),
-          const SizedBox(height: 8),
-          _ReviewCard(
-            author: 'Sadia Khan',
-            rating: '⭐⭐⭐⭐⭐',
-            comment: 'Reliable commuter, highly recommend.',
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
@@ -189,57 +200,6 @@ class _InfoCard extends StatelessWidget {
             ),
           ),
           Text(trailing, style: const TextStyle(fontSize: 28)),
-        ],
-      ),
-    );
-  }
-}
-
-class _ReviewCard extends StatelessWidget {
-  const _ReviewCard({
-    required this.author,
-    required this.rating,
-    required this.comment,
-  });
-
-  final String author;
-  final String rating;
-  final String comment;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.cardPadding),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                author,
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const Spacer(),
-              Text(rating, style: const TextStyle(fontSize: 12)),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            comment,
-            style: GoogleFonts.inter(
-              fontSize: 13,
-              color: AppColors.textSecondary,
-              height: 1.4,
-            ),
-          ),
         ],
       ),
     );

@@ -1,6 +1,6 @@
-# SameWay Backend
+# Same Way Backend
 
-Production-ready **Next.js API backend** for the SameWay monorepo (`app/` Flutter + `web/` admin).
+Production-ready **Next.js API backend** for the Same Way monorepo (`app/` Flutter + `web/` admin).
 
 ## Architecture
 
@@ -51,7 +51,7 @@ All API responses follow `{ success: true, data }` or `{ success: false, error }
 
 ```bash
 cd sameway-backend
-cp .env.example .env   # edit DATABASE_URL and JWT secrets
+cp .env.example .env   # edit DB_* credentials and JWT secrets
 npm install
 npm run db:push        # create tables
 npm run db:seed        # seed domains + demo users
@@ -203,4 +203,4 @@ Add `CORS_ORIGINS` for your Flutter web port (`7357` is preconfigured).
 
 ## License
 
-Private — SameWay project.
+Private — Same Way project.

@@ -7,9 +7,13 @@ abstract final class AppRoutes {
   // Onboarding
   static const splash = '/';
   static const signUp = '/sign-up';
+  static const signIn = '/sign-in';
   static const profileSetup = '/profile-setup';
+  static const commuteDetails = '/commute-details';
+  static const workVerification = '/work-verification';
   static const vehicle = '/vehicle';
   static const workLocation = '/work-location';
+  static const pickOfficeMap = '/work-location/pick-office';
   static const officeId = '/office-id';
 
   // Main tabs

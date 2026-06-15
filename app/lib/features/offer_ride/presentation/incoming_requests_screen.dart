@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sameway/core/routes/app_routes.dart';
+import 'package:sameway/core/constants/app_brand.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_elevation.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
@@ -10,14 +11,14 @@ import 'package:sameway/core/widgets/sameway_ui_kit.dart';
 class IncomingRequestsScreen extends StatelessWidget {
   const IncomingRequestsScreen({super.key});
 
-  static const _requests = [
-    _RideRequest(
+  static final _requests = [
+    const _RideRequest(
       name: 'Karim R.',
       route: 'Uttara Sec 4 → near your route',
       match: '92% match',
       note: 'Regular commuter · verified',
     ),
-    _RideRequest(
+    const _RideRequest(
       name: 'Sadia K.',
       route: 'Azampur → Motijheel area',
       match: '87% match',
@@ -27,7 +28,7 @@ class IncomingRequestsScreen extends StatelessWidget {
       name: 'Tanvir M.',
       route: 'House Building → Farmgate',
       match: '81% match',
-      note: 'New to SameWay',
+      note: 'New to $kAppName',
     ),
   ];
 

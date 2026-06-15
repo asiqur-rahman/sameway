@@ -74,9 +74,8 @@ class DepartureInScreen extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          SamewayPrimaryButton(
+          SamewayDarkButton(
             label: 'Continue to notify riders',
-            backgroundColor: AppColors.primaryDark,
             onPressed: () => context.push(AppRoutes.tapToNotify),
           ),
         ],

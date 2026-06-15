@@ -341,12 +341,17 @@ class MobilePageHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final canGoBack = showBack && (onBack != null || backFallback != null || context.canPop());
 
-    return Padding(
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppColors.background,
+        border: Border(bottom: BorderSide(color: AppColors.border)),
+      ),
+      child: Padding(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.screenHorizontal,
-        8,
+        10,
         AppSpacing.screenHorizontal,
-        12,
+        14,
       ),
       child: Row(
         children: [
@@ -376,6 +381,7 @@ class MobilePageHeader extends StatelessWidget {
           ?trailing,
         ],
       ),
+      ),
     );
   }
 }
@@ -387,7 +393,10 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(label, style: AppTypography.sectionOverline);
+    return Padding(
+      padding: const EdgeInsets.only(top: 16, bottom: 8),
+      child: Text(label, style: AppTypography.sectionOverline),
+    );
   }
 }
 
@@ -413,22 +422,28 @@ class SelectionCard extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
           decoration: BoxDecoration(
-            color: selected ? AppColors.surface : AppColors.surfaceMuted,
-            borderRadius: BorderRadius.circular(AppRadius.md),
+            color: selected
+                ? AppColors.primary.withValues(alpha: 0.07)
+                : AppColors.surfaceMuted,
+            borderRadius: BorderRadius.circular(14),
             border: Border.all(
-              color: selected ? AppColors.primary : AppColors.border,
-              width: selected ? 2 : 1,
+              color: selected ? AppColors.primary : Colors.transparent,
+              width: 2,
             ),
-            boxShadow: selected ? AppShadows.soft : null,
           ),
           child: Column(
             children: [
-              Text(emoji, style: const TextStyle(fontSize: 26)),
-              const SizedBox(height: 8),
-              Text(title, style: AppTypography.selectionTitle()),
-              const SizedBox(height: 4),
+              Text(emoji, style: const TextStyle(fontSize: 28)),
+              const SizedBox(height: 6),
+              Text(
+                title,
+                style: AppTypography.selectionTitle(
+                  color: selected ? AppColors.primary : AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 3),
               Text(
                 subtitle,
                 textAlign: TextAlign.center,
@@ -448,30 +463,68 @@ class InfoBanner extends StatelessWidget {
     required this.emoji,
     required this.text,
     this.tint = AppColors.primary,
+    this.neutral = false,
+    this.compact = false,
+    this.bottomMargin = 0,
   });
 
   final String emoji;
   final String text;
   final Color tint;
+  final bool neutral;
+  final bool compact;
+  final double bottomMargin;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: tint.withValues(alpha: 0.07),
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: tint.withValues(alpha: 0.18)),
+    final style = compact ? AppTypography.infoBannerCompact : AppTypography.infoBanner;
+    final emojiSize = compact ? 14.0 : (neutral ? 16.0 : 14.0);
+    final padding = compact
+        ? const EdgeInsets.fromLTRB(14, 10, 14, 10)
+        : const EdgeInsets.fromLTRB(14, 11, 14, 11);
+    final bgColor = neutral
+        ? AppColors.surfaceMuted
+        : compact
+            ? tint.withValues(alpha: 0.06)
+            : tint.withValues(alpha: 0.07);
+
+    return Padding(
+      padding: EdgeInsets.only(bottom: bottomMargin),
+      child: Container(
+        padding: padding,
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(12),
+          border: neutral || compact
+              ? null
+              : Border.all(color: tint.withValues(alpha: 0.18)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(emoji, style: TextStyle(fontSize: emojiSize)),
+            const SizedBox(width: 8),
+            Expanded(child: Text(text, style: style)),
+          ],
+        ),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(emoji, style: const TextStyle(fontSize: 14)),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(text, style: AppTypography.infoBanner),
-          ),
-        ],
+    );
+  }
+}
+
+/// 12px uppercase in-card label — wireframe "Who can see this ID?"
+class FieldGroupLabel extends StatelessWidget {
+  const FieldGroupLabel(this.label, {super.key});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Text(
+        label.toUpperCase(),
+        style: AppTypography.fieldGroupLabel,
       ),
     );
   }

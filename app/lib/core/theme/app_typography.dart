@@ -14,21 +14,21 @@ abstract final class AppTypography {
 
   static TextStyle get greetingTitle => GoogleFonts.inter(
         fontSize: 22,
-        fontWeight: FontWeight.w400,
+        fontWeight: FontWeight.w800,
         letterSpacing: -0.6,
         color: AppColors.textPrimary,
         height: 27 / 22,
       );
 
-  // --- Tabs (Roboto in Figma) ---
-  static TextStyle tabSelected({Color? color}) => GoogleFonts.roboto(
+  // --- Tabs (Inter — wireframe v2) ---
+  static TextStyle tabSelected({Color? color}) => GoogleFonts.inter(
         fontSize: 14,
         fontWeight: FontWeight.w700,
         color: color ?? AppColors.textPrimary,
         height: 16 / 14,
       );
 
-  static TextStyle tabUnselected({Color? color}) => GoogleFonts.roboto(
+  static TextStyle tabUnselected({Color? color}) => GoogleFonts.inter(
         fontSize: 14,
         fontWeight: FontWeight.w500,
         color: color ?? AppColors.textMuted,
@@ -65,6 +65,20 @@ abstract final class AppTypography {
         fontWeight: FontWeight.w400,
         color: AppColors.textMuted,
         height: 15 / 12,
+      );
+
+  static TextStyle get locationValue => GoogleFonts.inter(
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+        height: 18 / 15,
+      );
+
+  static TextStyle get dateTimeValue => GoogleFonts.inter(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+        height: 17 / 14,
       );
 
   static TextStyle chipLabel({Color? color}) => GoogleFonts.roboto(
@@ -119,8 +133,14 @@ abstract final class AppTypography {
         height: 19 / 16,
       );
 
-  /// Figma dark CTA — #0F172A fill, Inter Regular 16 white (Post Ride, Search Rides).
-  static TextStyle get buttonDark => searchButton;
+  /// Wireframe primary CTA — #0F172A fill, Inter SemiBold 16 white.
+  static TextStyle get buttonDark => GoogleFonts.inter(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        letterSpacing: -0.3,
+        color: Colors.white,
+        height: 19 / 16,
+      );
 
   /// Figma dark CTA — Roboto Regular 16 white (Confirm & Continue).
   static TextStyle get buttonDarkRobotoRegular => GoogleFonts.roboto(
@@ -170,10 +190,26 @@ abstract final class AppTypography {
         height: 15 / 12,
       );
 
+  // --- Auth / hero ---
+  static TextStyle get screenHeroTitle => GoogleFonts.inter(
+        fontSize: 30,
+        fontWeight: FontWeight.w800,
+        letterSpacing: -1,
+        color: AppColors.textPrimary,
+        height: 36 / 30,
+      );
+
+  static TextStyle get screenHeroSubtitle => GoogleFonts.inter(
+        fontSize: 15,
+        fontWeight: FontWeight.w400,
+        color: AppColors.textMuted,
+        height: 18 / 15,
+      );
+
   // --- Forms ---
   static TextStyle get fieldLabel => GoogleFonts.inter(
         fontSize: 12,
-        fontWeight: FontWeight.w400,
+        fontWeight: FontWeight.w600,
         color: AppColors.textSecondary,
         letterSpacing: 0.1,
         height: 15 / 12,
@@ -284,11 +320,39 @@ abstract final class AppTypography {
         color: AppColors.primary,
       );
 
+  static TextStyle get linkAction => GoogleFonts.inter(
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+        color: AppColors.primary,
+      );
+
   static TextStyle get infoBanner => GoogleFonts.inter(
+        fontSize: 13,
+        fontWeight: FontWeight.w400,
+        color: AppColors.textMuted,
+        height: 1.55,
+      );
+
+  static TextStyle get infoBannerTitle => GoogleFonts.inter(
+        fontSize: 13,
+        fontWeight: FontWeight.w700,
+        color: AppColors.textPrimary,
+      );
+
+  static TextStyle get infoBannerCompact => GoogleFonts.inter(
         fontSize: 12,
         fontWeight: FontWeight.w400,
-        color: AppColors.textSecondary,
-        height: 1.45,
+        color: AppColors.textMuted,
+        height: 1.6,
+      );
+
+  /// In-card label e.g. "Who can see this ID?" — 12px bold muted.
+  static TextStyle get fieldGroupLabel => GoogleFonts.inter(
+        fontSize: 12,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 0.8,
+        color: AppColors.textMuted,
+        height: 15 / 12,
       );
 
   static TextStyle get flowStep => GoogleFonts.inter(

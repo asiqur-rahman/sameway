@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:sameway/core/routes/app_routes.dart';
+import 'package:sameway/core/session/app_session.dart';
+import 'package:sameway/core/theme/app_placeholders.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_elevation.dart';
-import 'package:sameway/core/theme/app_placeholders.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/theme/app_typography.dart';
 import 'package:sameway/core/widgets/sameway_bottom_nav.dart';
+import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_tab_switcher.dart';
-import 'package:sameway/core/widgets/sameway_text_field.dart';
+import 'package:sameway/features/find_ride/find_ride_flow.dart';
+import 'package:sameway/features/home/presentation/widgets/add_vehicle_sheet.dart';
 import 'package:sameway/features/home/presentation/widgets/home_widgets.dart';
+import 'package:sameway/features/onboarding/onboarding_state.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,40 +26,112 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _tabIndex = 0;
+  late int _tabIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabIndex = AppSession.instance.currentUser?.defaultHomeTab ??
+        OnboardingState.instance.defaultHomeTab;
+  }
+
+  Future<void> _onTabChanged(int index) async {
+    if (index == 0 &&
+        !OnboardingState.instance.isDriver &&
+        !OnboardingState.instance.hasVehicleDetails) {
+      final saved = await showAddVehicleSheet(context);
+      if (!mounted) return;
+      if (saved == true) {
+        setState(() => _tabIndex = 0);
+      }
+      return;
+    }
+    setState(() => _tabIndex = index);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final dateLabel = DateFormat('EEE, MMM d').format(DateTime.now());
+    return ListenableBuilder(
+      listenable: AppSession.instance,
+      builder: (context, _) {
+        final user = AppSession.instance.currentUser;
+        final state = OnboardingState.instance;
+        final dateLabel = DateFormat('EEE, MMM d').format(DateTime.now());
+        final greetingName = user?.firstName ?? 'there';
+        final headerTitle = _tabIndex == 1 && state.isDriver
+            ? 'Find a Ride'
+            : 'Good morning, $greetingName!';
 
-    return SamewayScreen(
-      bottomNavigationBar: const SamewayBottomNav(currentIndex: 0),
-      child: Column(
-        children: [
-          Container(
-            height: 66,
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              border: const Border(bottom: BorderSide(color: AppColors.border)),
-              boxShadow: AppShadows.soft,
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '$dateLabel · Uttara, Dhaka',
-                        style: AppTypography.greetingMeta,
+        return SamewayScreen(
+          bottomNavigationBar: const SamewayBottomNav(currentIndex: 0),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.screenHorizontal,
+                  12,
+                  AppSpacing.screenHorizontal,
+                  10,
+                ),
+                decoration: const BoxDecoration(
+                  color: AppColors.background,
+                  border: Border(bottom: BorderSide(color: AppColors.border)),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '$dateLabel · Dhaka',
+                            style: AppTypography.greetingMeta,
+                          ),
+                          Text(
+                            headerTitle,
+                            style: AppTypography.greetingTitle,
+                          ),
+                        ],
                       ),
-                      Text(
-                        'Good morning, Rafiq!',
-                        style: AppTypography.greetingTitle,
-                      ),
-                    ],
+                    ),
+                    if (!state.isDriver) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    margin: const EdgeInsets.only(right: 8),
+                    decoration: BoxDecoration(
+                      color: AppColors.accentBlue.withValues(alpha: 0.09),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: AppColors.accentBlue.withValues(alpha: 0.25)),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('🧍', style: TextStyle(fontSize: 13)),
+                        const SizedBox(width: 5),
+                        Text(
+                          state.isWalker ? 'Walker' : 'Rider',
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.accentBlue,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                if (state.isDriver)
+                  Container(
+                  width: 42,
+                  height: 42,
+                  margin: const EdgeInsets.only(right: 8),
+                  decoration: SamewayDecorations.iconButton(),
+                  alignment: Alignment.center,
+                  child: Icon(
+                    Icons.dark_mode_outlined,
+                    size: 20,
+                    color: AppColors.textMuted,
                   ),
                 ),
                 Stack(
@@ -98,7 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: SamewayTabSwitcher(
               tabs: const ['🚗 Offer a Ride', '🔍 Find a Ride'],
               selectedIndex: _tabIndex,
-              onChanged: (index) => setState(() => _tabIndex = index),
+              onChanged: _onTabChanged,
             ),
           ),
           Expanded(
@@ -106,6 +183,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+    );
+      },
     );
   }
 }
@@ -115,6 +194,22 @@ class _OfferTabContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = AppSession.instance.currentUser;
+    final vehicle = user?.vehicle;
+    final seats = vehicle?.seats ?? 2;
+    final routeFrom = user?.homeAddress?.trim().isNotEmpty == true
+        ? user!.homeAddress!
+        : AppPlaceholders.from;
+    final routeTo = user?.officeAddress?.trim().isNotEmpty == true
+        ? user!.officeAddress!
+        : AppPlaceholders.to;
+    final leaveTime = vehicle?.usuallyLeave.trim().isNotEmpty == true
+        ? vehicle!.usuallyLeave
+        : null;
+    final schedule = leaveTime != null
+        ? 'Mon–Fri · $leaveTime · $seats seat${seats == 1 ? '' : 's'} available'
+        : 'Mon–Fri · $seats seat${seats == 1 ? '' : 's'} available';
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.screenHorizontal,
@@ -129,29 +224,16 @@ class _OfferTabContent extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SectionLabel(label: 'REGULAR ROUTE — QUICK POST'),
+              const SectionLabel(label: 'Regular Route — Quick Post'),
               const SizedBox(height: 12),
-              const RouteTimeline(
-                route: 'Uttara Sector 4 → Motijheel',
-                schedule: 'Mon–Fri · 8:30 AM · 2 seats available',
+              RouteTimeline(
+                route: '$routeFrom → $routeTo',
+                schedule: schedule,
               ),
               const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                height: 49,
-                child: FilledButton(
-                  onPressed: () => context.push(AppRoutes.postRideEmpty),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primaryDark,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.lg),
-                    ),
-                  ),
-                  child: Text(
-                    '🚗 Post for Today — 1 tap',
-                    style: AppTypography.buttonPrimary,
-                  ),
-                ),
+              SamewayDarkButton(
+                label: '🚗  Post for Today — 1 tap',
+                onPressed: () => context.push(AppRoutes.postRideEmpty),
               ),
               const SizedBox(height: 12),
               const OrDivider(),
@@ -160,8 +242,8 @@ class _OfferTabContent extends StatelessWidget {
                 child: GestureDetector(
                   onTap: () => context.push(AppRoutes.postRideEmpty),
                   child: Text(
-                    '＋ Create a different / new ride',
-                    style: AppTypography.link,
+                    '＋  Create a different / new ride',
+                    style: AppTypography.linkAction,
                   ),
                 ),
               ),
@@ -182,10 +264,12 @@ class _OfferTabContent extends StatelessWidget {
           style: AppTypography.sectionOverline,
         ),
         const SizedBox(height: 8),
-        const ActiveRideCard(
-          timeLabel: 'Tomorrow · 8:30 AM',
-          routeLabel: 'Uttara → Motijheel · 2 riders confirmed',
-          onTapRoute: AppRoutes.departureIn,
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Text(
+            'No active rides yet',
+            style: AppTypography.caption,
+          ),
         ),
       ],
     );
@@ -195,87 +279,86 @@ class _OfferTabContent extends StatelessWidget {
 class _FindTabContent extends StatelessWidget {
   const _FindTabContent();
 
-  static final _fromController = TextEditingController();
-  static final _toController = TextEditingController();
-  static final _dateController = TextEditingController();
-  static final _timeController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
+    final user = AppSession.instance.currentUser;
+    final prefs = user?.commutePreferences;
+    final from = user?.homeAddress?.trim().isNotEmpty == true
+        ? user!.homeAddress!
+        : AppPlaceholders.from;
+    final to = user?.officeAddress?.trim().isNotEmpty == true
+        ? user!.officeAddress!
+        : AppPlaceholders.to;
+    final arriveBy = prefs?.arriveBy.trim().isNotEmpty == true
+        ? prefs!.arriveBy
+        : AppPlaceholders.arriveBy;
+    final dateLabel = DateFormat('EEE, MMM d').format(DateTime.now());
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.screenHorizontal,
-        16,
+        12,
         AppSpacing.screenHorizontal,
         16,
       ),
       children: [
-        Container(
-          padding: const EdgeInsets.all(AppSpacing.cardPadding),
-          decoration: SamewayDecorations.card(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SamewayTextField(
-                label: 'From',
-                icon: '📍',
-                hint: AppPlaceholders.from,
-                controller: _fromController,
-              ),
-              const SizedBox(height: 8),
-              SamewayTextField(
-                label: 'To',
-                icon: '🏢',
-                hint: AppPlaceholders.to,
-                controller: _toController,
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: SamewayTextField(
-                      label: 'Date',
-                      hint: AppPlaceholders.date,
-                      controller: _dateController,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: SamewayTextField(
-                      label: 'Arrive by',
-                      hint: AppPlaceholders.arriveBy,
-                      controller: _timeController,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'PREFERENCES',
-                style: AppTypography.sectionOverline,
-              ),
-              const SizedBox(height: 8),
-              const FindPreferencesRow(),
-              const SizedBox(height: 8),
-              SizedBox(
-                width: double.infinity,
-                height: 49,
-                child: FilledButton(
-                  onPressed: () => context.push(AppRoutes.searchResults),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primaryDark,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.lg),
-                    ),
-                  ),
-                  child: Text(
-                    'Search Rides',
-                    style: AppTypography.searchButton,
-                  ),
+        const FindRideMapPreview(),
+        const SizedBox(height: 12),
+        Transform.translate(
+          offset: const Offset(0, -18),
+          child: Container(
+            decoration: SamewayDecorations.card(radius: 18),
+            child: Column(
+              children: [
+                LocationFieldRow(
+                  label: 'From',
+                  value: from,
+                  isOrigin: true,
                 ),
-              ),
-            ],
+                const Divider(height: 1, indent: 38),
+                LocationFieldRow(
+                  label: 'To',
+                  value: to,
+                  isOrigin: false,
+                ),
+              ],
+            ),
           ),
+        ),
+        const SizedBox(height: 0),
+        Row(
+          children: [
+            Expanded(
+              child: DateTimeFieldTile(
+                emoji: '📅',
+                label: 'Date',
+                value: dateLabel,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: DateTimeFieldTile(
+                emoji: '⏰',
+                label: 'Arrive by',
+                value: arriveBy,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        const FindPreferencesRow(),
+        const SizedBox(height: 12),
+        SamewayDarkButton(
+          label: '🔍  Search Rides',
+          onPressed: () {
+            FindRideFlow.instance
+              ..hydrateFromSession()
+              ..from = user?.homeAddress?.trim() ?? ''
+              ..to = user?.officeAddress?.trim() ?? ''
+              ..dateLabel = dateLabel
+              ..arriveBy = prefs?.arriveBy.trim() ?? '';
+            context.push(AppRoutes.searchFilters);
+          },
         ),
         const SizedBox(height: 16),
         Text(
@@ -283,12 +366,8 @@ class _FindTabContent extends StatelessWidget {
           style: AppTypography.sectionOverline,
         ),
         const SizedBox(height: 8),
-        const RecentSearchRow(
-          label: 'Uttara Sec 4 → Motijheel · Today 8:30 AM',
-        ),
-        const SizedBox(height: 8),
-        const RecentSearchRow(
-          label: 'Uttara Sec 4 → Gulshan 1 · Yesterday',
+        RecentSearchRow(
+          label: '$from → $to · $dateLabel',
         ),
       ],
     );

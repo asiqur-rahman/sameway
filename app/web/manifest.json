@@ -1,11 +1,11 @@
 {
-    "name": "sameway",
-    "short_name": "sameway",
+    "name": "Same Way",
+    "short_name": "Same Way",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "Same Way — verified office carpool for commuters.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

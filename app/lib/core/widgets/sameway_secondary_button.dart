@@ -31,10 +31,11 @@ class SamewaySecondaryButton extends StatelessWidget {
               ),
               child: Text(
                 label,
-                style: GoogleFonts.roboto(
+                style: GoogleFonts.inter(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   letterSpacing: -0.3,
+                  color: AppColors.textPrimary,
                 ),
               ),
             )

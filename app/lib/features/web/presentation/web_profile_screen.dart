@@ -91,12 +91,8 @@ class WebProfileScreen extends StatelessWidget {
                           keyboardType: TextInputType.phone,
                         ),
                         const SizedBox(height: 24),
-                        SamewayPrimaryButton(
+                        SamewayDarkButton(
                           label: 'Save Changes',
-                          backgroundColor: AppColors.primaryDark,
-                          height: 49,
-                          borderRadius: 12,
-                          fontSize: 16,
                           onPressed: () {},
                         ),
                       ],

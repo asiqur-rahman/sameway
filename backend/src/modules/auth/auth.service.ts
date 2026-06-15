@@ -55,6 +55,7 @@ export async function signup(input: SignupInput) {
       passwordHash,
       companyDomain,
       verificationStatus,
+      workEmailVerified: true,
       reminderSettings: { create: {} },
     },
   });

@@ -76,12 +76,8 @@ class WebFindRideScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 16),
-                  SamewayPrimaryButton(
+                  SamewayDarkButton(
                     label: 'Search',
-                    backgroundColor: AppColors.primaryDark,
-                    height: 47,
-                    borderRadius: 10,
-                    fontSize: 14,
                     onPressed: () {},
                   ),
                 ],
@@ -192,11 +188,8 @@ class _MatchCard extends StatelessWidget {
             style: GoogleFonts.inter(fontSize: 14),
           ),
           const SizedBox(width: 16),
-          SamewayPrimaryButton(
+          SamewayDarkButton(
             label: 'Request',
-            height: 40,
-            borderRadius: 8,
-            fontSize: 13,
             onPressed: () {},
           ),
         ],

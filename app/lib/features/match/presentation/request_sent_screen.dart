@@ -91,7 +91,7 @@ class RequestSentScreen extends StatelessWidget {
               ),
             ),
           ),
-          SamewayPrimaryButton(
+          SamewayDarkButton(
             label: '💬 Chat with Karim',
             onPressed: () => context.go(AppRoutes.chatConversation),
           ),
