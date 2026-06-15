@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { NotFoundError, ValidationError } from "@/lib/http/errors";
 import type {
+  commutePreferencesSchema,
   deviceTokenSchema,
   placeSchema,
   reminderSettingsSchema,
@@ -12,6 +13,21 @@ import type { z } from "zod";
 
 export async function updateProfile(userId: string, data: z.infer<typeof updateProfileSchema>) {
   return db.user.update({ where: { id: userId }, data });
+}
+
+export async function upsertCommutePreferences(
+  userId: string,
+  data: z.infer<typeof commutePreferencesSchema>,
+) {
+  return db.commutePreferences.upsert({
+    where: { userId },
+    create: { userId, ...data },
+    update: data,
+  });
+}
+
+export async function getCommutePreferences(userId: string) {
+  return db.commutePreferences.findUnique({ where: { userId } });
 }
 
 export async function addVehicle(userId: string, data: z.infer<typeof vehicleSchema>) {
@@ -26,6 +42,16 @@ export async function updateVehicle(
   const vehicle = await db.vehicle.findFirst({ where: { id: vehicleId, userId } });
   if (!vehicle) throw new NotFoundError("Vehicle");
   return db.vehicle.update({ where: { id: vehicleId }, data });
+}
+
+export async function deleteVehicle(userId: string, vehicleId: string) {
+  const vehicle = await db.vehicle.findFirst({ where: { id: vehicleId, userId } });
+  if (!vehicle) throw new NotFoundError("Vehicle");
+  await db.vehicle.delete({ where: { id: vehicleId } });
+}
+
+export async function getReminderSettings(userId: string) {
+  return db.reminderSettings.findUnique({ where: { userId } });
 }
 
 export async function upsertPlace(userId: string, data: z.infer<typeof placeSchema>) {

@@ -20,6 +20,7 @@ export type Role = (typeof Role)[keyof typeof Role]
 export const CommuteType = {
   DRIVE: 'DRIVE',
   RIDE: 'RIDE',
+  WALK: 'WALK',
   BOTH: 'BOTH'
 } as const
 
@@ -131,3 +132,21 @@ export const PlaceLabel = {
 } as const
 
 export type PlaceLabel = (typeof PlaceLabel)[keyof typeof PlaceLabel]
+
+
+export const IdVisibility = {
+  ADMIN_ONLY: 'ADMIN_ONLY',
+  PUBLIC_TO_RIDERS: 'PUBLIC_TO_RIDERS'
+} as const
+
+export type IdVisibility = (typeof IdVisibility)[keyof typeof IdVisibility]
+
+
+export const OutboxStatus = {
+  PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  SENT: 'SENT',
+  FAILED: 'FAILED'
+} as const
+
+export type OutboxStatus = (typeof OutboxStatus)[keyof typeof OutboxStatus]

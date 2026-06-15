@@ -61,13 +61,16 @@ class _CommuteDetailsScreenState extends State<CommuteDetailsScreen> {
         user.vehicle = vehicle;
         user.phase = OnboardingPhase.commuteDone;
       });
+      await AppSession.instance.syncVehicle(vehicle);
     } else {
+      final prefs = _buildPreferences();
       await AppSession.instance.updateCurrent((user) {
         user.commuteType = _mode;
-        user.commutePreferences = _buildPreferences();
+        user.commutePreferences = prefs;
         user.vehicle = null;
         user.phase = OnboardingPhase.commuteDone;
       });
+      await AppSession.instance.syncCommutePreferences(prefs);
     }
     if (!mounted) return;
     context.push(AppRoutes.workVerification);

@@ -5,6 +5,7 @@ import { signAccessToken, signRefreshToken } from "@/lib/auth/jwt";
 import { ConflictError, ForbiddenError, UnauthorizedError } from "@/lib/http/errors";
 import { getSystemConfig } from "@/lib/system-config";
 import { omitPassword } from "@/lib/shared";
+import { toUserProfileDto } from "@/application/mappers/user.mapper";
 import type { SigninInput, SignupInput } from "./auth.schema";
 
 function extractDomain(email: string): string {
@@ -57,10 +58,16 @@ export async function signup(input: SignupInput) {
       workEmailVerified,
       reminderSettings: { create: {} },
     },
+    include: {
+      vehicles: true,
+      places: true,
+      commutePreferences: true,
+      reminderSettings: true,
+    },
   });
 
   const tokens = await issueTokens(user.id, user.role);
-  return { user: omitPassword(user), tokens };
+  return { user: toUserProfileDto(omitPassword(user)), tokens };
 }
 
 export async function signin(input: SigninInput) {
@@ -70,8 +77,19 @@ export async function signin(input: SigninInput) {
   const valid = await verifyPassword(input.password, user.passwordHash);
   if (!valid) throw new UnauthorizedError("Invalid credentials");
 
+  const fullUser = await db.user.findUnique({
+    where: { id: user.id },
+    include: {
+      vehicles: true,
+      places: true,
+      commutePreferences: true,
+      reminderSettings: true,
+    },
+  });
+  if (!fullUser) throw new UnauthorizedError("User not found");
+
   const tokens = await issueTokens(user.id, user.role);
-  return { user: omitPassword(user), tokens };
+  return { user: toUserProfileDto(omitPassword(fullUser)), tokens };
 }
 
 export async function refresh(refreshToken: string) {
@@ -85,11 +103,19 @@ export async function refresh(refreshToken: string) {
 
   await db.refreshToken.delete({ where: { id: stored.id } });
 
-  const user = await db.user.findUnique({ where: { id: payload.sub } });
+  const user = await db.user.findUnique({
+    where: { id: payload.sub },
+    include: {
+      vehicles: true,
+      places: true,
+      commutePreferences: true,
+      reminderSettings: true,
+    },
+  });
   if (!user) throw new UnauthorizedError("User not found");
 
   const tokens = await issueTokens(user.id, user.role);
-  return { user: omitPassword(user), tokens };
+  return { user: toUserProfileDto(omitPassword(user)), tokens };
 }
 
 export async function logout(refreshToken: string) {
@@ -125,10 +151,11 @@ export async function getMe(userId: string) {
       vehicles: true,
       places: true,
       reminderSettings: true,
+      commutePreferences: true,
     },
   });
   if (!user) throw new UnauthorizedError("User not found");
-  return omitPassword(user);
+  return toUserProfileDto(omitPassword(user));
 }
 
 /** Periodic cleanup for expired refresh tokens (call from cron or health). */

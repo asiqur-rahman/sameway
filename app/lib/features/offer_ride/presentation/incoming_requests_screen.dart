@@ -9,8 +9,21 @@ import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_ui_kit.dart';
 
-class IncomingRequestsScreen extends StatelessWidget {
+class IncomingRequestsScreen extends StatefulWidget {
   const IncomingRequestsScreen({super.key});
+
+  @override
+  State<IncomingRequestsScreen> createState() => _IncomingRequestsScreenState();
+}
+
+class _IncomingRequestsScreenState extends State<IncomingRequestsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AppDataStore.instance.refreshJoinRequests();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

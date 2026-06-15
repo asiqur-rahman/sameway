@@ -4,6 +4,12 @@ import { requireAuth } from "@/lib/auth/session";
 import { reminderSettingsSchema } from "@/modules/users/users.schema";
 import * as usersService from "@/modules/users/users.service";
 
+export const GET = apiRoute(async (request) => {
+  const session = await requireAuth(request);
+  const settings = await usersService.getReminderSettings(session.id);
+  return ok(settings);
+});
+
 export const PATCH = apiRoute(async (request) => {
   const session = await requireAuth(request);
   const body = await parseBody(request, reminderSettingsSchema);

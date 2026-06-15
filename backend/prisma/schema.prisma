@@ -17,6 +17,7 @@ enum Role {
 enum CommuteType {
   DRIVE
   RIDE
+  WALK
   BOTH
 }
 
@@ -94,6 +95,18 @@ enum PlaceLabel {
   CUSTOM
 }
 
+enum IdVisibility {
+  ADMIN_ONLY
+  PUBLIC_TO_RIDERS
+}
+
+enum OutboxStatus {
+  PENDING
+  PROCESSING
+  SENT
+  FAILED
+}
+
 // ─── Auth & Users ────────────────────────────────────────────────────────────
 
 model User {
@@ -104,6 +117,9 @@ model User {
   passwordHash       String
   photoUrl           String?
   commuteType        CommuteType?
+  companyName        String?
+  designation        String?
+  idVisibility       IdVisibility?
   gender             Gender?
   companyDomain      String?
   verificationStatus VerificationStatus @default(PENDING)
@@ -129,6 +145,7 @@ model User {
   messagesSent    Message[]
   notifications   Notification[]
   reminderSettings ReminderSettings?
+  commutePreferences CommutePreferences?
   refreshTokens   RefreshToken[]
   deviceTokens    DeviceToken[]
   reviewsGiven    Review[]                  @relation("ReviewsGiven")
@@ -160,6 +177,9 @@ model Vehicle {
   availableSeats Int         @default(1)
   year           Int?
   color          String?
+  usuallyLeave   String?
+  latestDepart   String?
+  riderPreference String?    @default("Anyone welcome")
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
   user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -317,6 +337,19 @@ model Notification {
   @@index([userId, read, createdAt])
 }
 
+model CommutePreferences {
+  id                String  @id @default(cuid())
+  userId            String  @unique
+  preferredVehicle  String  @default("Any")
+  genderPreference  String  @default("No preference")
+  maxWalkMinutes    Int     @default(10)
+  leaveBy           String?
+  arriveBy          String?
+  walkWithOthers    Boolean @default(true)
+  walkingPace       String  @default("Normal")
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 model ReminderSettings {
   id                 String  @id @default(cuid())
   userId             String  @unique
@@ -378,4 +411,22 @@ model AdminActivityLog {
   createdAt DateTime @default(now())
 
   @@index([createdAt])
+}
+
+/// Async notification delivery queue (FCM / email workers).
+model NotificationOutbox {
+  id          String       @id @default(cuid())
+  userId      String
+  type        NotificationType
+  title       String
+  body        String
+  payload     Json?
+  status      OutboxStatus @default(PENDING)
+  attempts    Int          @default(0)
+  lastError   String?
+  createdAt   DateTime     @default(now())
+  processedAt DateTime?
+
+  @@index([status, createdAt])
+  @@index([userId])
 }

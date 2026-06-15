@@ -13,6 +13,7 @@ enum IdVisibility { adminOnly, publicToRiders }
 
 class VehicleInfo {
   const VehicleInfo({
+    this.id,
     required this.type,
     required this.makeModel,
     required this.licensePlate,
@@ -23,6 +24,7 @@ class VehicleInfo {
     this.riderPreference = 'Anyone welcome',
   });
 
+  final String? id;
   final String type;
   final String makeModel;
   final String licensePlate;
@@ -33,6 +35,7 @@ class VehicleInfo {
   final String riderPreference;
 
   Map<String, dynamic> toJson() => {
+        if (id != null) 'id': id,
         'type': type,
         'makeModel': makeModel,
         'licensePlate': licensePlate,
@@ -44,6 +47,7 @@ class VehicleInfo {
       };
 
   factory VehicleInfo.fromJson(Map<String, dynamic> json) => VehicleInfo(
+        id: json['id'] as String?,
         type: json['type'] as String? ?? 'car',
         makeModel: json['makeModel'] as String? ?? '',
         licensePlate: json['licensePlate'] as String? ?? '',
@@ -102,8 +106,7 @@ class UserProfile {
     required this.fullName,
     required this.workEmail,
     required this.phone,
-    required this.passwordHash,
-    this.photoPath,
+    this.photoUrl,
     this.commuteType = CommuteType.drive,
     this.phase = OnboardingPhase.accountCreated,
     this.companyName,
@@ -111,20 +114,23 @@ class UserProfile {
     this.officeLat,
     this.officeLng,
     this.homeAddress,
+    this.homeLat,
+    this.homeLng,
     this.designation,
     this.idVisibility = IdVisibility.adminOnly,
     this.idCardPath,
     this.vehicle,
     this.commutePreferences,
     this.workEmailVerified = false,
+    this.officeLocationVerified = false,
+    this.employeeIdVerified = false,
   });
 
   final String id;
   String fullName;
   String workEmail;
   String phone;
-  String passwordHash;
-  String? photoPath;
+  String? photoUrl;
   CommuteType commuteType;
   OnboardingPhase phase;
   String? companyName;
@@ -132,12 +138,16 @@ class UserProfile {
   double? officeLat;
   double? officeLng;
   String? homeAddress;
+  double? homeLat;
+  double? homeLng;
   String? designation;
   IdVisibility idVisibility;
   String? idCardPath;
   VehicleInfo? vehicle;
   CommutePreferences? commutePreferences;
   bool workEmailVerified;
+  bool officeLocationVerified;
+  bool employeeIdVerified;
 
   String get firstName => fullName.split(' ').first;
 
@@ -157,8 +167,7 @@ class UserProfile {
         'fullName': fullName,
         'workEmail': workEmail,
         'phone': phone,
-        'passwordHash': passwordHash,
-        'photoPath': photoPath,
+        'photoUrl': photoUrl,
         'commuteType': commuteType.name,
         'phase': phase.name,
         'companyName': companyName,
@@ -166,12 +175,16 @@ class UserProfile {
         'officeLat': officeLat,
         'officeLng': officeLng,
         'homeAddress': homeAddress,
+        'homeLat': homeLat,
+        'homeLng': homeLng,
         'designation': designation,
         'idVisibility': idVisibility.name,
         'idCardPath': idCardPath,
         'vehicle': vehicle?.toJson(),
         'commutePreferences': commutePreferences?.toJson(),
         'workEmailVerified': workEmailVerified,
+        'officeLocationVerified': officeLocationVerified,
+        'employeeIdVerified': employeeIdVerified,
       };
 
   factory UserProfile.fromJson(Map<String, dynamic> json) => UserProfile(
@@ -179,8 +192,7 @@ class UserProfile {
         fullName: json['fullName'] as String,
         workEmail: json['workEmail'] as String,
         phone: json['phone'] as String,
-        passwordHash: json['passwordHash'] as String,
-        photoPath: json['photoPath'] as String?,
+        photoUrl: json['photoUrl'] as String?,
         commuteType: CommuteType.values.byName(
           json['commuteType'] as String? ?? 'drive',
         ),
@@ -192,6 +204,8 @@ class UserProfile {
         officeLat: (json['officeLat'] as num?)?.toDouble(),
         officeLng: (json['officeLng'] as num?)?.toDouble(),
         homeAddress: json['homeAddress'] as String?,
+        homeLat: (json['homeLat'] as num?)?.toDouble(),
+        homeLng: (json['homeLng'] as num?)?.toDouble(),
         designation: json['designation'] as String?,
         idVisibility: IdVisibility.values.byName(
           json['idVisibility'] as String? ?? 'adminOnly',
@@ -206,6 +220,8 @@ class UserProfile {
               )
             : null,
         workEmailVerified: json['workEmailVerified'] as bool? ?? false,
+        officeLocationVerified: json['officeLocationVerified'] as bool? ?? false,
+        employeeIdVerified: json['employeeIdVerified'] as bool? ?? false,
       );
 
   static String encodeList(List<UserProfile> users) =>

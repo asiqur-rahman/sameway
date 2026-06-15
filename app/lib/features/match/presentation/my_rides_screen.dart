@@ -19,6 +19,14 @@ class _MyRidesScreenState extends State<MyRidesScreen> {
   int _tabIndex = 0;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AppDataStore.instance.refreshBookings();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: AppDataStore.instance,

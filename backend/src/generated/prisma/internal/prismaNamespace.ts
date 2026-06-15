@@ -396,12 +396,14 @@ export const ModelName = {
   ConversationParticipant: 'ConversationParticipant',
   Message: 'Message',
   Notification: 'Notification',
+  CommutePreferences: 'CommutePreferences',
   ReminderSettings: 'ReminderSettings',
   DeviceToken: 'DeviceToken',
   Review: 'Review',
   AllowedDomain: 'AllowedDomain',
   SystemConfig: 'SystemConfig',
-  AdminActivityLog: 'AdminActivityLog'
+  AdminActivityLog: 'AdminActivityLog',
+  NotificationOutbox: 'NotificationOutbox'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -417,7 +419,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "refreshToken" | "vehicle" | "place" | "regularRoute" | "ride" | "rideRequest" | "rideParticipant" | "conversation" | "conversationParticipant" | "message" | "notification" | "reminderSettings" | "deviceToken" | "review" | "allowedDomain" | "systemConfig" | "adminActivityLog"
+    modelProps: "user" | "refreshToken" | "vehicle" | "place" | "regularRoute" | "ride" | "rideRequest" | "rideParticipant" | "conversation" | "conversationParticipant" | "message" | "notification" | "commutePreferences" | "reminderSettings" | "deviceToken" | "review" | "allowedDomain" | "systemConfig" | "adminActivityLog" | "notificationOutbox"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1309,6 +1311,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    CommutePreferences: {
+      payload: Prisma.$CommutePreferencesPayload<ExtArgs>
+      fields: Prisma.CommutePreferencesFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CommutePreferencesFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommutePreferencesPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CommutePreferencesFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommutePreferencesPayload>
+        }
+        findFirst: {
+          args: Prisma.CommutePreferencesFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommutePreferencesPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CommutePreferencesFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommutePreferencesPayload>
+        }
+        findMany: {
+          args: Prisma.CommutePreferencesFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommutePreferencesPayload>[]
+        }
+        create: {
+          args: Prisma.CommutePreferencesCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommutePreferencesPayload>
+        }
+        createMany: {
+          args: Prisma.CommutePreferencesCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CommutePreferencesCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommutePreferencesPayload>[]
+        }
+        delete: {
+          args: Prisma.CommutePreferencesDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommutePreferencesPayload>
+        }
+        update: {
+          args: Prisma.CommutePreferencesUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommutePreferencesPayload>
+        }
+        deleteMany: {
+          args: Prisma.CommutePreferencesDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CommutePreferencesUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CommutePreferencesUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommutePreferencesPayload>[]
+        }
+        upsert: {
+          args: Prisma.CommutePreferencesUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CommutePreferencesPayload>
+        }
+        aggregate: {
+          args: Prisma.CommutePreferencesAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCommutePreferences>
+        }
+        groupBy: {
+          args: Prisma.CommutePreferencesGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CommutePreferencesGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CommutePreferencesCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CommutePreferencesCountAggregateOutputType> | number
+        }
+      }
+    }
     ReminderSettings: {
       payload: Prisma.$ReminderSettingsPayload<ExtArgs>
       fields: Prisma.ReminderSettingsFieldRefs
@@ -1753,6 +1829,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    NotificationOutbox: {
+      payload: Prisma.$NotificationOutboxPayload<ExtArgs>
+      fields: Prisma.NotificationOutboxFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.NotificationOutboxFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationOutboxPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.NotificationOutboxFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationOutboxPayload>
+        }
+        findFirst: {
+          args: Prisma.NotificationOutboxFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationOutboxPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.NotificationOutboxFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationOutboxPayload>
+        }
+        findMany: {
+          args: Prisma.NotificationOutboxFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationOutboxPayload>[]
+        }
+        create: {
+          args: Prisma.NotificationOutboxCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationOutboxPayload>
+        }
+        createMany: {
+          args: Prisma.NotificationOutboxCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.NotificationOutboxCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationOutboxPayload>[]
+        }
+        delete: {
+          args: Prisma.NotificationOutboxDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationOutboxPayload>
+        }
+        update: {
+          args: Prisma.NotificationOutboxUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationOutboxPayload>
+        }
+        deleteMany: {
+          args: Prisma.NotificationOutboxDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.NotificationOutboxUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.NotificationOutboxUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationOutboxPayload>[]
+        }
+        upsert: {
+          args: Prisma.NotificationOutboxUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$NotificationOutboxPayload>
+        }
+        aggregate: {
+          args: Prisma.NotificationOutboxAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateNotificationOutbox>
+        }
+        groupBy: {
+          args: Prisma.NotificationOutboxGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationOutboxGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.NotificationOutboxCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.NotificationOutboxCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1800,6 +1950,9 @@ export const UserScalarFieldEnum = {
   passwordHash: 'passwordHash',
   photoUrl: 'photoUrl',
   commuteType: 'commuteType',
+  companyName: 'companyName',
+  designation: 'designation',
+  idVisibility: 'idVisibility',
   gender: 'gender',
   companyDomain: 'companyDomain',
   verificationStatus: 'verificationStatus',
@@ -1839,6 +1992,9 @@ export const VehicleScalarFieldEnum = {
   availableSeats: 'availableSeats',
   year: 'year',
   color: 'color',
+  usuallyLeave: 'usuallyLeave',
+  latestDepart: 'latestDepart',
+  riderPreference: 'riderPreference',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1976,6 +2132,21 @@ export const NotificationScalarFieldEnum = {
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
+export const CommutePreferencesScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  preferredVehicle: 'preferredVehicle',
+  genderPreference: 'genderPreference',
+  maxWalkMinutes: 'maxWalkMinutes',
+  leaveBy: 'leaveBy',
+  arriveBy: 'arriveBy',
+  walkWithOthers: 'walkWithOthers',
+  walkingPace: 'walkingPace'
+} as const
+
+export type CommutePreferencesScalarFieldEnum = (typeof CommutePreferencesScalarFieldEnum)[keyof typeof CommutePreferencesScalarFieldEnum]
+
+
 export const ReminderSettingsScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -2042,6 +2213,23 @@ export const AdminActivityLogScalarFieldEnum = {
 } as const
 
 export type AdminActivityLogScalarFieldEnum = (typeof AdminActivityLogScalarFieldEnum)[keyof typeof AdminActivityLogScalarFieldEnum]
+
+
+export const NotificationOutboxScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  title: 'title',
+  body: 'body',
+  payload: 'payload',
+  status: 'status',
+  attempts: 'attempts',
+  lastError: 'lastError',
+  createdAt: 'createdAt',
+  processedAt: 'processedAt'
+} as const
+
+export type NotificationOutboxScalarFieldEnum = (typeof NotificationOutboxScalarFieldEnum)[keyof typeof NotificationOutboxScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -2123,6 +2311,20 @@ export type EnumCommuteTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$Pris
  * Reference to a field of type 'CommuteType[]'
  */
 export type ListEnumCommuteTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CommuteType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'IdVisibility'
+ */
+export type EnumIdVisibilityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'IdVisibility'>
+    
+
+
+/**
+ * Reference to a field of type 'IdVisibility[]'
+ */
+export type ListEnumIdVisibilityFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'IdVisibility[]'>
     
 
 
@@ -2356,6 +2558,20 @@ export type EnumNotificationTypeFieldRefInput<$PrismaModel> = FieldRefInputType<
 export type ListEnumNotificationTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'NotificationType[]'>
     
 
+
+/**
+ * Reference to a field of type 'OutboxStatus'
+ */
+export type EnumOutboxStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OutboxStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'OutboxStatus[]'
+ */
+export type ListEnumOutboxStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OutboxStatus[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -2478,12 +2694,14 @@ export type GlobalOmitConfig = {
   conversationParticipant?: Prisma.ConversationParticipantOmit
   message?: Prisma.MessageOmit
   notification?: Prisma.NotificationOmit
+  commutePreferences?: Prisma.CommutePreferencesOmit
   reminderSettings?: Prisma.ReminderSettingsOmit
   deviceToken?: Prisma.DeviceTokenOmit
   review?: Prisma.ReviewOmit
   allowedDomain?: Prisma.AllowedDomainOmit
   systemConfig?: Prisma.SystemConfigOmit
   adminActivityLog?: Prisma.AdminActivityLogOmit
+  notificationOutbox?: Prisma.NotificationOutboxOmit
 }
 
 /* Types for Logging */

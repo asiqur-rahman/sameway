@@ -131,18 +131,27 @@ class RideDetailScreen extends StatelessWidget {
               label: 'Request to Join →',
               onPressed: () async {
                 final flow = FindRideFlow.instance;
-                final result = await AppDataStore.instance.requestJoinRide(
-                  driverName: listing.driverFullName,
-                  route: '${listing.from} → ${listing.to}',
-                  from: listing.from,
-                  to: listing.to,
-                  timeLabel: '${flow.dateLabel.isEmpty ? 'Today' : flow.dateLabel} · ${listing.departTime}',
-                  detail: 'Driver: ${listing.driverFullName} · ${listing.seats} seat${listing.seats == 1 ? '' : 's'}',
-                  matchLabel: '${listing.overlap}% match',
-                );
-                flow.lastRequestChatThreadId = result.chat.id;
-                flow.lastRequestDriverName = listing.driverName.replaceAll('.', '').split(' ').first;
-                if (context.mounted) context.push(AppRoutes.requestSent);
+                try {
+                  await AppDataStore.instance.requestJoinRide(
+                    rideId: listing.id,
+                    driverName: listing.driverFullName,
+                    route: '${listing.from} → ${listing.to}',
+                    from: listing.from,
+                    to: listing.to,
+                    timeLabel: '${flow.dateLabel.isEmpty ? 'Today' : flow.dateLabel} · ${listing.departTime}',
+                    detail: 'Driver: ${listing.driverFullName} · ${listing.seats} seat${listing.seats == 1 ? '' : 's'}',
+                    matchLabel: '${listing.overlap}% match',
+                  );
+                  flow.lastRequestChatThreadId = null;
+                  flow.lastRequestDriverName = listing.driverName.replaceAll('.', '').split(' ').first;
+                  if (context.mounted) context.push(AppRoutes.requestSent);
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(e.toString())),
+                    );
+                  }
+                }
               },
             ),
           ),

@@ -16,11 +16,31 @@ flutter run -d chrome --web-port=7357
 
 **QA navigation:** Open `/catalog` to jump to any screen.
 
+## Backend API
+
+Start the API from `../backend/` (`npm run dev`). The app connects automatically:
+
+| Platform | Default base URL |
+|----------|------------------|
+| Android emulator | `http://10.0.2.2:3000/api/v1` |
+| iOS sim / web | `http://localhost:3000/api/v1` |
+| Physical device | `--dart-define=API_BASE_URL=http://<LAN-IP>:3000/api/v1` |
+
+```bash
+# Physical device example
+flutter run -d <device> --dart-define=API_BASE_URL=http://192.168.1.10:3000/api/v1
+```
+
+Disable API (offline UI only): `--dart-define=API_ENABLED=false`
+
 ## Project structure
 
 ```
 lib/
-├── core/           # theme, routes, widgets
+├── core/
+│   ├── api/        # Dio client, JWT, repositories
+│   ├── session/    # AppSession, AppDataStore
+│   └── ...
 ├── features/
 │   ├── onboarding/
 │   ├── home/

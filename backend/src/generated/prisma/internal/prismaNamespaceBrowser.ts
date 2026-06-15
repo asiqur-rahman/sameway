@@ -63,12 +63,14 @@ export const ModelName = {
   ConversationParticipant: 'ConversationParticipant',
   Message: 'Message',
   Notification: 'Notification',
+  CommutePreferences: 'CommutePreferences',
   ReminderSettings: 'ReminderSettings',
   DeviceToken: 'DeviceToken',
   Review: 'Review',
   AllowedDomain: 'AllowedDomain',
   SystemConfig: 'SystemConfig',
-  AdminActivityLog: 'AdminActivityLog'
+  AdminActivityLog: 'AdminActivityLog',
+  NotificationOutbox: 'NotificationOutbox'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -95,6 +97,9 @@ export const UserScalarFieldEnum = {
   passwordHash: 'passwordHash',
   photoUrl: 'photoUrl',
   commuteType: 'commuteType',
+  companyName: 'companyName',
+  designation: 'designation',
+  idVisibility: 'idVisibility',
   gender: 'gender',
   companyDomain: 'companyDomain',
   verificationStatus: 'verificationStatus',
@@ -134,6 +139,9 @@ export const VehicleScalarFieldEnum = {
   availableSeats: 'availableSeats',
   year: 'year',
   color: 'color',
+  usuallyLeave: 'usuallyLeave',
+  latestDepart: 'latestDepart',
+  riderPreference: 'riderPreference',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -271,6 +279,21 @@ export const NotificationScalarFieldEnum = {
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
+export const CommutePreferencesScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  preferredVehicle: 'preferredVehicle',
+  genderPreference: 'genderPreference',
+  maxWalkMinutes: 'maxWalkMinutes',
+  leaveBy: 'leaveBy',
+  arriveBy: 'arriveBy',
+  walkWithOthers: 'walkWithOthers',
+  walkingPace: 'walkingPace'
+} as const
+
+export type CommutePreferencesScalarFieldEnum = (typeof CommutePreferencesScalarFieldEnum)[keyof typeof CommutePreferencesScalarFieldEnum]
+
+
 export const ReminderSettingsScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -337,6 +360,23 @@ export const AdminActivityLogScalarFieldEnum = {
 } as const
 
 export type AdminActivityLogScalarFieldEnum = (typeof AdminActivityLogScalarFieldEnum)[keyof typeof AdminActivityLogScalarFieldEnum]
+
+
+export const NotificationOutboxScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  title: 'title',
+  body: 'body',
+  payload: 'payload',
+  status: 'status',
+  attempts: 'attempts',
+  lastError: 'lastError',
+  createdAt: 'createdAt',
+  processedAt: 'processedAt'
+} as const
+
+export type NotificationOutboxScalarFieldEnum = (typeof NotificationOutboxScalarFieldEnum)[keyof typeof NotificationOutboxScalarFieldEnum]
 
 
 export const SortOrder = {

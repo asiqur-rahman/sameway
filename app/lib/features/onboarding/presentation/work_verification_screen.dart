@@ -6,6 +6,7 @@ import 'package:sameway/core/models/map_location.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_placeholders.dart';
+import 'package:sameway/core/api/repositories/users_repository.dart';
 import 'package:sameway/core/session/app_session.dart';
 import 'package:sameway/core/session/user_profile.dart';
 import 'package:sameway/core/widgets/onboarding_step_layout.dart';
@@ -101,6 +102,30 @@ class _WorkVerificationScreenState extends State<WorkVerificationScreen> {
       user.idCardPath = _idCardPath;
       user.phase = OnboardingPhase.complete;
     });
+
+    await AppSession.instance.syncPlace(
+      label: 'OFFICE',
+      address: _office!.address,
+      lat: _office!.lat,
+      lng: _office!.lng,
+    );
+
+    final home = _homeController.text.trim();
+    if (home.isNotEmpty) {
+      await AppSession.instance.syncPlace(
+        label: 'HOME',
+        address: home,
+        lat: AppSession.instance.currentUser?.homeLat ?? 23.8759,
+        lng: AppSession.instance.currentUser?.homeLng ?? 90.3795,
+      );
+    }
+
+    try {
+      await UsersRepository.instance.submitVerification(
+        verificationMethod: 'SELF_VERIFY',
+      );
+      await AppSession.instance.refreshMe();
+    } catch (_) {}
     if (!mounted) return;
     context.go(AppRoutes.home);
   }

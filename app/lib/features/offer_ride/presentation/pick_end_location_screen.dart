@@ -61,7 +61,17 @@ class _PickEndLocationScreenState extends State<PickEndLocationScreen> {
       );
       return;
     }
-    await AppDataStore.instance.updatePostRideDraft((d) => d.endAddress = address);
+    await AppDataStore.instance.updatePostRideDraft((d) {
+      d.endAddress = address;
+      final user = AppSession.instance.currentUser;
+      if (_selected == user?.officeAddress) {
+        d.endLat = user?.officeLat;
+        d.endLng = user?.officeLng;
+      } else if (_selected == user?.homeAddress) {
+        d.endLat = user?.homeLat;
+        d.endLng = user?.homeLng;
+      }
+    });
     if (!mounted) return;
     context.push(route);
   }

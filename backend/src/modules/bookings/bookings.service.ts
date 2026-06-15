@@ -1,32 +1,9 @@
 import type { Prisma } from "@/generated/prisma/client";
 import { db } from "@/lib/db";
-import { paginate } from "@/lib/shared";
+import { toDriverBookingDto } from "@/application/mappers/ride.mapper";
+import * as notificationsService from "@/modules/notifications/notifications.service";
 
-export async function listNotifications(userId: string, page = 1, limit = 30) {
-  const { skip, take } = paginate(page, limit);
-  const [items, total] = await Promise.all([
-    db.notification.findMany({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-      skip,
-      take,
-    }),
-    db.notification.count({ where: { userId } }),
-  ]);
-  return { items, total, page, limit };
-}
-
-export async function markRead(notificationId: string, userId: string) {
-  return db.notification.updateMany({
-    where: { id: notificationId, userId },
-    data: { read: true },
-  });
-}
-
-export async function markAllRead(userId: string) {
-  await db.notification.updateMany({ where: { userId, read: false }, data: { read: true } });
-  return { ok: true };
-}
+export { listNotifications, markRead, markAllRead } from "@/modules/notifications/notifications.service";
 
 function buildRideFilter(status?: "upcoming" | "completed"): Prisma.RideWhereInput {
   const now = new Date();
@@ -54,6 +31,7 @@ export async function getMyBookings(userId: string, status?: "upcoming" | "compl
         include: {
           driver: { select: { id: true, fullName: true, photoUrl: true } },
           vehicle: true,
+          conversations: { select: { id: true }, take: 1 },
         },
       },
     },
@@ -66,5 +44,20 @@ export async function getMyBookings(userId: string, status?: "upcoming" | "compl
     orderBy: { departureAt: "desc" },
   });
 
-  return { asRider, asDriver };
+  return {
+    asRider: asRider.map((r) => ({
+      id: r.ride.id,
+      route: `${r.ride.startAddress} → ${r.ride.endAddress}`,
+      from: r.ride.startAddress,
+      to: r.ride.endAddress,
+      timeLabel: r.ride.departureAt.toISOString(),
+      detail: `Driver: ${r.ride.driver.fullName} · ${r.ride.availableSeats} seats`,
+      status: r.status.toLowerCase(),
+      driverName: r.ride.driver.fullName,
+      isDriver: false,
+      chatThreadId: r.ride.conversations[0]?.id ?? null,
+    })),
+    asDriver: asDriver.map(toDriverBookingDto),
+    unreadNotifications: (await notificationsService.listNotifications(userId, 1, 1)).unreadCount,
+  };
 }

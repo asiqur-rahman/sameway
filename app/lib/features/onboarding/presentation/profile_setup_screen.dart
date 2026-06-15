@@ -31,7 +31,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     final user = AppSession.instance.currentUser;
     _nameController = TextEditingController(text: user?.fullName ?? '');
     _commuteType = user?.commuteType ?? CommuteType.drive;
-    _photoPath = user?.photoPath;
+    _photoPath = user?.photoUrl;
   }
 
   @override
@@ -56,7 +56,6 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     await AppSession.instance.updateCurrent((user) {
       user.fullName = _nameController.text.trim();
       user.commuteType = _commuteType;
-      user.photoPath = _photoPath;
       user.phase = OnboardingPhase.profileDone;
     });
     if (!mounted) return;

@@ -63,22 +63,24 @@ export async function sendMessage(
       include: { sender: { select: { id: true, fullName: true, photoUrl: true } } },
     });
     await tx.conversation.update({ where: { id: conversationId }, data: { updatedAt: new Date() } });
+    return msg;
+  });
 
-    const others = await tx.conversationParticipant.findMany({
-      where: { conversationId, userId: { not: senderId } },
-    });
-    await tx.notification.createMany({
-      data: others.map((o) => ({
+  const others = await db.conversationParticipant.findMany({
+    where: { conversationId, userId: { not: senderId } },
+  });
+  if (others.length > 0) {
+    const { notifyMany } = await import("@/infrastructure/outbox/notification-outbox");
+    await notifyMany(
+      others.map((o) => ({
         userId: o.userId,
         type: NotificationType.MESSAGE,
         title: "New message",
         body: input.body.slice(0, 100),
-        payload: { conversationId, messageId: msg.id },
+        payload: { conversationId, messageId: message.id },
       })),
-    });
-
-    return msg;
-  });
+    );
+  }
 
   return message;
 }

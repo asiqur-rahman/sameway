@@ -1,38 +1,29 @@
-import { NotificationType, RideStatus, type Prisma } from "@/generated/prisma/client";
-import { MemoryCache } from "@/lib/cache/memory-cache";
+import type { Prisma } from "@/generated/prisma/client";
+import { NotificationType, ParticipantStatus, RideStatus } from "@/generated/prisma/client";
+import { container } from "@/application/container";
+import { toRideDetailDto } from "@/application/mappers/ride.mapper";
 import { db } from "@/lib/db";
-import { env } from "@/lib/env";
 import { ForbiddenError, NotFoundError, ConflictError } from "@/lib/http/errors";
 import { getSystemConfig } from "@/lib/system-config";
-import { paginate } from "@/lib/shared";
+import { notifyUser } from "@/infrastructure/outbox/notification-outbox";
 import {
   buildSegments,
   scoreRouteMatch,
-  walkingMinutes,
-  type RouteSegment,
 } from "@/modules/matching/matching.service";
-import {
-  expandSearchBBox,
-  searchCacheKey,
-  segmentOverlapsBBox,
-} from "@/modules/matching/geo";
+import type { RouteSegment } from "@/modules/matching/matching.service";
+import type { GeoPoint } from "@/lib/shared";
 import type { createRideSchema, rideRequestSchema, searchRidesSchema } from "./rides.schema";
 import type { z } from "zod";
-
-type SearchResult = {
-  items: ReturnType<typeof scoreAndFilterRides>;
-  total: number;
-  page: number;
-  limit: number;
-};
-
-const searchCache = new MemoryCache<SearchResult>(env.SEARCH_CACHE_TTL_SEC * 1000);
 
 async function assertRidePostingAllowed() {
   const config = await getSystemConfig();
   if (config.maintenanceMode) {
     throw new ForbiddenError("Ride posting is disabled during maintenance");
   }
+}
+
+async function invalidateSearchCache() {
+  await container.searchRides.invalidateCache();
 }
 
 export async function createRide(userId: string, input: z.infer<typeof createRideSchema>) {
@@ -65,163 +56,32 @@ export async function createRide(userId: string, input: z.infer<typeof createRid
     include: { vehicle: true, driver: { select: { id: true, fullName: true, photoUrl: true, rating: true } } },
   });
 
-  searchCache.clear();
+  await invalidateSearchCache();
   return ride;
+}
+
+export async function getIncomingRequests(driverId: string, rideId: string) {
+  const ride = await db.ride.findFirst({ where: { id: rideId, driverId } });
+  if (!ride) throw new NotFoundError("Ride");
+  return db.rideRequest.findMany({
+    where: { rideId, status: "PENDING" },
+    include: { rider: { select: { id: true, fullName: true, photoUrl: true, rating: true } } },
+    orderBy: { createdAt: "desc" },
+  });
 }
 
 export async function getRideById(rideId: string) {
-  const ride = await db.ride.findUnique({
-    where: { id: rideId },
-    include: {
-      vehicle: true,
-      driver: { select: { id: true, fullName: true, photoUrl: true, rating: true, rideCount: true } },
-      requests: { include: { rider: { select: { id: true, fullName: true, photoUrl: true } } } },
-      participants: true,
-    },
-  });
+  const ride = await container.rideRepository.findById(rideId);
   if (!ride) throw new NotFoundError("Ride");
-  return ride;
+  return toRideDetailDto(ride);
 }
 
 export async function getMyRidesAsDriver(userId: string) {
-  return db.ride.findMany({
-    where: { driverId: userId },
-    orderBy: { departureAt: "desc" },
-    take: 100,
-    include: { vehicle: true, requests: true },
-  });
+  return container.rideRepository.listByDriver(userId);
 }
 
-function buildGeoWhere(
-  bbox: ReturnType<typeof expandSearchBBox>,
-): Prisma.RideWhereInput {
-  return {
-    OR: [
-      {
-        AND: [
-          { startLat: { gte: bbox.minLat, lte: bbox.maxLat } },
-          { startLng: { gte: bbox.minLng, lte: bbox.maxLng } },
-        ],
-      },
-      {
-        AND: [
-          { endLat: { gte: bbox.minLat, lte: bbox.maxLat } },
-          { endLng: { gte: bbox.minLng, lte: bbox.maxLng } },
-        ],
-      },
-      {
-        AND: [
-          { startLat: { lte: bbox.maxLat } },
-          { endLat: { gte: bbox.minLat } },
-          { startLng: { lte: bbox.maxLng } },
-          { endLng: { gte: bbox.minLng } },
-        ],
-      },
-    ],
-  };
-}
-
-function scoreAndFilterRides(
-  rides: Awaited<ReturnType<typeof db.ride.findMany>>,
-  input: z.infer<typeof searchRidesSchema>,
-  riderGender: string | null | undefined,
-) {
-  const riderFrom = { address: input.fromAddress ?? "", lat: input.fromLat, lng: input.fromLng };
-  const riderTo = { address: input.toAddress ?? "", lat: input.toLat, lng: input.toLng };
-  const bbox = expandSearchBBox(
-    input.fromLat,
-    input.fromLng,
-    input.toLat,
-    input.toLng,
-    env.SEARCH_BBOX_BUFFER_KM,
-  );
-
-  return rides
-    .filter((ride) =>
-      segmentOverlapsBBox(ride.startLat, ride.startLng, ride.endLat, ride.endLng, bbox),
-    )
-    .map((ride) => {
-      const driver = (ride as { driver?: { gender?: string | null } }).driver;
-      const segments = (ride.segments as unknown as RouteSegment[]) ?? [];
-      const matchScore = scoreRouteMatch({ riderFrom, riderTo, driverSegments: segments });
-      const walkMin = walkingMinutes(
-        Math.hypot(input.fromLat - ride.startLat, input.fromLng - ride.startLng) * 111_000,
-      );
-      return { ...ride, matchScore, walkMin, driver };
-    })
-    .filter((r) => {
-      if (r.matchScore < input.minMatchScore) return false;
-      if (r.walkMin > input.maxWalkingMinutes) return false;
-      if (input.genderPreference === "SAME" && riderGender && r.driver?.gender) {
-        return r.driver.gender === riderGender;
-      }
-      return r.matchScore > 0;
-    })
-    .sort((a, b) => b.matchScore - a.matchScore);
-}
-
-export async function searchRides(
-  userId: string,
-  input: z.infer<typeof searchRidesSchema>,
-) {
-  const { page, limit, fromLat, fromLng, toLat, toLng, vehicleFilter } = input;
-
-  const cacheKey = `${userId}:${searchCacheKey(input)}`;
-  if (env.SEARCH_CACHE_TTL_SEC > 0) {
-    const cached = searchCache.get(cacheKey);
-    if (cached) return cached;
-  }
-
-  const bbox = expandSearchBBox(fromLat, fromLng, toLat, toLng, env.SEARCH_BBOX_BUFFER_KM);
-
-  const rider = await db.user.findUnique({
-    where: { id: userId },
-    select: { gender: true },
-  });
-
-  const where: Prisma.RideWhereInput = {
-    status: "OPEN",
-    departureAt: { gte: new Date() },
-    driverId: { not: userId },
-    AND: [buildGeoWhere(bbox)],
-    ...(vehicleFilter !== "ANY" ? { vehicle: { type: vehicleFilter } } : {}),
-  };
-
-  const rides = await db.ride.findMany({
-    where,
-    include: {
-      vehicle: true,
-      driver: {
-        select: { id: true, fullName: true, photoUrl: true, rating: true, gender: true },
-      },
-    },
-    orderBy: { departureAt: "asc" },
-    take: env.SEARCH_CANDIDATE_CAP,
-  });
-
-  const scored = scoreAndFilterRides(rides, input, rider?.gender);
-
-  const { skip, take } = paginate(page, limit);
-  const result: SearchResult = {
-    items: scored,
-    total: scored.length,
-    page,
-    limit,
-  };
-
-  const paged: SearchResult = {
-    items: scored.slice(skip, skip + take),
-    total: result.total,
-    page: result.page,
-    limit: result.limit,
-  };
-
-  if (env.SEARCH_CACHE_TTL_SEC > 0) {
-    searchCache.set(cacheKey, paged);
-    searchCache.prune(5_000);
-  }
-
-  return paged;
+export async function searchRides(userId: string, input: z.infer<typeof searchRidesSchema>) {
+  return container.searchRides.execute(userId, input);
 }
 
 export async function requestRide(
@@ -238,18 +98,48 @@ export async function requestRide(
   });
   if (existing) throw new ConflictError("Request already exists");
 
+  const riderPlaces = await db.place.findMany({
+    where: { userId: riderId, label: { in: ["HOME", "OFFICE"] } },
+  });
+  const home = riderPlaces.find((p) => p.label === "HOME");
+  const office = riderPlaces.find((p) => p.label === "OFFICE");
+
+  let matchScore: number | undefined;
+  let pickupSegment: Prisma.InputJsonValue | undefined;
+
+  if (home && office) {
+    const stops = (ride.stops as GeoPoint[] | null) ?? [];
+    const segments =
+      (ride.segments as unknown as RouteSegment[]) ??
+      buildSegments(
+        { address: ride.startAddress, lat: ride.startLat, lng: ride.startLng },
+        { address: ride.endAddress, lat: ride.endLat, lng: ride.endLng },
+        stops,
+      );
+    matchScore = scoreRouteMatch({
+      riderFrom: { address: home.address, lat: home.lat, lng: home.lng },
+      riderTo: { address: office.address, lat: office.lat, lng: office.lng },
+      driverSegments: segments,
+    });
+    pickupSegment = (segments[0] ?? null) as Prisma.InputJsonValue;
+  }
+
   const request = await db.rideRequest.create({
-    data: { rideId, riderId, riderNote: input.riderNote },
+    data: {
+      rideId,
+      riderId,
+      riderNote: input.riderNote,
+      matchScore,
+      pickupSegment,
+    },
   });
 
-  await db.notification.create({
-    data: {
-      userId: ride.driverId,
-      type: NotificationType.RIDE_REQUEST,
-      title: "New ride request",
-      body: "A rider wants to join your trip",
-      payload: { rideId, requestId: request.id },
-    },
+  await notifyUser({
+    userId: ride.driverId,
+    type: NotificationType.RIDE_REQUEST,
+    title: "New ride request",
+    body: "A rider wants to join your trip",
+    payload: { rideId, requestId: request.id },
   });
 
   return request;
@@ -305,13 +195,38 @@ export async function respondToRequest(
           payload: { rideId, conversationId: conversation.id },
         },
       });
+      await tx.notificationOutbox.create({
+        data: {
+          userId: request.riderId,
+          type: NotificationType.RIDE_CONFIRMED,
+          title: "Ride accepted",
+          body: "Your ride request was accepted",
+          payload: { rideId, conversationId: conversation.id },
+        },
+      });
     }
 
     return req;
   });
 
-  searchCache.clear();
+  await invalidateSearchCache();
   return updated;
+}
+
+export async function cancelRide(rideId: string, driverId: string) {
+  const ride = await container.cancelRide.execute(rideId, driverId);
+  await invalidateSearchCache();
+  return ride;
+}
+
+export async function updateRideStatus(
+  rideId: string,
+  driverId: string,
+  status: RideStatus,
+) {
+  const ride = await container.updateRideStatus.execute(rideId, driverId, status);
+  await invalidateSearchCache();
+  return ride;
 }
 
 export async function updateParticipantStatus(
@@ -319,9 +234,14 @@ export async function updateParticipantStatus(
   userId: string,
   status: string,
 ) {
+  const participant = await db.rideParticipant.findUnique({
+    where: { rideId_userId: { rideId, userId } },
+  });
+  if (!participant) throw new NotFoundError("Participant");
+
   return db.rideParticipant.update({
     where: { rideId_userId: { rideId, userId } },
-    data: { status: status as "CONFIRMED" },
+    data: { status: status as ParticipantStatus },
   });
 }
 
@@ -338,15 +258,16 @@ export async function driverHeadingOut(rideId: string, driverId: string) {
     where: { rideId, role: "RIDER" },
   });
 
-  await db.notification.createMany({
-    data: riders.map((r) => ({
+  const { notifyMany } = await import("@/infrastructure/outbox/notification-outbox");
+  await notifyMany(
+    riders.map((r) => ({
       userId: r.userId,
       type: NotificationType.DRIVER_ETA,
       title: "Driver is heading out",
       body: "Your driver is on the way",
       payload: { rideId },
     })),
-  });
+  );
 
   return { notified: riders.length };
 }
@@ -358,14 +279,6 @@ export async function getLiveRide(rideId: string) {
   });
 }
 
-export async function cancelRide(rideId: string, userId: string) {
-  const ride = await db.ride.findFirst({ where: { id: rideId, driverId: userId } });
-  if (!ride) throw new NotFoundError("Ride");
-  searchCache.clear();
-  return db.ride.update({ where: { id: rideId }, data: { status: RideStatus.CANCELLED } });
-}
-
-// Regular routes
 export async function listRegularRoutes(userId: string) {
   return db.regularRoute.findMany({ where: { userId }, orderBy: { createdAt: "desc" } });
 }
@@ -387,6 +300,46 @@ export async function createRegularRoute(userId: string, input: z.infer<typeof i
       defaultSeats: input.defaultSeats,
     },
   });
+}
+
+export async function updateRegularRoute(
+  userId: string,
+  routeId: string,
+  data: Partial<z.infer<typeof import("./rides.schema").regularRouteSchema>>,
+) {
+  const route = await db.regularRoute.findFirst({ where: { id: routeId, userId } });
+  if (!route) throw new NotFoundError("Regular route");
+  return db.regularRoute.update({
+    where: { id: routeId },
+    data: {
+      name: data.name,
+      scheduleDays: data.scheduleDays,
+      departureTime: data.departureTime,
+      defaultSeats: data.defaultSeats,
+      ...(data.start
+        ? {
+            startAddress: data.start.address,
+            startLat: data.start.lat,
+            startLng: data.start.lng,
+          }
+        : {}),
+      ...(data.end
+        ? {
+            endAddress: data.end.address,
+            endLat: data.end.lat,
+            endLng: data.end.lng,
+          }
+        : {}),
+      ...(data.stops ? { stops: data.stops } : {}),
+    },
+  });
+}
+
+export async function deleteRegularRoute(userId: string, routeId: string) {
+  const route = await db.regularRoute.findFirst({ where: { id: routeId, userId } });
+  if (!route) throw new NotFoundError("Regular route");
+  await db.regularRoute.delete({ where: { id: routeId } });
+  return { ok: true };
 }
 
 export async function postRideFromRoute(userId: string, routeId: string, departureAt: Date) {

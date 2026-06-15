@@ -10,6 +10,10 @@ class FindRideFlow {
 
   String from = '';
   String to = '';
+  double? fromLat;
+  double? fromLng;
+  double? toLat;
+  double? toLng;
   String dateLabel = '';
   String arriveBy = '';
   int vehicleIndex = 0;
@@ -34,6 +38,10 @@ class FindRideFlow {
     to = user?.officeAddress?.trim().isNotEmpty == true
         ? user!.officeAddress!
         : '';
+    fromLat = user?.homeLat;
+    fromLng = user?.homeLng;
+    toLat = user?.officeLat;
+    toLng = user?.officeLng;
     dateLabel = DateFormat('EEE, MMM d').format(DateTime.now());
     arriveBy = prefs?.arriveBy.trim().isNotEmpty == true
         ? prefs!.arriveBy
@@ -119,6 +127,34 @@ class FindRideListing {
   final String? coRiderName;
   final String? coRiderInitial;
   final List<String> kudos;
+
+  factory FindRideListing.fromJson(Map<String, dynamic> json) => FindRideListing(
+        id: json['id'] as String,
+        driverName: json['driverName'] as String? ?? '',
+        driverFullName: json['driverFullName'] as String? ?? '',
+        driverInitial: json['driverInitial'] as String? ?? '?',
+        company: json['company'] as String? ?? '',
+        from: json['from'] as String? ?? '',
+        to: json['to'] as String? ?? '',
+        departTime: json['departTime'] as String? ?? '',
+        arriveTime: json['arriveTime'] as String? ?? '',
+        seats: json['seats'] as int? ?? 1,
+        overlap: json['overlap'] as int? ?? json['matchScore'] as int? ?? 0,
+        rides: json['rides'] as int? ?? 0,
+        onTimePct: json['onTimePct'] as int? ?? 90,
+        vehicleLabel: json['vehicleLabel'] as String? ?? '',
+        vehicleDetail: json['vehicleDetail'] as String? ?? '',
+        pickupLabel: json['pickupLabel'] as String? ?? '',
+        pickupDetail: json['pickupDetail'] as String? ?? '',
+        driverNote: json['driverNote'] as String? ?? '',
+        isBike: json['isBike'] as bool? ?? false,
+        coRiderName: json['coRiderName'] as String?,
+        coRiderInitial: json['coRiderInitial'] as String?,
+        kudos: (json['kudos'] as List<dynamic>?)
+                ?.map((e) => e as String)
+                .toList() ??
+            const ['🚗 Smooth driver', '⏰ Punctual', '💬 Good chat'],
+      );
 }
 
 const sampleFindRideListings = [

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sameway/core/session/app_session.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_placeholders.dart';
@@ -58,9 +59,14 @@ class _SearchFiltersScreenState extends State<SearchFiltersScreen> {
   }
 
   void _search() {
+    final user = AppSession.instance.currentUser;
     FindRideFlow.instance
       ..from = _fromController.text.trim()
       ..to = _toController.text.trim()
+      ..fromLat = user?.homeLat
+      ..fromLng = user?.homeLng
+      ..toLat = user?.officeLat
+      ..toLng = user?.officeLng
       ..dateLabel = _dateController.text.trim()
       ..arriveBy = _arriveController.text.trim()
       ..vehicleIndex = _vehicleIndex

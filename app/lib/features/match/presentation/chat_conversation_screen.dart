@@ -22,6 +22,7 @@ class _ChatConversationScreenState extends State<ChatConversationScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      AppDataStore.instance.loadConversation(widget.threadId);
       AppDataStore.instance.markChatRead(widget.threadId);
     });
   }

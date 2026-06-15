@@ -1,51 +1,55 @@
-import 'dart:convert';
-
-import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sameway/core/session/app_data_store.dart';
+import 'package:sameway/core/api/api_client.dart';
+import 'package:sameway/core/api/api_config.dart';
+import 'package:sameway/core/api/api_exception.dart';
+import 'package:sameway/core/api/repositories/auth_repository.dart';
+import 'package:sameway/core/api/repositories/users_repository.dart';
+import 'package:sameway/core/api/user_mapper.dart';
 import 'package:sameway/core/session/user_profile.dart';
 import 'package:sameway/core/validation/form_validators.dart';
 import 'package:sameway/features/onboarding/onboarding_state.dart';
 
-/// Local auth + onboarding session (persists across restarts).
+/// Auth + onboarding session backed by the Same Way API.
 class AppSession extends ChangeNotifier {
   AppSession._();
 
   static final AppSession instance = AppSession._();
 
-  static const _usersKey = 'sameway_users';
-  static const _currentUserIdKey = 'sameway_current_user_id';
-
   bool _ready = false;
-  List<UserProfile> _users = [];
-  String? _currentUserId;
+  UserProfile? _currentUser;
 
   bool get isReady => _ready;
-  bool get isLoggedIn => _currentUserId != null;
-  UserProfile? get currentUser =>
-      _currentUserId == null ? null : _userById(_currentUserId!);
-
-  UserProfile? _userById(String id) {
-    for (final u in _users) {
-      if (u.id == id) return u;
-    }
-    return null;
-  }
+  bool get isLoggedIn => _currentUser != null;
+  UserProfile? get currentUser => _currentUser;
 
   Future<void> initialize() async {
-    final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString(_usersKey);
-    if (raw != null) {
-      _users = UserProfile.decodeList(raw);
+    ApiClient.instance.initialize(
+      onRefreshFailed: () async {
+        _currentUser = null;
+        notifyListeners();
+      },
+    );
+
+    if (!ApiConfig.enabled) {
+      _ready = true;
+      notifyListeners();
+      return;
     }
-    _currentUserId = prefs.getString(_currentUserIdKey);
-    _syncOnboardingState();
+
+    try {
+      final user = await AuthRepository.instance.fetchMe();
+      _currentUser = user;
+      _syncOnboardingState();
+    } catch (_) {
+      _currentUser = null;
+    }
     _ready = true;
     notifyListeners();
   }
 
   void _syncOnboardingState() {
-    final user = currentUser;
+    final user = _currentUser;
     final state = OnboardingState.instance;
     if (user == null) {
       state.reset();
@@ -54,34 +58,6 @@ class AppSession extends ChangeNotifier {
     state.commuteType = user.commuteType;
     state.hasVehicleDetails = user.hasVehicleDetails;
     state.designation = user.designation;
-  }
-
-  Future<void> _persist() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_usersKey, UserProfile.encodeList(_users));
-    if (_currentUserId != null) {
-      await prefs.setString(_currentUserIdKey, _currentUserId!);
-    } else {
-      await prefs.remove(_currentUserIdKey);
-    }
-  }
-
-  Future<void> _commit(UserProfile user) async {
-    final idx = _users.indexWhere((u) => u.id == user.id);
-    if (idx >= 0) {
-      _users[idx] = user;
-    } else {
-      _users.add(user);
-    }
-    _currentUserId = user.id;
-    _syncOnboardingState();
-    await _persist();
-    notifyListeners();
-  }
-
-  static String hashPassword(String password) {
-    final bytes = utf8.encode('sameway:$password');
-    return sha256.convert(bytes).toString();
   }
 
   Future<String?> register({
@@ -94,66 +70,121 @@ class AppSession extends ChangeNotifier {
     final emailErr = FormValidators.workEmail(email);
     if (emailErr != null) return emailErr;
 
-    final phoneDigits = phone.replaceAll(RegExp(r'\D'), '');
-    final exists = _users.any((u) {
-      final uPhone = u.phone.replaceAll(RegExp(r'\D'), '');
-      return u.workEmail == email || uPhone == phoneDigits;
-    });
-    if (exists) return 'An account with this email or phone already exists';
-
-    final user = UserProfile(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      fullName: fullName.trim(),
-      workEmail: email,
-      phone: phone.trim(),
-      passwordHash: hashPassword(password),
-      workEmailVerified: FormValidators.isEmailDomainAutoVerified(email),
-      phase: OnboardingPhase.accountCreated,
-    );
-
-    await _commit(user);
-    return null;
+    try {
+      _currentUser = await AuthRepository.instance.signup(
+        fullName: fullName,
+        workEmail: email,
+        phone: phone,
+        password: password,
+      );
+      _syncOnboardingState();
+      await AppDataStore.instance.refreshAll();
+      notifyListeners();
+      return null;
+    } on ApiException catch (e) {
+      return e.message;
+    } catch (e) {
+      return 'Could not create account. Is the backend running?';
+    }
   }
 
   Future<String?> signIn({
     required String workEmail,
     required String password,
   }) async {
-    final email = workEmail.trim().toLowerCase();
-    UserProfile? user;
-    for (final u in _users) {
-      if (u.workEmail == email) {
-        user = u;
-        break;
-      }
+    try {
+      _currentUser = await AuthRepository.instance.signin(
+        workEmail: workEmail,
+        password: password,
+      );
+      _syncOnboardingState();
+      await AppDataStore.instance.refreshAll();
+      notifyListeners();
+      return null;
+    } on ApiException catch (e) {
+      return e.message;
+    } catch (_) {
+      return 'Could not sign in. Is the backend running?';
     }
-    if (user == null) return 'No account found for this email';
-    if (user.passwordHash != hashPassword(password)) {
-      return 'Incorrect password';
-    }
-    _currentUserId = user.id;
-    _syncOnboardingState();
-    await _persist();
-    notifyListeners();
-    return null;
   }
 
   Future<void> signOut() async {
-    _currentUserId = null;
+    await AuthRepository.instance.signOut();
+    _currentUser = null;
     OnboardingState.instance.reset();
-    await _persist();
     notifyListeners();
   }
 
+  Future<void> refreshMe() async {
+    final user = await AuthRepository.instance.fetchMe();
+    if (user != null) {
+      _currentUser = user;
+      _syncOnboardingState();
+      notifyListeners();
+    }
+  }
+
   Future<void> updateCurrent(void Function(UserProfile user) mutate) async {
-    final user = currentUser;
+    final user = _currentUser;
     if (user == null) return;
     mutate(user);
-    await _commit(user);
+    notifyListeners();
+
+    try {
+      await UsersRepository.instance.updateProfile({
+        if (user.fullName.isNotEmpty) 'fullName': user.fullName,
+        'commuteType': UserMapper.commuteTypeToApi(user.commuteType),
+        if (user.companyName != null) 'companyName': user.companyName,
+        if (user.designation != null) 'designation': user.designation,
+        'idVisibility': user.idVisibility == IdVisibility.publicToRiders
+            ? 'PUBLIC_TO_RIDERS'
+            : 'ADMIN_ONLY',
+      });
+      await refreshMe();
+    } catch (_) {}
+  }
+
+  Future<void> syncVehicle(VehicleInfo vehicle) async {
+    final user = _currentUser;
+    if (user == null) return;
+    try {
+      if (vehicle.id != null) {
+        // updates handled separately if needed
+      } else {
+        final saved = await UsersRepository.instance.addVehicle(vehicle);
+        user.vehicle = saved;
+      }
+      await refreshMe();
+      notifyListeners();
+    } catch (_) {}
+  }
+
+  Future<void> syncCommutePreferences(CommutePreferences prefs) async {
+    try {
+      await UsersRepository.instance.updateCommutePreferences(prefs);
+      await refreshMe();
+    } catch (_) {}
+  }
+
+  Future<void> syncPlace({
+    required String label,
+    required String address,
+    required double lat,
+    required double lng,
+  }) async {
+    try {
+      await UsersRepository.instance.savePlace(
+        label: label,
+        address: address,
+        lat: lat,
+        lng: lng,
+      );
+      await refreshMe();
+    } catch (_) {}
   }
 
   String? onboardingRouteForCurrentUser() {
-    final user = currentUser;
+    final user = _currentUser;
     if (user == null) return null;
     return FormValidators.routeForPhase(user.phase);
   }

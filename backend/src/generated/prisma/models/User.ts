@@ -44,6 +44,9 @@ export type UserMinAggregateOutputType = {
   passwordHash: string | null
   photoUrl: string | null
   commuteType: $Enums.CommuteType | null
+  companyName: string | null
+  designation: string | null
+  idVisibility: $Enums.IdVisibility | null
   gender: $Enums.Gender | null
   companyDomain: string | null
   verificationStatus: $Enums.VerificationStatus | null
@@ -68,6 +71,9 @@ export type UserMaxAggregateOutputType = {
   passwordHash: string | null
   photoUrl: string | null
   commuteType: $Enums.CommuteType | null
+  companyName: string | null
+  designation: string | null
+  idVisibility: $Enums.IdVisibility | null
   gender: $Enums.Gender | null
   companyDomain: string | null
   verificationStatus: $Enums.VerificationStatus | null
@@ -92,6 +98,9 @@ export type UserCountAggregateOutputType = {
   passwordHash: number
   photoUrl: number
   commuteType: number
+  companyName: number
+  designation: number
+  idVisibility: number
   gender: number
   companyDomain: number
   verificationStatus: number
@@ -128,6 +137,9 @@ export type UserMinAggregateInputType = {
   passwordHash?: true
   photoUrl?: true
   commuteType?: true
+  companyName?: true
+  designation?: true
+  idVisibility?: true
   gender?: true
   companyDomain?: true
   verificationStatus?: true
@@ -152,6 +164,9 @@ export type UserMaxAggregateInputType = {
   passwordHash?: true
   photoUrl?: true
   commuteType?: true
+  companyName?: true
+  designation?: true
+  idVisibility?: true
   gender?: true
   companyDomain?: true
   verificationStatus?: true
@@ -176,6 +191,9 @@ export type UserCountAggregateInputType = {
   passwordHash?: true
   photoUrl?: true
   commuteType?: true
+  companyName?: true
+  designation?: true
+  idVisibility?: true
   gender?: true
   companyDomain?: true
   verificationStatus?: true
@@ -287,6 +305,9 @@ export type UserGroupByOutputType = {
   passwordHash: string
   photoUrl: string | null
   commuteType: $Enums.CommuteType | null
+  companyName: string | null
+  designation: string | null
+  idVisibility: $Enums.IdVisibility | null
   gender: $Enums.Gender | null
   companyDomain: string | null
   verificationStatus: $Enums.VerificationStatus
@@ -334,6 +355,9 @@ export type UserWhereInput = {
   passwordHash?: Prisma.StringFilter<"User"> | string
   photoUrl?: Prisma.StringNullableFilter<"User"> | string | null
   commuteType?: Prisma.EnumCommuteTypeNullableFilter<"User"> | $Enums.CommuteType | null
+  companyName?: Prisma.StringNullableFilter<"User"> | string | null
+  designation?: Prisma.StringNullableFilter<"User"> | string | null
+  idVisibility?: Prisma.EnumIdVisibilityNullableFilter<"User"> | $Enums.IdVisibility | null
   gender?: Prisma.EnumGenderNullableFilter<"User"> | $Enums.Gender | null
   companyDomain?: Prisma.StringNullableFilter<"User"> | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFilter<"User"> | $Enums.VerificationStatus
@@ -358,6 +382,7 @@ export type UserWhereInput = {
   messagesSent?: Prisma.MessageListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   reminderSettings?: Prisma.XOR<Prisma.ReminderSettingsNullableScalarRelationFilter, Prisma.ReminderSettingsWhereInput> | null
+  commutePreferences?: Prisma.XOR<Prisma.CommutePreferencesNullableScalarRelationFilter, Prisma.CommutePreferencesWhereInput> | null
   refreshTokens?: Prisma.RefreshTokenListRelationFilter
   deviceTokens?: Prisma.DeviceTokenListRelationFilter
   reviewsGiven?: Prisma.ReviewListRelationFilter
@@ -372,6 +397,9 @@ export type UserOrderByWithRelationInput = {
   passwordHash?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   commuteType?: Prisma.SortOrderInput | Prisma.SortOrder
+  companyName?: Prisma.SortOrderInput | Prisma.SortOrder
+  designation?: Prisma.SortOrderInput | Prisma.SortOrder
+  idVisibility?: Prisma.SortOrderInput | Prisma.SortOrder
   gender?: Prisma.SortOrderInput | Prisma.SortOrder
   companyDomain?: Prisma.SortOrderInput | Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
@@ -396,6 +424,7 @@ export type UserOrderByWithRelationInput = {
   messagesSent?: Prisma.MessageOrderByRelationAggregateInput
   notifications?: Prisma.NotificationOrderByRelationAggregateInput
   reminderSettings?: Prisma.ReminderSettingsOrderByWithRelationInput
+  commutePreferences?: Prisma.CommutePreferencesOrderByWithRelationInput
   refreshTokens?: Prisma.RefreshTokenOrderByRelationAggregateInput
   deviceTokens?: Prisma.DeviceTokenOrderByRelationAggregateInput
   reviewsGiven?: Prisma.ReviewOrderByRelationAggregateInput
@@ -413,6 +442,9 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   passwordHash?: Prisma.StringFilter<"User"> | string
   photoUrl?: Prisma.StringNullableFilter<"User"> | string | null
   commuteType?: Prisma.EnumCommuteTypeNullableFilter<"User"> | $Enums.CommuteType | null
+  companyName?: Prisma.StringNullableFilter<"User"> | string | null
+  designation?: Prisma.StringNullableFilter<"User"> | string | null
+  idVisibility?: Prisma.EnumIdVisibilityNullableFilter<"User"> | $Enums.IdVisibility | null
   gender?: Prisma.EnumGenderNullableFilter<"User"> | $Enums.Gender | null
   companyDomain?: Prisma.StringNullableFilter<"User"> | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFilter<"User"> | $Enums.VerificationStatus
@@ -437,6 +469,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   messagesSent?: Prisma.MessageListRelationFilter
   notifications?: Prisma.NotificationListRelationFilter
   reminderSettings?: Prisma.XOR<Prisma.ReminderSettingsNullableScalarRelationFilter, Prisma.ReminderSettingsWhereInput> | null
+  commutePreferences?: Prisma.XOR<Prisma.CommutePreferencesNullableScalarRelationFilter, Prisma.CommutePreferencesWhereInput> | null
   refreshTokens?: Prisma.RefreshTokenListRelationFilter
   deviceTokens?: Prisma.DeviceTokenListRelationFilter
   reviewsGiven?: Prisma.ReviewListRelationFilter
@@ -451,6 +484,9 @@ export type UserOrderByWithAggregationInput = {
   passwordHash?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrderInput | Prisma.SortOrder
   commuteType?: Prisma.SortOrderInput | Prisma.SortOrder
+  companyName?: Prisma.SortOrderInput | Prisma.SortOrder
+  designation?: Prisma.SortOrderInput | Prisma.SortOrder
+  idVisibility?: Prisma.SortOrderInput | Prisma.SortOrder
   gender?: Prisma.SortOrderInput | Prisma.SortOrder
   companyDomain?: Prisma.SortOrderInput | Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
@@ -483,6 +519,9 @@ export type UserScalarWhereWithAggregatesInput = {
   passwordHash?: Prisma.StringWithAggregatesFilter<"User"> | string
   photoUrl?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   commuteType?: Prisma.EnumCommuteTypeNullableWithAggregatesFilter<"User"> | $Enums.CommuteType | null
+  companyName?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  designation?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  idVisibility?: Prisma.EnumIdVisibilityNullableWithAggregatesFilter<"User"> | $Enums.IdVisibility | null
   gender?: Prisma.EnumGenderNullableWithAggregatesFilter<"User"> | $Enums.Gender | null
   companyDomain?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   verificationStatus?: Prisma.EnumVerificationStatusWithAggregatesFilter<"User"> | $Enums.VerificationStatus
@@ -507,6 +546,9 @@ export type UserCreateInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -531,6 +573,7 @@ export type UserCreateInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutAuthorInput
@@ -545,6 +588,9 @@ export type UserUncheckedCreateInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -569,6 +615,7 @@ export type UserUncheckedCreateInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -583,6 +630,9 @@ export type UserUpdateInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -607,6 +657,7 @@ export type UserUpdateInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutAuthorNestedInput
@@ -621,6 +672,9 @@ export type UserUncheckedUpdateInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -645,6 +699,7 @@ export type UserUncheckedUpdateInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutAuthorNestedInput
@@ -659,6 +714,9 @@ export type UserCreateManyInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -683,6 +741,9 @@ export type UserUpdateManyMutationInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -707,6 +768,9 @@ export type UserUncheckedUpdateManyInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -731,6 +795,9 @@ export type UserCountOrderByAggregateInput = {
   passwordHash?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrder
   commuteType?: Prisma.SortOrder
+  companyName?: Prisma.SortOrder
+  designation?: Prisma.SortOrder
+  idVisibility?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   companyDomain?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
@@ -760,6 +827,9 @@ export type UserMaxOrderByAggregateInput = {
   passwordHash?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrder
   commuteType?: Prisma.SortOrder
+  companyName?: Prisma.SortOrder
+  designation?: Prisma.SortOrder
+  idVisibility?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   companyDomain?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
@@ -784,6 +854,9 @@ export type UserMinOrderByAggregateInput = {
   passwordHash?: Prisma.SortOrder
   photoUrl?: Prisma.SortOrder
   commuteType?: Prisma.SortOrder
+  companyName?: Prisma.SortOrder
+  designation?: Prisma.SortOrder
+  idVisibility?: Prisma.SortOrder
   gender?: Prisma.SortOrder
   companyDomain?: Prisma.SortOrder
   verificationStatus?: Prisma.SortOrder
@@ -820,6 +893,10 @@ export type NullableStringFieldUpdateOperationsInput = {
 
 export type NullableEnumCommuteTypeFieldUpdateOperationsInput = {
   set?: $Enums.CommuteType | null
+}
+
+export type NullableEnumIdVisibilityFieldUpdateOperationsInput = {
+  set?: $Enums.IdVisibility | null
 }
 
 export type NullableEnumGenderFieldUpdateOperationsInput = {
@@ -1002,6 +1079,20 @@ export type UserUpdateOneRequiredWithoutNotificationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutNotificationsInput, Prisma.UserUpdateWithoutNotificationsInput>, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
 }
 
+export type UserCreateNestedOneWithoutCommutePreferencesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCommutePreferencesInput, Prisma.UserUncheckedCreateWithoutCommutePreferencesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCommutePreferencesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutCommutePreferencesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCommutePreferencesInput, Prisma.UserUncheckedCreateWithoutCommutePreferencesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCommutePreferencesInput
+  upsert?: Prisma.UserUpsertWithoutCommutePreferencesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCommutePreferencesInput, Prisma.UserUpdateWithoutCommutePreferencesInput>, Prisma.UserUncheckedUpdateWithoutCommutePreferencesInput>
+}
+
 export type UserCreateNestedOneWithoutReminderSettingsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutReminderSettingsInput, Prisma.UserUncheckedCreateWithoutReminderSettingsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutReminderSettingsInput
@@ -1066,6 +1157,9 @@ export type UserCreateWithoutRefreshTokensInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -1090,6 +1184,7 @@ export type UserCreateWithoutRefreshTokensInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesCreateNestedOneWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutAuthorInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutTargetUserInput
@@ -1103,6 +1198,9 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -1127,6 +1225,7 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedCreateNestedOneWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutAuthorInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutTargetUserInput
@@ -1156,6 +1255,9 @@ export type UserUpdateWithoutRefreshTokensInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -1180,6 +1282,7 @@ export type UserUpdateWithoutRefreshTokensInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUpdateOneWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutAuthorNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutTargetUserNestedInput
@@ -1193,6 +1296,9 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -1217,6 +1323,7 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedUpdateOneWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutTargetUserNestedInput
@@ -1230,6 +1337,9 @@ export type UserCreateWithoutVehiclesInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -1253,6 +1363,7 @@ export type UserCreateWithoutVehiclesInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutAuthorInput
@@ -1267,6 +1378,9 @@ export type UserUncheckedCreateWithoutVehiclesInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -1290,6 +1404,7 @@ export type UserUncheckedCreateWithoutVehiclesInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -1320,6 +1435,9 @@ export type UserUpdateWithoutVehiclesInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -1343,6 +1461,7 @@ export type UserUpdateWithoutVehiclesInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutAuthorNestedInput
@@ -1357,6 +1476,9 @@ export type UserUncheckedUpdateWithoutVehiclesInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -1380,6 +1502,7 @@ export type UserUncheckedUpdateWithoutVehiclesInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutAuthorNestedInput
@@ -1394,6 +1517,9 @@ export type UserCreateWithoutPlacesInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -1417,6 +1543,7 @@ export type UserCreateWithoutPlacesInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutAuthorInput
@@ -1431,6 +1558,9 @@ export type UserUncheckedCreateWithoutPlacesInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -1454,6 +1584,7 @@ export type UserUncheckedCreateWithoutPlacesInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -1484,6 +1615,9 @@ export type UserUpdateWithoutPlacesInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -1507,6 +1641,7 @@ export type UserUpdateWithoutPlacesInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutAuthorNestedInput
@@ -1521,6 +1656,9 @@ export type UserUncheckedUpdateWithoutPlacesInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -1544,6 +1682,7 @@ export type UserUncheckedUpdateWithoutPlacesInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutAuthorNestedInput
@@ -1558,6 +1697,9 @@ export type UserCreateWithoutRegularRoutesInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -1581,6 +1723,7 @@ export type UserCreateWithoutRegularRoutesInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutAuthorInput
@@ -1595,6 +1738,9 @@ export type UserUncheckedCreateWithoutRegularRoutesInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -1618,6 +1764,7 @@ export type UserUncheckedCreateWithoutRegularRoutesInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -1648,6 +1795,9 @@ export type UserUpdateWithoutRegularRoutesInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -1671,6 +1821,7 @@ export type UserUpdateWithoutRegularRoutesInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutAuthorNestedInput
@@ -1685,6 +1836,9 @@ export type UserUncheckedUpdateWithoutRegularRoutesInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -1708,6 +1862,7 @@ export type UserUncheckedUpdateWithoutRegularRoutesInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutAuthorNestedInput
@@ -1722,6 +1877,9 @@ export type UserCreateWithoutRidesAsDriverInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -1745,6 +1903,7 @@ export type UserCreateWithoutRidesAsDriverInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutAuthorInput
@@ -1759,6 +1918,9 @@ export type UserUncheckedCreateWithoutRidesAsDriverInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -1782,6 +1944,7 @@ export type UserUncheckedCreateWithoutRidesAsDriverInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -1812,6 +1975,9 @@ export type UserUpdateWithoutRidesAsDriverInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -1835,6 +2001,7 @@ export type UserUpdateWithoutRidesAsDriverInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutAuthorNestedInput
@@ -1849,6 +2016,9 @@ export type UserUncheckedUpdateWithoutRidesAsDriverInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -1872,6 +2042,7 @@ export type UserUncheckedUpdateWithoutRidesAsDriverInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutAuthorNestedInput
@@ -1886,6 +2057,9 @@ export type UserCreateWithoutRideRequestsInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -1909,6 +2083,7 @@ export type UserCreateWithoutRideRequestsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutAuthorInput
@@ -1923,6 +2098,9 @@ export type UserUncheckedCreateWithoutRideRequestsInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -1946,6 +2124,7 @@ export type UserUncheckedCreateWithoutRideRequestsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -1976,6 +2155,9 @@ export type UserUpdateWithoutRideRequestsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -1999,6 +2181,7 @@ export type UserUpdateWithoutRideRequestsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutAuthorNestedInput
@@ -2013,6 +2196,9 @@ export type UserUncheckedUpdateWithoutRideRequestsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -2036,6 +2222,7 @@ export type UserUncheckedUpdateWithoutRideRequestsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2050,6 +2237,9 @@ export type UserCreateWithoutParticipationsInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -2073,6 +2263,7 @@ export type UserCreateWithoutParticipationsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutAuthorInput
@@ -2087,6 +2278,9 @@ export type UserUncheckedCreateWithoutParticipationsInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -2110,6 +2304,7 @@ export type UserUncheckedCreateWithoutParticipationsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -2140,6 +2335,9 @@ export type UserUpdateWithoutParticipationsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -2163,6 +2361,7 @@ export type UserUpdateWithoutParticipationsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutAuthorNestedInput
@@ -2177,6 +2376,9 @@ export type UserUncheckedUpdateWithoutParticipationsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -2200,6 +2402,7 @@ export type UserUncheckedUpdateWithoutParticipationsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2214,6 +2417,9 @@ export type UserCreateWithoutConversationsInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -2237,6 +2443,7 @@ export type UserCreateWithoutConversationsInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutAuthorInput
@@ -2251,6 +2458,9 @@ export type UserUncheckedCreateWithoutConversationsInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -2274,6 +2484,7 @@ export type UserUncheckedCreateWithoutConversationsInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -2304,6 +2515,9 @@ export type UserUpdateWithoutConversationsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -2327,6 +2541,7 @@ export type UserUpdateWithoutConversationsInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutAuthorNestedInput
@@ -2341,6 +2556,9 @@ export type UserUncheckedUpdateWithoutConversationsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -2364,6 +2582,7 @@ export type UserUncheckedUpdateWithoutConversationsInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2378,6 +2597,9 @@ export type UserCreateWithoutMessagesSentInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -2401,6 +2623,7 @@ export type UserCreateWithoutMessagesSentInput = {
   conversations?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutAuthorInput
@@ -2415,6 +2638,9 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -2438,6 +2664,7 @@ export type UserUncheckedCreateWithoutMessagesSentInput = {
   conversations?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -2468,6 +2695,9 @@ export type UserUpdateWithoutMessagesSentInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -2491,6 +2721,7 @@ export type UserUpdateWithoutMessagesSentInput = {
   conversations?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutAuthorNestedInput
@@ -2505,6 +2736,9 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -2528,6 +2762,7 @@ export type UserUncheckedUpdateWithoutMessagesSentInput = {
   conversations?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2542,6 +2777,9 @@ export type UserCreateWithoutNotificationsInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -2565,6 +2803,7 @@ export type UserCreateWithoutNotificationsInput = {
   conversations?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   reminderSettings?: Prisma.ReminderSettingsCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutAuthorInput
@@ -2579,6 +2818,9 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -2602,6 +2844,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
   conversations?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -2632,6 +2875,9 @@ export type UserUpdateWithoutNotificationsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -2655,6 +2901,7 @@ export type UserUpdateWithoutNotificationsInput = {
   conversations?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   reminderSettings?: Prisma.ReminderSettingsUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutAuthorNestedInput
@@ -2669,6 +2916,9 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -2692,13 +2942,14 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
   conversations?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutTargetUserNestedInput
 }
 
-export type UserCreateWithoutReminderSettingsInput = {
+export type UserCreateWithoutCommutePreferencesInput = {
   id?: string
   fullName: string
   workEmail: string
@@ -2706,6 +2957,9 @@ export type UserCreateWithoutReminderSettingsInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -2729,13 +2983,14 @@ export type UserCreateWithoutReminderSettingsInput = {
   conversations?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  reminderSettings?: Prisma.ReminderSettingsCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutAuthorInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutTargetUserInput
 }
 
-export type UserUncheckedCreateWithoutReminderSettingsInput = {
+export type UserUncheckedCreateWithoutCommutePreferencesInput = {
   id?: string
   fullName: string
   workEmail: string
@@ -2743,6 +2998,9 @@ export type UserUncheckedCreateWithoutReminderSettingsInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -2766,6 +3024,187 @@ export type UserUncheckedCreateWithoutReminderSettingsInput = {
   conversations?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  reminderSettings?: Prisma.ReminderSettingsUncheckedCreateNestedOneWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutAuthorInput
+  reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutTargetUserInput
+}
+
+export type UserCreateOrConnectWithoutCommutePreferencesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCommutePreferencesInput, Prisma.UserUncheckedCreateWithoutCommutePreferencesInput>
+}
+
+export type UserUpsertWithoutCommutePreferencesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCommutePreferencesInput, Prisma.UserUncheckedUpdateWithoutCommutePreferencesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCommutePreferencesInput, Prisma.UserUncheckedCreateWithoutCommutePreferencesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCommutePreferencesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCommutePreferencesInput, Prisma.UserUncheckedUpdateWithoutCommutePreferencesInput>
+}
+
+export type UserUpdateWithoutCommutePreferencesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  workEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
+  gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+  companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
+  employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  rideCount?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isOnline?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicles?: Prisma.VehicleUpdateManyWithoutUserNestedInput
+  places?: Prisma.PlaceUpdateManyWithoutUserNestedInput
+  regularRoutes?: Prisma.RegularRouteUpdateManyWithoutUserNestedInput
+  ridesAsDriver?: Prisma.RideUpdateManyWithoutDriverNestedInput
+  rideRequests?: Prisma.RideRequestUpdateManyWithoutRiderNestedInput
+  participations?: Prisma.RideParticipantUpdateManyWithoutUserNestedInput
+  conversations?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
+  messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  reminderSettings?: Prisma.ReminderSettingsUpdateOneWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
+  deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUpdateManyWithoutAuthorNestedInput
+  reviewsReceived?: Prisma.ReviewUpdateManyWithoutTargetUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCommutePreferencesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  workEmail?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
+  gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+  companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
+  verificationMethod?: Prisma.NullableEnumVerificationMethodFieldUpdateOperationsInput | $Enums.VerificationMethod | null
+  employeeIdImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  workEmailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  officeLocationVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  employeeIdVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  rating?: Prisma.FloatFieldUpdateOperationsInput | number
+  rideCount?: Prisma.IntFieldUpdateOperationsInput | number
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  isOnline?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  vehicles?: Prisma.VehicleUncheckedUpdateManyWithoutUserNestedInput
+  places?: Prisma.PlaceUncheckedUpdateManyWithoutUserNestedInput
+  regularRoutes?: Prisma.RegularRouteUncheckedUpdateManyWithoutUserNestedInput
+  ridesAsDriver?: Prisma.RideUncheckedUpdateManyWithoutDriverNestedInput
+  rideRequests?: Prisma.RideRequestUncheckedUpdateManyWithoutRiderNestedInput
+  participations?: Prisma.RideParticipantUncheckedUpdateManyWithoutUserNestedInput
+  conversations?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
+  messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  reminderSettings?: Prisma.ReminderSettingsUncheckedUpdateOneWithoutUserNestedInput
+  refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+  reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutAuthorNestedInput
+  reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutTargetUserNestedInput
+}
+
+export type UserCreateWithoutReminderSettingsInput = {
+  id?: string
+  fullName: string
+  workEmail: string
+  phone: string
+  passwordHash: string
+  photoUrl?: string | null
+  commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
+  gender?: $Enums.Gender | null
+  companyDomain?: string | null
+  verificationStatus?: $Enums.VerificationStatus
+  verificationMethod?: $Enums.VerificationMethod | null
+  employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
+  rating?: number
+  rideCount?: number
+  role?: $Enums.Role
+  isOnline?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicles?: Prisma.VehicleCreateNestedManyWithoutUserInput
+  places?: Prisma.PlaceCreateNestedManyWithoutUserInput
+  regularRoutes?: Prisma.RegularRouteCreateNestedManyWithoutUserInput
+  ridesAsDriver?: Prisma.RideCreateNestedManyWithoutDriverInput
+  rideRequests?: Prisma.RideRequestCreateNestedManyWithoutRiderInput
+  participations?: Prisma.RideParticipantCreateNestedManyWithoutUserInput
+  conversations?: Prisma.ConversationParticipantCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesCreateNestedOneWithoutUserInput
+  refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
+  deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
+  reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutAuthorInput
+  reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutTargetUserInput
+}
+
+export type UserUncheckedCreateWithoutReminderSettingsInput = {
+  id?: string
+  fullName: string
+  workEmail: string
+  phone: string
+  passwordHash: string
+  photoUrl?: string | null
+  commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
+  gender?: $Enums.Gender | null
+  companyDomain?: string | null
+  verificationStatus?: $Enums.VerificationStatus
+  verificationMethod?: $Enums.VerificationMethod | null
+  employeeIdImageUrl?: string | null
+  workEmailVerified?: boolean
+  officeLocationVerified?: boolean
+  employeeIdVerified?: boolean
+  rating?: number
+  rideCount?: number
+  role?: $Enums.Role
+  isOnline?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  vehicles?: Prisma.VehicleUncheckedCreateNestedManyWithoutUserInput
+  places?: Prisma.PlaceUncheckedCreateNestedManyWithoutUserInput
+  regularRoutes?: Prisma.RegularRouteUncheckedCreateNestedManyWithoutUserInput
+  ridesAsDriver?: Prisma.RideUncheckedCreateNestedManyWithoutDriverInput
+  rideRequests?: Prisma.RideRequestUncheckedCreateNestedManyWithoutRiderInput
+  participations?: Prisma.RideParticipantUncheckedCreateNestedManyWithoutUserInput
+  conversations?: Prisma.ConversationParticipantUncheckedCreateNestedManyWithoutUserInput
+  messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -2796,6 +3235,9 @@ export type UserUpdateWithoutReminderSettingsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -2819,6 +3261,7 @@ export type UserUpdateWithoutReminderSettingsInput = {
   conversations?: Prisma.ConversationParticipantUpdateManyWithoutUserNestedInput
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutAuthorNestedInput
@@ -2833,6 +3276,9 @@ export type UserUncheckedUpdateWithoutReminderSettingsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -2856,6 +3302,7 @@ export type UserUncheckedUpdateWithoutReminderSettingsInput = {
   conversations?: Prisma.ConversationParticipantUncheckedUpdateManyWithoutUserNestedInput
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutAuthorNestedInput
@@ -2870,6 +3317,9 @@ export type UserCreateWithoutDeviceTokensInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -2894,6 +3344,7 @@ export type UserCreateWithoutDeviceTokensInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutAuthorInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutTargetUserInput
@@ -2907,6 +3358,9 @@ export type UserUncheckedCreateWithoutDeviceTokensInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -2931,6 +3385,7 @@ export type UserUncheckedCreateWithoutDeviceTokensInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutAuthorInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutTargetUserInput
@@ -2960,6 +3415,9 @@ export type UserUpdateWithoutDeviceTokensInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -2984,6 +3442,7 @@ export type UserUpdateWithoutDeviceTokensInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutAuthorNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutTargetUserNestedInput
@@ -2997,6 +3456,9 @@ export type UserUncheckedUpdateWithoutDeviceTokensInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -3021,6 +3483,7 @@ export type UserUncheckedUpdateWithoutDeviceTokensInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutAuthorNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutTargetUserNestedInput
@@ -3034,6 +3497,9 @@ export type UserCreateWithoutReviewsGivenInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -3058,6 +3524,7 @@ export type UserCreateWithoutReviewsGivenInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
   reviewsReceived?: Prisma.ReviewCreateNestedManyWithoutTargetUserInput
@@ -3071,6 +3538,9 @@ export type UserUncheckedCreateWithoutReviewsGivenInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -3095,6 +3565,7 @@ export type UserUncheckedCreateWithoutReviewsGivenInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
   reviewsReceived?: Prisma.ReviewUncheckedCreateNestedManyWithoutTargetUserInput
@@ -3113,6 +3584,9 @@ export type UserCreateWithoutReviewsReceivedInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -3137,6 +3611,7 @@ export type UserCreateWithoutReviewsReceivedInput = {
   messagesSent?: Prisma.MessageCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewCreateNestedManyWithoutAuthorInput
@@ -3150,6 +3625,9 @@ export type UserUncheckedCreateWithoutReviewsReceivedInput = {
   passwordHash: string
   photoUrl?: string | null
   commuteType?: $Enums.CommuteType | null
+  companyName?: string | null
+  designation?: string | null
+  idVisibility?: $Enums.IdVisibility | null
   gender?: $Enums.Gender | null
   companyDomain?: string | null
   verificationStatus?: $Enums.VerificationStatus
@@ -3174,6 +3652,7 @@ export type UserUncheckedCreateWithoutReviewsReceivedInput = {
   messagesSent?: Prisma.MessageUncheckedCreateNestedManyWithoutSenderInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedCreateNestedOneWithoutUserInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedCreateNestedOneWithoutUserInput
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   deviceTokens?: Prisma.DeviceTokenUncheckedCreateNestedManyWithoutUserInput
   reviewsGiven?: Prisma.ReviewUncheckedCreateNestedManyWithoutAuthorInput
@@ -3203,6 +3682,9 @@ export type UserUpdateWithoutReviewsGivenInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -3227,6 +3709,7 @@ export type UserUpdateWithoutReviewsGivenInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
   reviewsReceived?: Prisma.ReviewUpdateManyWithoutTargetUserNestedInput
@@ -3240,6 +3723,9 @@ export type UserUncheckedUpdateWithoutReviewsGivenInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -3264,6 +3750,7 @@ export type UserUncheckedUpdateWithoutReviewsGivenInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
   reviewsReceived?: Prisma.ReviewUncheckedUpdateManyWithoutTargetUserNestedInput
@@ -3288,6 +3775,9 @@ export type UserUpdateWithoutReviewsReceivedInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -3312,6 +3802,7 @@ export type UserUpdateWithoutReviewsReceivedInput = {
   messagesSent?: Prisma.MessageUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUpdateManyWithoutAuthorNestedInput
@@ -3325,6 +3816,9 @@ export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   photoUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   commuteType?: Prisma.NullableEnumCommuteTypeFieldUpdateOperationsInput | $Enums.CommuteType | null
+  companyName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  designation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  idVisibility?: Prisma.NullableEnumIdVisibilityFieldUpdateOperationsInput | $Enums.IdVisibility | null
   gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
   companyDomain?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   verificationStatus?: Prisma.EnumVerificationStatusFieldUpdateOperationsInput | $Enums.VerificationStatus
@@ -3349,6 +3843,7 @@ export type UserUncheckedUpdateWithoutReviewsReceivedInput = {
   messagesSent?: Prisma.MessageUncheckedUpdateManyWithoutSenderNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   reminderSettings?: Prisma.ReminderSettingsUncheckedUpdateOneWithoutUserNestedInput
+  commutePreferences?: Prisma.CommutePreferencesUncheckedUpdateOneWithoutUserNestedInput
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   deviceTokens?: Prisma.DeviceTokenUncheckedUpdateManyWithoutUserNestedInput
   reviewsGiven?: Prisma.ReviewUncheckedUpdateManyWithoutAuthorNestedInput
@@ -3501,6 +3996,9 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   passwordHash?: boolean
   photoUrl?: boolean
   commuteType?: boolean
+  companyName?: boolean
+  designation?: boolean
+  idVisibility?: boolean
   gender?: boolean
   companyDomain?: boolean
   verificationStatus?: boolean
@@ -3525,6 +4023,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   messagesSent?: boolean | Prisma.User$messagesSentArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   reminderSettings?: boolean | Prisma.User$reminderSettingsArgs<ExtArgs>
+  commutePreferences?: boolean | Prisma.User$commutePreferencesArgs<ExtArgs>
   refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
   deviceTokens?: boolean | Prisma.User$deviceTokensArgs<ExtArgs>
   reviewsGiven?: boolean | Prisma.User$reviewsGivenArgs<ExtArgs>
@@ -3540,6 +4039,9 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   passwordHash?: boolean
   photoUrl?: boolean
   commuteType?: boolean
+  companyName?: boolean
+  designation?: boolean
+  idVisibility?: boolean
   gender?: boolean
   companyDomain?: boolean
   verificationStatus?: boolean
@@ -3564,6 +4066,9 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   passwordHash?: boolean
   photoUrl?: boolean
   commuteType?: boolean
+  companyName?: boolean
+  designation?: boolean
+  idVisibility?: boolean
   gender?: boolean
   companyDomain?: boolean
   verificationStatus?: boolean
@@ -3588,6 +4093,9 @@ export type UserSelectScalar = {
   passwordHash?: boolean
   photoUrl?: boolean
   commuteType?: boolean
+  companyName?: boolean
+  designation?: boolean
+  idVisibility?: boolean
   gender?: boolean
   companyDomain?: boolean
   verificationStatus?: boolean
@@ -3604,7 +4112,7 @@ export type UserSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "workEmail" | "phone" | "passwordHash" | "photoUrl" | "commuteType" | "gender" | "companyDomain" | "verificationStatus" | "verificationMethod" | "employeeIdImageUrl" | "workEmailVerified" | "officeLocationVerified" | "employeeIdVerified" | "rating" | "rideCount" | "role" | "isOnline" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "workEmail" | "phone" | "passwordHash" | "photoUrl" | "commuteType" | "companyName" | "designation" | "idVisibility" | "gender" | "companyDomain" | "verificationStatus" | "verificationMethod" | "employeeIdImageUrl" | "workEmailVerified" | "officeLocationVerified" | "employeeIdVerified" | "rating" | "rideCount" | "role" | "isOnline" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   vehicles?: boolean | Prisma.User$vehiclesArgs<ExtArgs>
   places?: boolean | Prisma.User$placesArgs<ExtArgs>
@@ -3616,6 +4124,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   messagesSent?: boolean | Prisma.User$messagesSentArgs<ExtArgs>
   notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   reminderSettings?: boolean | Prisma.User$reminderSettingsArgs<ExtArgs>
+  commutePreferences?: boolean | Prisma.User$commutePreferencesArgs<ExtArgs>
   refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
   deviceTokens?: boolean | Prisma.User$deviceTokensArgs<ExtArgs>
   reviewsGiven?: boolean | Prisma.User$reviewsGivenArgs<ExtArgs>
@@ -3638,6 +4147,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     messagesSent: Prisma.$MessagePayload<ExtArgs>[]
     notifications: Prisma.$NotificationPayload<ExtArgs>[]
     reminderSettings: Prisma.$ReminderSettingsPayload<ExtArgs> | null
+    commutePreferences: Prisma.$CommutePreferencesPayload<ExtArgs> | null
     refreshTokens: Prisma.$RefreshTokenPayload<ExtArgs>[]
     deviceTokens: Prisma.$DeviceTokenPayload<ExtArgs>[]
     reviewsGiven: Prisma.$ReviewPayload<ExtArgs>[]
@@ -3651,6 +4161,9 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     passwordHash: string
     photoUrl: string | null
     commuteType: $Enums.CommuteType | null
+    companyName: string | null
+    designation: string | null
+    idVisibility: $Enums.IdVisibility | null
     gender: $Enums.Gender | null
     companyDomain: string | null
     verificationStatus: $Enums.VerificationStatus
@@ -4069,6 +4582,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   messagesSent<T extends Prisma.User$messagesSentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$messagesSentArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reminderSettings<T extends Prisma.User$reminderSettingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reminderSettingsArgs<ExtArgs>>): Prisma.Prisma__ReminderSettingsClient<runtime.Types.Result.GetResult<Prisma.$ReminderSettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  commutePreferences<T extends Prisma.User$commutePreferencesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$commutePreferencesArgs<ExtArgs>>): Prisma.Prisma__CommutePreferencesClient<runtime.Types.Result.GetResult<Prisma.$CommutePreferencesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   refreshTokens<T extends Prisma.User$refreshTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$refreshTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   deviceTokens<T extends Prisma.User$deviceTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$deviceTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DeviceTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reviewsGiven<T extends Prisma.User$reviewsGivenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reviewsGivenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -4109,6 +4623,9 @@ export interface UserFieldRefs {
   readonly passwordHash: Prisma.FieldRef<"User", 'String'>
   readonly photoUrl: Prisma.FieldRef<"User", 'String'>
   readonly commuteType: Prisma.FieldRef<"User", 'CommuteType'>
+  readonly companyName: Prisma.FieldRef<"User", 'String'>
+  readonly designation: Prisma.FieldRef<"User", 'String'>
+  readonly idVisibility: Prisma.FieldRef<"User", 'IdVisibility'>
   readonly gender: Prisma.FieldRef<"User", 'Gender'>
   readonly companyDomain: Prisma.FieldRef<"User", 'String'>
   readonly verificationStatus: Prisma.FieldRef<"User", 'VerificationStatus'>
@@ -4748,6 +5265,25 @@ export type User$reminderSettingsArgs<ExtArgs extends runtime.Types.Extensions.I
    */
   include?: Prisma.ReminderSettingsInclude<ExtArgs> | null
   where?: Prisma.ReminderSettingsWhereInput
+}
+
+/**
+ * User.commutePreferences
+ */
+export type User$commutePreferencesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CommutePreferences
+   */
+  select?: Prisma.CommutePreferencesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CommutePreferences
+   */
+  omit?: Prisma.CommutePreferencesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CommutePreferencesInclude<ExtArgs> | null
+  where?: Prisma.CommutePreferencesWhereInput
 }
 
 /**

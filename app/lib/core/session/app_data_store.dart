@@ -1,9 +1,14 @@
-import 'dart:math';
-
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart' show TimeOfDay;
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sameway/core/api/api_config.dart';
+import 'package:sameway/core/api/repositories/bookings_repository.dart';
+import 'package:sameway/core/api/repositories/chat_repository.dart';
+import 'package:sameway/core/api/repositories/rides_repository.dart';
 import 'package:sameway/core/session/app_data_models.dart';
 import 'package:sameway/core/session/app_session.dart';
+import 'package:sameway/core/utils/commute_time_format.dart';
 
 class AppDataStore extends ChangeNotifier {
   AppDataStore._();
@@ -11,73 +16,122 @@ class AppDataStore extends ChangeNotifier {
   static final AppDataStore instance = AppDataStore._();
 
   static const _storageKey = 'sameway_app_data';
-  static final _random = Random();
 
-  static String _newId() =>
-      '${DateTime.now().microsecondsSinceEpoch}_${_random.nextInt(1 << 32)}';
-
-  Map<String, UserAppData> _byUser = {};
+  PostRideDraft _draft = PostRideDraft();
+  List<UserRide> _rides = [];
+  List<JoinRequest> _joinRequests = [];
+  List<ChatThread> _chats = [];
+  String? _activePostedRideId;
   bool _ready = false;
 
   bool get isReady => _ready;
 
-  UserAppData? get _currentData {
-    final userId = AppSession.instance.currentUser?.id;
-    if (userId == null) return null;
-    return _byUser.putIfAbsent(userId, UserAppData.new);
-  }
-
-  PostRideDraft get postRideDraft =>
-      _currentData?.postRideDraft ?? PostRideDraft();
-
-  List<UserRide> get rides => List.unmodifiable(_currentData?.rides ?? const []);
-
-  List<UserRide> get upcomingRides =>
-      rides.where((r) => r.isUpcoming).toList();
-
+  PostRideDraft get postRideDraft => _draft;
+  List<UserRide> get rides => List.unmodifiable(_rides);
+  List<UserRide> get upcomingRides => _rides.where((r) => r.isUpcoming).toList();
   List<UserRide> get completedRides =>
-      rides.where((r) => r.status == RideStatus.completed).toList();
+      _rides.where((r) => r.status == RideStatus.completed).toList();
+  List<JoinRequest> get pendingJoinRequests =>
+      _joinRequests.where((r) => r.status == RideStatus.pending).toList();
+  List<ChatThread> get chatThreads => List.unmodifiable(_chats);
+  int get unreadChatCount => _chats.where((t) => t.unread).length;
 
-  List<JoinRequest> get pendingJoinRequests => (_currentData?.joinRequests ?? [])
-      .where((r) => r.status == RideStatus.pending)
-      .toList();
-
-  List<ChatThread> get chatThreads =>
-      List.unmodifiable(_currentData?.chats ?? const []);
-
-  int get unreadChatCount =>
-      chatThreads.where((t) => t.unread).length;
-
-  UserRide? get activePostedRide => rides.cast<UserRide?>().firstWhere(
-        (r) => r != null && r.isDriver && r.isUpcoming,
-        orElse: () => null,
-      );
+  UserRide? get activePostedRide {
+    if (_activePostedRideId != null) {
+      for (final r in _rides) {
+        if (r.id == _activePostedRideId) return r;
+      }
+    }
+    for (final r in _rides) {
+      if (r.isDriver && r.isUpcoming) return r;
+    }
+    return null;
+  }
 
   Future<void> initialize() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_storageKey);
     if (raw != null && raw.isNotEmpty) {
       try {
-        _byUser = UserAppData.decodeMap(raw);
-      } catch (_) {
-        _byUser = {};
-      }
+        final map = UserAppData.decodeMap(raw);
+        final userId = AppSession.instance.currentUser?.id;
+        if (userId != null && map.containsKey(userId)) {
+          _draft = map[userId]!.postRideDraft;
+          _activePostedRideId = map[userId]!.activePostedRideId;
+        }
+      } catch (_) {}
     }
     _ready = true;
+    if (AppSession.instance.isLoggedIn && ApiConfig.enabled) {
+      await refreshAll();
+    }
     notifyListeners();
   }
 
-  Future<void> _persist() async {
+  Future<void> _persistDraft() async {
+    final userId = AppSession.instance.currentUser?.id;
+    if (userId == null) return;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_storageKey, UserAppData.encodeMap(_byUser));
+    final data = UserAppData(
+      postRideDraft: _draft,
+      activePostedRideId: _activePostedRideId,
+    );
+    await prefs.setString(_storageKey, UserAppData.encodeMap({userId: data}));
     notifyListeners();
+  }
+
+  Future<void> refreshAll() async {
+    if (!ApiConfig.enabled || !AppSession.instance.isLoggedIn) return;
+    await Future.wait([
+      refreshBookings(),
+      refreshChats(),
+      refreshJoinRequests(),
+    ]);
+  }
+
+  Future<void> refreshBookings() async {
+    try {
+      final result = await BookingsRepository.instance.fetchMine();
+      _rides = [...result.upcoming, ...result.completed];
+      notifyListeners();
+    } catch (_) {}
+  }
+
+  Future<void> refreshChats() async {
+    try {
+      _chats = await ChatRepository.instance.fetchConversations();
+      notifyListeners();
+    } catch (_) {}
+  }
+
+  Future<void> refreshJoinRequests() async {
+    final rideId = _activePostedRideId ?? activePostedRide?.id;
+    if (rideId == null) {
+      _joinRequests = [];
+      notifyListeners();
+      return;
+    }
+    try {
+      final rows = await RidesRepository.instance.getIncomingRequests(rideId);
+      _joinRequests = rows.map((r) {
+        final rider = r['rider'] as Map<String, dynamic>? ?? {};
+        final score = r['matchScore'] as num?;
+        return JoinRequest(
+          id: r['id'] as String,
+          riderName: rider['fullName'] as String? ?? 'Rider',
+          route: r['riderNote'] as String? ?? 'Join request',
+          matchLabel: score != null ? '${score.round()}% match' : 'Match pending',
+          note: r['riderNote'] as String? ?? '',
+          rideId: rideId,
+        );
+      }).toList();
+      notifyListeners();
+    } catch (_) {}
   }
 
   Future<void> updatePostRideDraft(void Function(PostRideDraft draft) edit) async {
-    final data = _currentData;
-    if (data == null) return;
-    edit(data.postRideDraft);
-    await _persist();
+    edit(_draft);
+    await _persistDraft();
   }
 
   Future<void> addStop(String address) async {
@@ -87,60 +141,54 @@ class AppDataStore extends ChangeNotifier {
   }
 
   Future<String> publishPostedRide() async {
-    final data = _currentData;
-    final draft = data?.postRideDraft;
-    if (data == null || draft == null || !draft.hasRoute) {
+    final draft = _draft;
+    final user = AppSession.instance.currentUser;
+    if (user == null || !draft.hasRoute) {
       throw StateError('Route is incomplete');
     }
 
-    final rideId = _newId();
-    final timeLabel = '${draft.dateLabel ?? 'Tomorrow'} · ${draft.departTime ?? '8:30 AM'}';
-    final ride = UserRide(
-      id: rideId,
-      route: draft.routeLabel,
-      from: draft.startAddress!,
-      to: draft.endAddress!,
-      timeLabel: timeLabel,
-      detail: '${draft.seats} seat${draft.seats == 1 ? '' : 's'} · ${draft.repeat}',
-      status: RideStatus.confirmed,
-      isDriver: true,
+    final vehicleId = user.vehicle?.id;
+    if (vehicleId == null) throw StateError('Add a vehicle before posting');
+
+    final startLat = draft.startLat ?? user.homeLat ?? 23.8759;
+    final startLng = draft.startLng ?? user.homeLng ?? 90.3795;
+    final endLat = draft.endLat ?? user.officeLat ?? 23.7330;
+    final endLng = draft.endLng ?? user.officeLng ?? 90.4172;
+
+    final date = draft.dateLabel != null
+        ? DateFormat('EEE, MMM d').parse(draft.dateLabel!)
+        : DateTime.now();
+    final time = CommuteTimeFormat.parse(draft.departTime) ?? const TimeOfDay(hour: 8, minute: 30);
+    final departureAt = DateTime(date.year, date.month, date.day, time.hour, time.minute);
+
+    final repeat = switch (draft.repeat) {
+      'Daily' => 'DAILY',
+      'Weekdays' => 'WEEKDAYS',
+      _ => 'ONCE',
+    };
+
+    final rideId = await RidesRepository.instance.createRide(
+      vehicleId: vehicleId,
+      startAddress: draft.startAddress!,
+      startLat: startLat,
+      startLng: startLng,
+      endAddress: draft.endAddress!,
+      endLat: endLat,
+      endLng: endLng,
+      departureAt: departureAt,
+      availableSeats: draft.seats,
+      repeat: repeat,
     );
-    data.rides.insert(0, ride);
 
-    if (data.joinRequests.where((r) => r.rideId == rideId).isEmpty) {
-      data.joinRequests.addAll([
-        JoinRequest(
-          id: _newId(),
-          riderName: 'Karim R.',
-          route: '${_shortPlace(draft.startAddress!)} → near your route',
-          matchLabel: '92% match',
-          note: 'Regular commuter · verified',
-          rideId: rideId,
-        ),
-        JoinRequest(
-          id: _newId(),
-          riderName: 'Sadia K.',
-          route: 'Azampur → ${_shortPlace(draft.endAddress!)} area',
-          matchLabel: '87% match',
-          note: 'Prefers front seat',
-          rideId: rideId,
-        ),
-        JoinRequest(
-          id: _newId(),
-          riderName: 'Tanvir M.',
-          route: 'House Building → Farmgate',
-          matchLabel: '81% match',
-          note: 'New to Same Way',
-          rideId: rideId,
-        ),
-      ]);
-    }
-
-    await _persist();
+    _activePostedRideId = rideId;
+    await _persistDraft();
+    await refreshBookings();
+    await refreshJoinRequests();
     return rideId;
   }
 
-  Future<({UserRide ride, ChatThread chat})> requestJoinRide({
+  Future<void> requestJoinRide({
+    required String rideId,
     required String driverName,
     required String route,
     required String from,
@@ -149,111 +197,67 @@ class AppDataStore extends ChangeNotifier {
     required String detail,
     String? matchLabel,
   }) async {
-    final data = _currentData;
-    if (data == null) throw StateError('Not signed in');
-
-    final rideId = _newId();
-    final threadId = _newId();
-    final thread = ChatThread(
-      id: threadId,
-      peerName: driverName,
-      rideContext: '$route · $timeLabel',
-      messages: [
-        ChatMessage(
-          text: 'Hi! I\'d like to join your ride. ${matchLabel ?? ''}'.trim(),
-          isMine: true,
-          sentAt: DateTime.now(),
-        ),
-      ],
+    await RidesRepository.instance.requestJoin(
+      rideId,
+      riderNote: 'Hi! I\'d like to join your ride. ${matchLabel ?? ''}'.trim(),
     );
-
-    final ride = UserRide(
-      id: rideId,
-      route: route,
-      from: from,
-      to: to,
-      timeLabel: timeLabel,
-      detail: detail,
-      status: RideStatus.pending,
-      driverName: driverName,
-      chatThreadId: threadId,
-    );
-
-    data.rides.insert(0, ride);
-    data.chats.insert(0, thread);
-    await _persist();
-    return (ride: ride, chat: thread);
+    await refreshBookings();
   }
 
   Future<void> acceptJoinRequest(String requestId) async {
-    final data = _currentData;
-    if (data == null) return;
-
-    final request = data.joinRequests.firstWhere((r) => r.id == requestId);
-    request.status = RideStatus.confirmed;
-
-    final threadId = _newId();
-    data.chats.insert(
-      0,
-      ChatThread(
-        id: threadId,
-        peerName: request.riderName,
-        rideContext: request.route,
-        messages: [
-          ChatMessage(
-            text: 'Ride confirmed! See you tomorrow.',
-            isMine: true,
-            sentAt: DateTime.now(),
-          ),
-        ],
-      ),
-    );
-
-    await _persist();
+    final rideId = _activePostedRideId ?? activePostedRide?.id;
+    if (rideId == null) return;
+    await RidesRepository.instance.acceptRequest(rideId, requestId);
+    await refreshJoinRequests();
+    await refreshBookings();
+    await refreshChats();
   }
 
   Future<void> declineJoinRequest(String requestId) async {
-    final data = _currentData;
-    if (data == null) return;
-    final request = data.joinRequests.firstWhere((r) => r.id == requestId);
-    request.status = RideStatus.declined;
-    await _persist();
+    final rideId = _activePostedRideId ?? activePostedRide?.id;
+    if (rideId == null) return;
+    await RidesRepository.instance.declineRequest(rideId, requestId);
+    await refreshJoinRequests();
   }
 
   Future<void> sendChatMessage(String threadId, String text) async {
-    final data = _currentData;
-    if (data == null || text.trim().isEmpty) return;
-
-    final thread = data.chats.firstWhere((t) => t.id == threadId);
-    thread.messages.add(
-      ChatMessage(text: text.trim(), isMine: true, sentAt: DateTime.now()),
-    );
-    thread.unread = false;
-    await _persist();
+    if (text.trim().isEmpty) return;
+    await ChatRepository.instance.sendMessage(threadId, text.trim());
+    await refreshChats();
+    final messages = await ChatRepository.instance.fetchMessages(threadId);
+    final thread = threadById(threadId);
+    if (thread != null) {
+      thread.messages
+        ..clear()
+        ..addAll(messages);
+    }
+    notifyListeners();
   }
 
   Future<void> markChatRead(String threadId) async {
-    final data = _currentData;
-    if (data == null) return;
-    final thread = data.chats.cast<ChatThread?>().firstWhere(
-          (t) => t?.id == threadId,
-          orElse: () => null,
-        );
+    await ChatRepository.instance.markRead(threadId);
+    final thread = threadById(threadId);
     if (thread != null && thread.unread) {
       thread.unread = false;
-      await _persist();
+      notifyListeners();
+    }
+  }
+
+  Future<void> loadConversation(String threadId) async {
+    final messages = await ChatRepository.instance.fetchMessages(threadId);
+    final thread = threadById(threadId);
+    if (thread != null) {
+      thread.messages
+        ..clear()
+        ..addAll(messages);
+      notifyListeners();
     }
   }
 
   ChatThread? threadById(String id) {
-    for (final t in chatThreads) {
+    for (final t in _chats) {
       if (t.id == id) return t;
     }
     return null;
-  }
-
-  String _shortPlace(String address) {
-    final parts = address.split(',');
-    return parts.first.trim();
   }
 }

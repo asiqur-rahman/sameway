@@ -45,6 +45,9 @@ export type VehicleMinAggregateOutputType = {
   availableSeats: number | null
   year: number | null
   color: string | null
+  usuallyLeave: string | null
+  latestDepart: string | null
+  riderPreference: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -58,6 +61,9 @@ export type VehicleMaxAggregateOutputType = {
   availableSeats: number | null
   year: number | null
   color: string | null
+  usuallyLeave: string | null
+  latestDepart: string | null
+  riderPreference: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -71,6 +77,9 @@ export type VehicleCountAggregateOutputType = {
   availableSeats: number
   year: number
   color: number
+  usuallyLeave: number
+  latestDepart: number
+  riderPreference: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -96,6 +105,9 @@ export type VehicleMinAggregateInputType = {
   availableSeats?: true
   year?: true
   color?: true
+  usuallyLeave?: true
+  latestDepart?: true
+  riderPreference?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -109,6 +121,9 @@ export type VehicleMaxAggregateInputType = {
   availableSeats?: true
   year?: true
   color?: true
+  usuallyLeave?: true
+  latestDepart?: true
+  riderPreference?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -122,6 +137,9 @@ export type VehicleCountAggregateInputType = {
   availableSeats?: true
   year?: true
   color?: true
+  usuallyLeave?: true
+  latestDepart?: true
+  riderPreference?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -222,6 +240,9 @@ export type VehicleGroupByOutputType = {
   availableSeats: number
   year: number | null
   color: string | null
+  usuallyLeave: string | null
+  latestDepart: string | null
+  riderPreference: string | null
   createdAt: Date
   updatedAt: Date
   _count: VehicleCountAggregateOutputType | null
@@ -258,6 +279,9 @@ export type VehicleWhereInput = {
   availableSeats?: Prisma.IntFilter<"Vehicle"> | number
   year?: Prisma.IntNullableFilter<"Vehicle"> | number | null
   color?: Prisma.StringNullableFilter<"Vehicle"> | string | null
+  usuallyLeave?: Prisma.StringNullableFilter<"Vehicle"> | string | null
+  latestDepart?: Prisma.StringNullableFilter<"Vehicle"> | string | null
+  riderPreference?: Prisma.StringNullableFilter<"Vehicle"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Vehicle"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Vehicle"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -273,6 +297,9 @@ export type VehicleOrderByWithRelationInput = {
   availableSeats?: Prisma.SortOrder
   year?: Prisma.SortOrderInput | Prisma.SortOrder
   color?: Prisma.SortOrderInput | Prisma.SortOrder
+  usuallyLeave?: Prisma.SortOrderInput | Prisma.SortOrder
+  latestDepart?: Prisma.SortOrderInput | Prisma.SortOrder
+  riderPreference?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
@@ -292,6 +319,9 @@ export type VehicleWhereUniqueInput = Prisma.AtLeast<{
   availableSeats?: Prisma.IntFilter<"Vehicle"> | number
   year?: Prisma.IntNullableFilter<"Vehicle"> | number | null
   color?: Prisma.StringNullableFilter<"Vehicle"> | string | null
+  usuallyLeave?: Prisma.StringNullableFilter<"Vehicle"> | string | null
+  latestDepart?: Prisma.StringNullableFilter<"Vehicle"> | string | null
+  riderPreference?: Prisma.StringNullableFilter<"Vehicle"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Vehicle"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Vehicle"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -307,6 +337,9 @@ export type VehicleOrderByWithAggregationInput = {
   availableSeats?: Prisma.SortOrder
   year?: Prisma.SortOrderInput | Prisma.SortOrder
   color?: Prisma.SortOrderInput | Prisma.SortOrder
+  usuallyLeave?: Prisma.SortOrderInput | Prisma.SortOrder
+  latestDepart?: Prisma.SortOrderInput | Prisma.SortOrder
+  riderPreference?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.VehicleCountOrderByAggregateInput
@@ -328,6 +361,9 @@ export type VehicleScalarWhereWithAggregatesInput = {
   availableSeats?: Prisma.IntWithAggregatesFilter<"Vehicle"> | number
   year?: Prisma.IntNullableWithAggregatesFilter<"Vehicle"> | number | null
   color?: Prisma.StringNullableWithAggregatesFilter<"Vehicle"> | string | null
+  usuallyLeave?: Prisma.StringNullableWithAggregatesFilter<"Vehicle"> | string | null
+  latestDepart?: Prisma.StringNullableWithAggregatesFilter<"Vehicle"> | string | null
+  riderPreference?: Prisma.StringNullableWithAggregatesFilter<"Vehicle"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Vehicle"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Vehicle"> | Date | string
 }
@@ -340,6 +376,9 @@ export type VehicleCreateInput = {
   availableSeats?: number
   year?: number | null
   color?: string | null
+  usuallyLeave?: string | null
+  latestDepart?: string | null
+  riderPreference?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutVehiclesInput
@@ -355,6 +394,9 @@ export type VehicleUncheckedCreateInput = {
   availableSeats?: number
   year?: number | null
   color?: string | null
+  usuallyLeave?: string | null
+  latestDepart?: string | null
+  riderPreference?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   rides?: Prisma.RideUncheckedCreateNestedManyWithoutVehicleInput
@@ -368,6 +410,9 @@ export type VehicleUpdateInput = {
   availableSeats?: Prisma.IntFieldUpdateOperationsInput | number
   year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuallyLeave?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latestDepart?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riderPreference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutVehiclesNestedInput
@@ -383,6 +428,9 @@ export type VehicleUncheckedUpdateInput = {
   availableSeats?: Prisma.IntFieldUpdateOperationsInput | number
   year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuallyLeave?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latestDepart?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riderPreference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rides?: Prisma.RideUncheckedUpdateManyWithoutVehicleNestedInput
@@ -397,6 +445,9 @@ export type VehicleCreateManyInput = {
   availableSeats?: number
   year?: number | null
   color?: string | null
+  usuallyLeave?: string | null
+  latestDepart?: string | null
+  riderPreference?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -409,6 +460,9 @@ export type VehicleUpdateManyMutationInput = {
   availableSeats?: Prisma.IntFieldUpdateOperationsInput | number
   year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuallyLeave?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latestDepart?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riderPreference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -422,6 +476,9 @@ export type VehicleUncheckedUpdateManyInput = {
   availableSeats?: Prisma.IntFieldUpdateOperationsInput | number
   year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuallyLeave?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latestDepart?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riderPreference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -450,6 +507,9 @@ export type VehicleCountOrderByAggregateInput = {
   availableSeats?: Prisma.SortOrder
   year?: Prisma.SortOrder
   color?: Prisma.SortOrder
+  usuallyLeave?: Prisma.SortOrder
+  latestDepart?: Prisma.SortOrder
+  riderPreference?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -468,6 +528,9 @@ export type VehicleMaxOrderByAggregateInput = {
   availableSeats?: Prisma.SortOrder
   year?: Prisma.SortOrder
   color?: Prisma.SortOrder
+  usuallyLeave?: Prisma.SortOrder
+  latestDepart?: Prisma.SortOrder
+  riderPreference?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -481,6 +544,9 @@ export type VehicleMinOrderByAggregateInput = {
   availableSeats?: Prisma.SortOrder
   year?: Prisma.SortOrder
   color?: Prisma.SortOrder
+  usuallyLeave?: Prisma.SortOrder
+  latestDepart?: Prisma.SortOrder
+  riderPreference?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -571,6 +637,9 @@ export type VehicleCreateWithoutUserInput = {
   availableSeats?: number
   year?: number | null
   color?: string | null
+  usuallyLeave?: string | null
+  latestDepart?: string | null
+  riderPreference?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   rides?: Prisma.RideCreateNestedManyWithoutVehicleInput
@@ -584,6 +653,9 @@ export type VehicleUncheckedCreateWithoutUserInput = {
   availableSeats?: number
   year?: number | null
   color?: string | null
+  usuallyLeave?: string | null
+  latestDepart?: string | null
+  riderPreference?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   rides?: Prisma.RideUncheckedCreateNestedManyWithoutVehicleInput
@@ -627,6 +699,9 @@ export type VehicleScalarWhereInput = {
   availableSeats?: Prisma.IntFilter<"Vehicle"> | number
   year?: Prisma.IntNullableFilter<"Vehicle"> | number | null
   color?: Prisma.StringNullableFilter<"Vehicle"> | string | null
+  usuallyLeave?: Prisma.StringNullableFilter<"Vehicle"> | string | null
+  latestDepart?: Prisma.StringNullableFilter<"Vehicle"> | string | null
+  riderPreference?: Prisma.StringNullableFilter<"Vehicle"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Vehicle"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Vehicle"> | Date | string
 }
@@ -639,6 +714,9 @@ export type VehicleCreateWithoutRidesInput = {
   availableSeats?: number
   year?: number | null
   color?: string | null
+  usuallyLeave?: string | null
+  latestDepart?: string | null
+  riderPreference?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutVehiclesInput
@@ -653,6 +731,9 @@ export type VehicleUncheckedCreateWithoutRidesInput = {
   availableSeats?: number
   year?: number | null
   color?: string | null
+  usuallyLeave?: string | null
+  latestDepart?: string | null
+  riderPreference?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -681,6 +762,9 @@ export type VehicleUpdateWithoutRidesInput = {
   availableSeats?: Prisma.IntFieldUpdateOperationsInput | number
   year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuallyLeave?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latestDepart?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riderPreference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutVehiclesNestedInput
@@ -695,6 +779,9 @@ export type VehicleUncheckedUpdateWithoutRidesInput = {
   availableSeats?: Prisma.IntFieldUpdateOperationsInput | number
   year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuallyLeave?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latestDepart?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riderPreference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -707,6 +794,9 @@ export type VehicleCreateManyUserInput = {
   availableSeats?: number
   year?: number | null
   color?: string | null
+  usuallyLeave?: string | null
+  latestDepart?: string | null
+  riderPreference?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -719,6 +809,9 @@ export type VehicleUpdateWithoutUserInput = {
   availableSeats?: Prisma.IntFieldUpdateOperationsInput | number
   year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuallyLeave?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latestDepart?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riderPreference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rides?: Prisma.RideUpdateManyWithoutVehicleNestedInput
@@ -732,6 +825,9 @@ export type VehicleUncheckedUpdateWithoutUserInput = {
   availableSeats?: Prisma.IntFieldUpdateOperationsInput | number
   year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuallyLeave?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latestDepart?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riderPreference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rides?: Prisma.RideUncheckedUpdateManyWithoutVehicleNestedInput
@@ -745,6 +841,9 @@ export type VehicleUncheckedUpdateManyWithoutUserInput = {
   availableSeats?: Prisma.IntFieldUpdateOperationsInput | number
   year?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  usuallyLeave?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  latestDepart?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  riderPreference?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -789,6 +888,9 @@ export type VehicleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   availableSeats?: boolean
   year?: boolean
   color?: boolean
+  usuallyLeave?: boolean
+  latestDepart?: boolean
+  riderPreference?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -805,6 +907,9 @@ export type VehicleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   availableSeats?: boolean
   year?: boolean
   color?: boolean
+  usuallyLeave?: boolean
+  latestDepart?: boolean
+  riderPreference?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -819,6 +924,9 @@ export type VehicleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   availableSeats?: boolean
   year?: boolean
   color?: boolean
+  usuallyLeave?: boolean
+  latestDepart?: boolean
+  riderPreference?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -833,11 +941,14 @@ export type VehicleSelectScalar = {
   availableSeats?: boolean
   year?: boolean
   color?: boolean
+  usuallyLeave?: boolean
+  latestDepart?: boolean
+  riderPreference?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type VehicleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "type" | "makeModel" | "licensePlate" | "availableSeats" | "year" | "color" | "createdAt" | "updatedAt", ExtArgs["result"]["vehicle"]>
+export type VehicleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "type" | "makeModel" | "licensePlate" | "availableSeats" | "year" | "color" | "usuallyLeave" | "latestDepart" | "riderPreference" | "createdAt" | "updatedAt", ExtArgs["result"]["vehicle"]>
 export type VehicleInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   rides?: boolean | Prisma.Vehicle$ridesArgs<ExtArgs>
@@ -865,6 +976,9 @@ export type $VehiclePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     availableSeats: number
     year: number | null
     color: string | null
+    usuallyLeave: string | null
+    latestDepart: string | null
+    riderPreference: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["vehicle"]>
@@ -1300,6 +1414,9 @@ export interface VehicleFieldRefs {
   readonly availableSeats: Prisma.FieldRef<"Vehicle", 'Int'>
   readonly year: Prisma.FieldRef<"Vehicle", 'Int'>
   readonly color: Prisma.FieldRef<"Vehicle", 'String'>
+  readonly usuallyLeave: Prisma.FieldRef<"Vehicle", 'String'>
+  readonly latestDepart: Prisma.FieldRef<"Vehicle", 'String'>
+  readonly riderPreference: Prisma.FieldRef<"Vehicle", 'String'>
   readonly createdAt: Prisma.FieldRef<"Vehicle", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Vehicle", 'DateTime'>
 }

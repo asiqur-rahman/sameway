@@ -4,6 +4,10 @@ class PostRideDraft {
   PostRideDraft({
     this.startAddress,
     this.endAddress,
+    this.startLat,
+    this.startLng,
+    this.endLat,
+    this.endLng,
     this.stops = const [],
     this.departTime,
     this.dateLabel,
@@ -13,6 +17,10 @@ class PostRideDraft {
 
   String? startAddress;
   String? endAddress;
+  double? startLat;
+  double? startLng;
+  double? endLat;
+  double? endLng;
   List<String> stops;
   String? departTime;
   String? dateLabel;
@@ -30,6 +38,10 @@ class PostRideDraft {
   Map<String, dynamic> toJson() => {
         'startAddress': startAddress,
         'endAddress': endAddress,
+        'startLat': startLat,
+        'startLng': startLng,
+        'endLat': endLat,
+        'endLng': endLng,
         'stops': stops,
         'departTime': departTime,
         'dateLabel': dateLabel,
@@ -40,6 +52,10 @@ class PostRideDraft {
   factory PostRideDraft.fromJson(Map<String, dynamic> json) => PostRideDraft(
         startAddress: json['startAddress'] as String?,
         endAddress: json['endAddress'] as String?,
+        startLat: (json['startLat'] as num?)?.toDouble(),
+        startLng: (json['startLng'] as num?)?.toDouble(),
+        endLat: (json['endLat'] as num?)?.toDouble(),
+        endLng: (json['endLng'] as num?)?.toDouble(),
         stops: (json['stops'] as List<dynamic>?)
                 ?.map((e) => e as String)
                 .toList() ??
@@ -223,42 +239,22 @@ class ChatThread {
 class UserAppData {
   UserAppData({
     PostRideDraft? postRideDraft,
-    List<UserRide>? rides,
-    List<JoinRequest>? joinRequests,
-    List<ChatThread>? chats,
-  })  : postRideDraft = postRideDraft ?? PostRideDraft(),
-        rides = rides ?? [],
-        joinRequests = joinRequests ?? [],
-        chats = chats ?? [];
+    this.activePostedRideId,
+  }) : postRideDraft = postRideDraft ?? PostRideDraft();
 
   PostRideDraft postRideDraft;
-  List<UserRide> rides;
-  List<JoinRequest> joinRequests;
-  List<ChatThread> chats;
+  String? activePostedRideId;
 
   Map<String, dynamic> toJson() => {
         'postRideDraft': postRideDraft.toJson(),
-        'rides': rides.map((r) => r.toJson()).toList(),
-        'joinRequests': joinRequests.map((r) => r.toJson()).toList(),
-        'chats': chats.map((c) => c.toJson()).toList(),
+        if (activePostedRideId != null) 'activePostedRideId': activePostedRideId,
       };
 
   factory UserAppData.fromJson(Map<String, dynamic> json) => UserAppData(
         postRideDraft: json['postRideDraft'] != null
             ? PostRideDraft.fromJson(json['postRideDraft'] as Map<String, dynamic>)
             : PostRideDraft(),
-        rides: (json['rides'] as List<dynamic>?)
-                ?.map((e) => UserRide.fromJson(e as Map<String, dynamic>))
-                .toList() ??
-            [],
-        joinRequests: (json['joinRequests'] as List<dynamic>?)
-                ?.map((e) => JoinRequest.fromJson(e as Map<String, dynamic>))
-                .toList() ??
-            [],
-        chats: (json['chats'] as List<dynamic>?)
-                ?.map((e) => ChatThread.fromJson(e as Map<String, dynamic>))
-                .toList() ??
-            [],
+        activePostedRideId: json['activePostedRideId'] as String?,
       );
 
   static String encodeMap(Map<String, UserAppData> map) =>

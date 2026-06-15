@@ -102,6 +102,11 @@ export type Message = Prisma.MessageModel
  */
 export type Notification = Prisma.NotificationModel
 /**
+ * Model CommutePreferences
+ * 
+ */
+export type CommutePreferences = Prisma.CommutePreferencesModel
+/**
  * Model ReminderSettings
  * 
  */
@@ -131,3 +136,8 @@ export type SystemConfig = Prisma.SystemConfigModel
  * 
  */
 export type AdminActivityLog = Prisma.AdminActivityLogModel
+/**
+ * Model NotificationOutbox
+ * Async notification delivery queue (FCM / email workers).
+ */
+export type NotificationOutbox = Prisma.NotificationOutboxModel

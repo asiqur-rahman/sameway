@@ -9,8 +9,21 @@ import 'package:sameway/core/widgets/chat_widgets.dart';
 import 'package:sameway/core/widgets/sameway_bottom_nav.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 
-class ChatListScreen extends StatelessWidget {
+class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
+
+  @override
+  State<ChatListScreen> createState() => _ChatListScreenState();
+}
+
+class _ChatListScreenState extends State<ChatListScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      AppDataStore.instance.refreshChats();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

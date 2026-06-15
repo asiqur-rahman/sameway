@@ -4,29 +4,20 @@ Production-ready **Next.js API backend** for the Same Way monorepo (`app/` Flutt
 
 ## Architecture
 
+See **[ARCHITECTURE.md](./ARCHITECTURE.md)** for the full layered design.
+
 ```
 backend/
 ├── prisma/
 │   ├── schema.prisma          # Full domain model (users, rides, chat, admin…)
 │   └── seed.ts                # Demo admin + user + allowed domains
 ├── src/
+│   ├── application/           # Use-cases, DTO mappers, DI container
+│   ├── domain/                # Repository + port interfaces
+│   ├── infrastructure/        # Prisma repos, cache, outbox queue
 │   ├── app/api/v1/            # Thin route handlers (REST)
-│   ├── modules/               # Business logic per domain
-│   │   ├── auth/
-│   │   ├── users/
-│   │   ├── rides/
-│   │   ├── matching/          # Route corridor scoring (±500m)
-│   │   ├── bookings/
-│   │   ├── chat/
-│   │   ├── notifications/
-│   │   ├── reviews/
-│   │   ├── admin/
-│   │   └── uploads/
-│   └── lib/
-│       ├── auth/              # JWT + session helpers
-│       ├── http/              # Errors, responses, apiRoute wrapper
-│       ├── db.ts
-│       └── env.ts
+│   ├── modules/               # Service facades per domain
+│   └── lib/                   # Auth, DB, HTTP, env
 ```
 
 ### Design principles

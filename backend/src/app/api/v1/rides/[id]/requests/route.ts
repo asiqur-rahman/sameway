@@ -6,10 +6,6 @@ import * as ridesService from "@/modules/rides/rides.service";
 export const GET = apiRoute(async (request, { params }) => {
   const session = await requireAuth(request);
   const { id } = await params;
-  const ride = await ridesService.getRideById(id);
-  if (ride.driverId !== session.id) {
-    const { ForbiddenError } = await import("@/lib/http/errors");
-    throw new ForbiddenError();
-  }
-  return ok(ride.requests);
+  const requests = await ridesService.getIncomingRequests(session.id, id);
+  return ok(requests);
 });
