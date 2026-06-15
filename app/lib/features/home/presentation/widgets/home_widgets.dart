@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sameway/core/routes/app_routes.dart';
+import 'package:sameway/core/session/app_session.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_elevation.dart';
+import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/theme/app_typography.dart';
 
 class SectionLabel extends StatelessWidget {
@@ -130,14 +132,19 @@ class ActiveRideCard extends StatelessWidget {
 }
 
 class RecentSearchRow extends StatelessWidget {
-  const RecentSearchRow({super.key, required this.label});
+  const RecentSearchRow({
+    super.key,
+    required this.label,
+    this.onTap,
+  });
 
   final String label;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => context.push(AppRoutes.searchFilters),
+      onTap: onTap ?? () => context.push(AppRoutes.searchFilters),
       child: Container(
       height: 45,
       padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -206,18 +213,23 @@ class PreferenceChip extends StatelessWidget {
   }
 }
 
-/// Home Find tab — compact multi-select preference pills in one row (Figma).
-class FindPreferencesRow extends StatefulWidget {
-  const FindPreferencesRow({super.key});
+class FindPreferencesRow extends StatelessWidget {
+  const FindPreferencesRow({
+    super.key,
+    required this.carSelected,
+    required this.bikeSelected,
+    required this.anyGenderSelected,
+    required this.onCarChanged,
+    required this.onBikeChanged,
+    required this.onAnyGenderChanged,
+  });
 
-  @override
-  State<FindPreferencesRow> createState() => _FindPreferencesRowState();
-}
-
-class _FindPreferencesRowState extends State<FindPreferencesRow> {
-  bool _carSelected = true;
-  bool _bikeSelected = false;
-  bool _anyGenderSelected = true;
+  final bool carSelected;
+  final bool bikeSelected;
+  final bool anyGenderSelected;
+  final ValueChanged<bool> onCarChanged;
+  final ValueChanged<bool> onBikeChanged;
+  final ValueChanged<bool> onAnyGenderChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -225,21 +237,21 @@ class _FindPreferencesRowState extends State<FindPreferencesRow> {
       children: [
         PreferenceChip(
           label: '🚗 Car',
-          selected: _carSelected,
+          selected: carSelected,
           useRoboto: true,
-          onTap: () => setState(() => _carSelected = !_carSelected),
+          onTap: () => onCarChanged(!carSelected),
         ),
         const SizedBox(width: 6),
         PreferenceChip(
           label: '🏍 Bike ok',
-          selected: _bikeSelected,
-          onTap: () => setState(() => _bikeSelected = !_bikeSelected),
+          selected: bikeSelected,
+          onTap: () => onBikeChanged(!bikeSelected),
         ),
         const SizedBox(width: 6),
         PreferenceChip(
           label: 'Any gender',
-          selected: _anyGenderSelected,
-          onTap: () => setState(() => _anyGenderSelected = !_anyGenderSelected),
+          selected: anyGenderSelected,
+          onTap: () => onAnyGenderChanged(!anyGenderSelected),
         ),
       ],
     );
@@ -574,6 +586,13 @@ class _FindMapRoutePainter extends CustomPainter {
 }
 
 class LocationFieldRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final bool isOrigin;
+  final String actionLabel;
+  final VoidCallback? onTap;
+  final bool mutedValue;
+
   const LocationFieldRow({
     super.key,
     required this.label,
@@ -581,13 +600,8 @@ class LocationFieldRow extends StatelessWidget {
     required this.isOrigin,
     this.actionLabel = '📍 Change',
     this.onTap,
+    this.mutedValue = false,
   });
-
-  final String label;
-  final String value;
-  final bool isOrigin;
-  final String actionLabel;
-  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -612,7 +626,14 @@ class LocationFieldRow extends StatelessWidget {
                 children: [
                   Text(label.toUpperCase(), style: AppTypography.sectionAccent(color: AppColors.textMuted)),
                   const SizedBox(height: 2),
-                  Text(value, style: AppTypography.locationValue),
+                  Text(
+                    value,
+                    style: mutedValue
+                        ? AppTypography.locationValue.copyWith(color: AppColors.textMuted)
+                        : AppTypography.locationValue,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ],
               ),
             ),
@@ -644,15 +665,19 @@ class DateTimeFieldTile extends StatelessWidget {
     required this.emoji,
     required this.label,
     required this.value,
+    this.onTap,
+    this.mutedValue = false,
   });
 
   final String emoji;
   final String label;
   final String value;
+  final VoidCallback? onTap;
+  final bool mutedValue;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    final child = Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
       decoration: BoxDecoration(
         color: AppColors.surface,
@@ -668,12 +693,113 @@ class DateTimeFieldTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label.toUpperCase(), style: AppTypography.sectionAccent(color: AppColors.textMuted)),
-                Text(value, style: AppTypography.dateTimeValue),
+                Text(
+                  value,
+                  style: mutedValue
+                      ? AppTypography.dateTimeValue.copyWith(color: AppColors.textMuted)
+                      : AppTypography.dateTimeValue,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ],
             ),
           ),
         ],
       ),
     );
+
+    if (onTap == null) return child;
+    return GestureDetector(onTap: onTap, behavior: HitTestBehavior.opaque, child: child);
   }
+}
+
+/// Bottom sheet to pick or type a commute location (home Find tab).
+Future<String?> showHomeLocationPicker(
+  BuildContext context, {
+  required String title,
+  String? initial,
+}) async {
+  final controller = TextEditingController(text: initial?.trim() ?? '');
+  final user = AppSession.instance.currentUser;
+  final saved = <({String emoji, String label, String address})>[];
+  if (user?.homeAddress?.trim().isNotEmpty == true) {
+    saved.add((emoji: '🏠', label: 'Home', address: user!.homeAddress!));
+  }
+  if (user?.officeAddress?.trim().isNotEmpty == true) {
+    saved.add((emoji: '🏢', label: 'Office', address: user!.officeAddress!));
+  }
+
+  return showModalBottomSheet<String>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: AppColors.surface,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (ctx) {
+      return Padding(
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.screenHorizontal,
+          16,
+          AppSpacing.screenHorizontal,
+          16 + MediaQuery.viewInsetsOf(ctx).bottom,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(title, style: AppTypography.greetingTitle),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              autofocus: saved.isEmpty,
+              decoration: InputDecoration(
+                hintText: 'Search or enter address',
+                filled: true,
+                fillColor: AppColors.surfaceMuted,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              ),
+            ),
+            if (saved.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Text('SAVED', style: AppTypography.sectionAccent(color: AppColors.textMuted)),
+              const SizedBox(height: 8),
+              for (final place in saved)
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Text(place.emoji, style: const TextStyle(fontSize: 20)),
+                  title: Text(place.label, style: AppTypography.listRowTitle),
+                  subtitle: Text(
+                    place.address,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.cardSubtitle,
+                  ),
+                  onTap: () => Navigator.pop(ctx, place.address),
+                ),
+            ],
+            const SizedBox(height: 12),
+            FilledButton(
+              onPressed: () {
+                final text = controller.text.trim();
+                if (text.isEmpty) return;
+                Navigator.pop(ctx, text);
+              },
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: const Text('Use this location'),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      );
+    },
+  );
 }

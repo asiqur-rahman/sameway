@@ -45,3 +45,9 @@ export class MaintenanceError extends AppError {
     super(503, "Service temporarily unavailable", "MAINTENANCE_MODE");
   }
 }
+
+export class TooManyRequestsError extends AppError {
+  constructor(retryAfterSec: number) {
+    super(429, "Too many requests", "RATE_LIMITED", { retryAfterSec });
+  }
+}

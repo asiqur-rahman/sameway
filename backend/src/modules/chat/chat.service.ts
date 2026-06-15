@@ -24,17 +24,27 @@ export async function listConversations(userId: string) {
   return participations.map((p) => p.conversation);
 }
 
-export async function getMessages(conversationId: string, userId: string) {
+export async function getMessages(
+  conversationId: string,
+  userId: string,
+  options?: { limit?: number; before?: Date },
+) {
   const participant = await db.conversationParticipant.findUnique({
     where: { conversationId_userId: { conversationId, userId } },
   });
   if (!participant) throw new ForbiddenError("Not a participant");
 
+  const limit = Math.min(options?.limit ?? 100, 200);
+
   return db.message.findMany({
-    where: { conversationId },
-    orderBy: { sentAt: "asc" },
+    where: {
+      conversationId,
+      ...(options?.before ? { sentAt: { lt: options.before } } : {}),
+    },
+    orderBy: { sentAt: "desc" },
+    take: limit,
     include: { sender: { select: { id: true, fullName: true, photoUrl: true } } },
-  });
+  }).then((rows) => rows.reverse());
 }
 
 export async function sendMessage(

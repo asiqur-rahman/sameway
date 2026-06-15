@@ -8,8 +8,8 @@ import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/session/app_session.dart';
 import 'package:sameway/core/session/user_profile.dart';
 import 'package:sameway/core/widgets/onboarding_step_layout.dart';
-import 'package:sameway/core/theme/app_placeholders.dart';
-import 'package:sameway/core/widgets/sameway_text_field.dart';
+import 'package:sameway/core/widgets/commute_time_select_field.dart';
+import 'package:sameway/core/utils/commute_time_format.dart';
 import 'package:sameway/core/widgets/sameway_ui_kit.dart';
 import 'package:sameway/features/onboarding/onboarding_state.dart';
 import 'package:sameway/features/onboarding/presentation/widgets/vehicle_form_section.dart';
@@ -31,8 +31,8 @@ class _CommuteDetailsScreenState extends State<CommuteDetailsScreen> {
   int _maxWalkMinutes = 10;
   bool _walkWithOthers = true;
   String _walkingPace = 'Normal';
-  final _leaveByController = TextEditingController();
-  final _arriveByController = TextEditingController();
+  TimeOfDay? _leaveBy;
+  TimeOfDay? _arriveBy;
 
   @override
   void initState() {
@@ -46,20 +46,9 @@ class _CommuteDetailsScreenState extends State<CommuteDetailsScreen> {
       _maxWalkMinutes = prefs.maxWalkMinutes;
       _walkWithOthers = prefs.walkWithOthers;
       _walkingPace = prefs.walkingPace;
-      if (prefs.leaveBy.isNotEmpty) {
-        _leaveByController.text = prefs.leaveBy;
-      }
-      if (prefs.arriveBy.isNotEmpty) {
-        _arriveByController.text = prefs.arriveBy;
-      }
+      _leaveBy = CommuteTimeFormat.parse(prefs.leaveBy);
+      _arriveBy = CommuteTimeFormat.parse(prefs.arriveBy);
     }
-  }
-
-  @override
-  void dispose() {
-    _leaveByController.dispose();
-    _arriveByController.dispose();
-    super.dispose();
   }
 
   void _continue() async {
@@ -85,8 +74,8 @@ class _CommuteDetailsScreenState extends State<CommuteDetailsScreen> {
   }
 
   CommutePreferences _buildPreferences() {
-    final leaveBy = _leaveByController.text.trim();
-    final arriveBy = _arriveByController.text.trim();
+    final leaveBy = _leaveBy != null ? CommuteTimeFormat.format(_leaveBy!) : '';
+    final arriveBy = _arriveBy != null ? CommuteTimeFormat.format(_arriveBy!) : '';
     if (_mode == CommuteType.walk) {
       return CommutePreferences(
         walkWithOthers: _walkWithOthers,
@@ -127,8 +116,10 @@ class _CommuteDetailsScreenState extends State<CommuteDetailsScreen> {
                       preferredVehicle: _preferredVehicle,
                       genderPreference: _genderPreference,
                       maxWalkMinutes: _maxWalkMinutes,
-                      leaveByController: _leaveByController,
-                      arriveByController: _arriveByController,
+                      leaveBy: _leaveBy,
+                      arriveBy: _arriveBy,
+                      onLeaveByChanged: (t) => setState(() => _leaveBy = t),
+                      onArriveByChanged: (t) => setState(() => _arriveBy = t),
                       onPreferredVehicleChanged: (v) =>
                           setState(() => _preferredVehicle = v),
                       onGenderChanged: (v) =>
@@ -140,8 +131,10 @@ class _CommuteDetailsScreenState extends State<CommuteDetailsScreen> {
                     _WalkerPreferencesSection(
                       walkWithOthers: _walkWithOthers,
                       walkingPace: _walkingPace,
-                      leaveByController: _leaveByController,
-                      arriveByController: _arriveByController,
+                      leaveBy: _leaveBy,
+                      arriveBy: _arriveBy,
+                      onLeaveByChanged: (t) => setState(() => _leaveBy = t),
+                      onArriveByChanged: (t) => setState(() => _arriveBy = t),
                       onWalkWithOthersChanged: (v) =>
                           setState(() => _walkWithOthers = v),
                       onPaceChanged: (v) => setState(() => _walkingPace = v),
@@ -219,8 +212,10 @@ class _RiderPreferencesSection extends StatelessWidget {
     required this.preferredVehicle,
     required this.genderPreference,
     required this.maxWalkMinutes,
-    required this.leaveByController,
-    required this.arriveByController,
+    required this.leaveBy,
+    required this.arriveBy,
+    required this.onLeaveByChanged,
+    required this.onArriveByChanged,
     required this.onPreferredVehicleChanged,
     required this.onGenderChanged,
     required this.onWalkMinutesChanged,
@@ -229,8 +224,10 @@ class _RiderPreferencesSection extends StatelessWidget {
   final String preferredVehicle;
   final String genderPreference;
   final int maxWalkMinutes;
-  final TextEditingController leaveByController;
-  final TextEditingController arriveByController;
+  final TimeOfDay? leaveBy;
+  final TimeOfDay? arriveBy;
+  final ValueChanged<TimeOfDay> onLeaveByChanged;
+  final ValueChanged<TimeOfDay> onArriveByChanged;
   final ValueChanged<String> onPreferredVehicleChanged;
   final ValueChanged<String> onGenderChanged;
   final ValueChanged<int> onWalkMinutesChanged;
@@ -335,20 +332,24 @@ class _RiderPreferencesSection extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: SamewayTextField(
+              child: CommuteTimeSelectField(
                 label: 'Leave by',
                 icon: '⏰',
-                hint: AppPlaceholders.usuallyLeave,
-                controller: leaveByController,
+                value: leaveBy,
+                placeholder: 'Select time',
+                initialTime: const TimeOfDay(hour: 8, minute: 0),
+                onSelected: onLeaveByChanged,
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: SamewayTextField(
+              child: CommuteTimeSelectField(
                 label: 'Arrive by',
                 icon: '🏢',
-                hint: AppPlaceholders.arriveBy,
-                controller: arriveByController,
+                value: arriveBy,
+                placeholder: 'Select time',
+                initialTime: const TimeOfDay(hour: 9, minute: 30),
+                onSelected: onArriveByChanged,
               ),
             ),
           ],
@@ -368,16 +369,20 @@ class _WalkerPreferencesSection extends StatelessWidget {
   const _WalkerPreferencesSection({
     required this.walkWithOthers,
     required this.walkingPace,
-    required this.leaveByController,
-    required this.arriveByController,
+    required this.leaveBy,
+    required this.arriveBy,
+    required this.onLeaveByChanged,
+    required this.onArriveByChanged,
     required this.onWalkWithOthersChanged,
     required this.onPaceChanged,
   });
 
   final bool walkWithOthers;
   final String walkingPace;
-  final TextEditingController leaveByController;
-  final TextEditingController arriveByController;
+  final TimeOfDay? leaveBy;
+  final TimeOfDay? arriveBy;
+  final ValueChanged<TimeOfDay> onLeaveByChanged;
+  final ValueChanged<TimeOfDay> onArriveByChanged;
   final ValueChanged<bool> onWalkWithOthersChanged;
   final ValueChanged<String> onPaceChanged;
 
@@ -448,20 +453,24 @@ class _WalkerPreferencesSection extends StatelessWidget {
         Row(
           children: [
             Expanded(
-              child: SamewayTextField(
+              child: CommuteTimeSelectField(
                 label: 'Leave by',
                 icon: '⏰',
-                hint: AppPlaceholders.usuallyLeave,
-                controller: leaveByController,
+                value: leaveBy,
+                placeholder: 'Select time',
+                initialTime: const TimeOfDay(hour: 8, minute: 0),
+                onSelected: onLeaveByChanged,
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: SamewayTextField(
+              child: CommuteTimeSelectField(
                 label: 'Arrive by',
                 icon: '🏢',
-                hint: AppPlaceholders.arriveBy,
-                controller: arriveByController,
+                value: arriveBy,
+                placeholder: 'Select time',
+                initialTime: const TimeOfDay(hour: 9, minute: 0),
+                onSelected: onArriveByChanged,
               ),
             ),
           ],

@@ -621,10 +621,23 @@ class RouteFieldTile extends StatelessWidget {
 
 /// Compact map preview for Post a Ride empty state (Figma: 100px, #eef2f7 shell).
 class PostRideMapPreview extends StatelessWidget {
-  const PostRideMapPreview({super.key});
+  const PostRideMapPreview({
+    super.key,
+    this.showRoute = false,
+    this.startLabel,
+    this.endLabel,
+  });
+
+  final bool showRoute;
+  final String? startLabel;
+  final String? endLabel;
 
   @override
   Widget build(BuildContext context) {
+    final label = showRoute && startLabel != null && endLabel != null
+        ? '$startLabel → $endLabel'
+        : 'Route map will appear after locations are set';
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(AppRadius.xl),
       child: Container(
@@ -642,7 +655,7 @@ class PostRideMapPreview extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
-              'Route map will appear after locations are set',
+              label,
               style: AppTypography.fieldHintSm.copyWith(fontSize: 13),
             ),
           ),
@@ -660,15 +673,18 @@ class PostRideRouteField extends StatelessWidget {
     required this.icon,
     required this.hint,
     required this.onTap,
+    this.value,
   });
 
   final String label;
   final String icon;
   final String hint;
   final VoidCallback onTap;
+  final String? value;
 
   @override
   Widget build(BuildContext context) {
+    final selected = value != null && value!.trim().isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -688,7 +704,14 @@ class PostRideRouteField extends StatelessWidget {
                 Text(icon, style: const TextStyle(fontSize: 16)),
                 const SizedBox(width: 10),
                 Expanded(
-                  child: Text(hint, style: AppTypography.fieldHintSm),
+                  child: Text(
+                    selected ? value! : hint,
+                    style: selected
+                        ? AppTypography.fieldValue.copyWith(fontSize: 14)
+                        : AppTypography.fieldHintSm,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
                 const Icon(Icons.chevron_right, size: 16, color: AppColors.textMuted),
               ],
@@ -762,11 +785,15 @@ class PostRideRouteBuilder extends StatelessWidget {
     required this.onPickStart,
     required this.onPickEnd,
     required this.onAddStop,
+    this.startValue,
+    this.endValue,
   });
 
   final VoidCallback onPickStart;
   final VoidCallback onPickEnd;
   final VoidCallback onAddStop;
+  final String? startValue;
+  final String? endValue;
 
   @override
   Widget build(BuildContext context) {
@@ -777,6 +804,7 @@ class PostRideRouteBuilder extends StatelessWidget {
           label: 'START (FROM)',
           icon: '📍',
           hint: 'Tap to set your home / start location',
+          value: startValue,
           onTap: onPickStart,
         ),
         RouteAddStopRow(onTap: onAddStop),
@@ -784,6 +812,7 @@ class PostRideRouteBuilder extends StatelessWidget {
           label: 'END (TO / OFFICE)',
           icon: '🏢',
           hint: 'Tap to set your office / destination',
+          value: endValue,
           onTap: onPickEnd,
         ),
       ],
@@ -956,34 +985,41 @@ class PostRideValueField extends StatelessWidget {
     required this.label,
     required this.emoji,
     required this.value,
+    this.onTap,
   });
 
   final String label;
   final String emoji;
   final String value;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
+    final child = Container(
+      height: 46,
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceMuted,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+      ),
+      child: Row(
+        children: [
+          Text(emoji, style: const TextStyle(fontSize: 16)),
+          const SizedBox(width: 10),
+          Text(value, style: AppTypography.fieldValue.copyWith(fontSize: 15)),
+        ],
+      ),
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: AppTypography.routeSectionLabel),
         const SizedBox(height: 5),
-        Container(
-          height: 46,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          decoration: BoxDecoration(
-            color: AppColors.surfaceMuted,
-            borderRadius: BorderRadius.circular(AppRadius.md),
-          ),
-          child: Row(
-            children: [
-              Text(emoji, style: const TextStyle(fontSize: 16)),
-              const SizedBox(width: 10),
-              Text(value, style: AppTypography.fieldValue.copyWith(fontSize: 15)),
-            ],
-          ),
-        ),
+        if (onTap != null)
+          GestureDetector(onTap: onTap, child: child)
+        else
+          child,
       ],
     );
   }

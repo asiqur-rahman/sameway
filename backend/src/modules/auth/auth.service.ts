@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/auth/password";
 import { signAccessToken, signRefreshToken } from "@/lib/auth/jwt";
 import { ConflictError, ForbiddenError, UnauthorizedError } from "@/lib/http/errors";
+import { getSystemConfig } from "@/lib/system-config";
 import { omitPassword } from "@/lib/shared";
 import type { SigninInput, SignupInput } from "./auth.schema";
 
@@ -11,22 +12,23 @@ function extractDomain(email: string): string {
 }
 
 async function assertSignupAllowed() {
-  const config = await db.systemConfig.findUnique({ where: { id: "default" } });
-  if (config?.maintenanceMode) {
+  const config = await getSystemConfig();
+  if (config.maintenanceMode) {
     throw new ForbiddenError("Signups are disabled during maintenance");
   }
 }
 
 async function resolveVerification(domain: string) {
   const allowed = await db.allowedDomain.findUnique({ where: { domain } });
-  const config = await db.systemConfig.findUnique({ where: { id: "default" } });
+  const config = await getSystemConfig();
   const autoVerify =
     allowed?.autoVerify === true ||
-    (config?.autoVerifyKnownDomains && allowed !== null);
+    (config.autoVerifyKnownDomains && allowed !== null);
 
   return {
     verificationStatus: autoVerify ? ("VERIFIED" as const) : ("PENDING" as const),
     companyDomain: domain,
+    workEmailVerified: autoVerify,
   };
 }
 
@@ -34,17 +36,14 @@ export async function signup(input: SignupInput) {
   await assertSignupAllowed();
 
   const domain = extractDomain(input.workEmail);
-  const allowed = await db.allowedDomain.findUnique({ where: { domain } });
-  if (!allowed) {
-    throw new ForbiddenError(`Email domain @${domain} is not allowed`);
-  }
 
   const existing = await db.user.findFirst({
     where: { OR: [{ workEmail: input.workEmail }, { phone: input.phone }] },
   });
   if (existing) throw new ConflictError("Email or phone already registered");
 
-  const { verificationStatus, companyDomain } = await resolveVerification(domain);
+  const { verificationStatus, companyDomain, workEmailVerified } =
+    await resolveVerification(domain);
   const passwordHash = await hashPassword(input.password);
 
   const user = await db.user.create({
@@ -55,7 +54,7 @@ export async function signup(input: SignupInput) {
       passwordHash,
       companyDomain,
       verificationStatus,
-      workEmailVerified: true,
+      workEmailVerified,
       reminderSettings: { create: {} },
     },
   });
@@ -130,4 +129,12 @@ export async function getMe(userId: string) {
   });
   if (!user) throw new UnauthorizedError("User not found");
   return omitPassword(user);
+}
+
+/** Periodic cleanup for expired refresh tokens (call from cron or health). */
+export async function purgeExpiredRefreshTokens(): Promise<number> {
+  const result = await db.refreshToken.deleteMany({
+    where: { expiresAt: { lt: new Date() } },
+  });
+  return result.count;
 }

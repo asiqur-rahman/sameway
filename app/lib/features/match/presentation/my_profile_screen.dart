@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sameway/core/routes/app_routes.dart';
+import 'package:sameway/core/session/app_data_store.dart';
 import 'package:sameway/core/session/app_session.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
@@ -12,9 +15,10 @@ class MyProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: AppSession.instance,
+      listenable: Listenable.merge([AppSession.instance, AppDataStore.instance]),
       builder: (context, _) {
         final user = AppSession.instance.currentUser;
+        final rideCount = AppDataStore.instance.rides.length;
         final initial = (user?.fullName.isNotEmpty == true)
             ? user!.fullName[0].toUpperCase()
             : '?';
@@ -81,9 +85,9 @@ class MyProfileScreen extends StatelessWidget {
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
-                children: const [
-                  _Badge(label: '🌟 0 rides'),
-                  _Badge(label: '⭐ New member'),
+                children: [
+                  _Badge(label: '🌟 $rideCount ride${rideCount == 1 ? '' : 's'}'),
+                  const _Badge(label: '⭐ New member'),
                 ],
               ),
               if (vehicle != null) ...[
@@ -107,6 +111,25 @@ class MyProfileScreen extends StatelessWidget {
                   trailing: '🏢',
                 ),
               ],
+              const SizedBox(height: 32),
+              OutlinedButton(
+                onPressed: () async {
+                  await AppSession.instance.signOut();
+                  if (context.mounted) context.go(AppRoutes.splash);
+                },
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.error,
+                  side: const BorderSide(color: AppColors.error),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
+                  ),
+                ),
+                child: Text(
+                  'Sign Out',
+                  style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                ),
+              ),
             ],
           ),
         );

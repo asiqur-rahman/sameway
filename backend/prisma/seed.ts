@@ -25,6 +25,7 @@ async function main() {
     { domain: "banglalink.net", autoVerify: true },
     { domain: "robidata.com", autoVerify: false },
     { domain: "sameway.local", autoVerify: true },
+    { domain: "gmail.com", autoVerify: false },
   ];
 
   for (const d of domains) {

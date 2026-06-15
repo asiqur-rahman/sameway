@@ -7,19 +7,40 @@ import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_secondary_button.dart';
+import 'package:sameway/features/find_ride/find_ride_flow.dart';
 
 class RequestSentScreen extends StatelessWidget {
   const RequestSentScreen({super.key});
 
-  static const _steps = [
-  _Step(icon: '✉️', title: 'Karim is notified', subtitle: 'He gets your ride request instantly'),
-  _Step(icon: '👀', title: 'Karim reviews your profile', subtitle: 'Ratings, route match, and preferences'),
-  _Step(icon: '✅', title: 'Ride confirmed', subtitle: 'You\'ll get a push when Karim accepts'),
-  _Step(icon: '💬', title: 'Chat opens', subtitle: 'Coordinate pickup and cost split'),
-];
-
   @override
   Widget build(BuildContext context) {
+    final flow = FindRideFlow.instance;
+    final driverName = flow.lastRequestDriverName ?? 'the driver';
+    final threadId = flow.lastRequestChatThreadId;
+
+    final steps = [
+      _Step(
+        icon: '✉️',
+        title: '$driverName is notified',
+        subtitle: 'They get your ride request instantly',
+      ),
+      const _Step(
+        icon: '👀',
+        title: 'Driver reviews your profile',
+        subtitle: 'Ratings, route match, and preferences',
+      ),
+      _Step(
+        icon: '✅',
+        title: 'Ride confirmed',
+        subtitle: 'You\'ll get a push when $driverName accepts',
+      ),
+      const _Step(
+        icon: '💬',
+        title: 'Chat opens',
+        subtitle: 'Coordinate pickup and cost split',
+      ),
+    ];
+
     return SamewayScreen(
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.screenHorizontal,
@@ -61,7 +82,7 @@ class RequestSentScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   Center(
                     child: Text(
-                      'Your request to join Karim\'s ride is waiting for approval.',
+                      'Your request to join $driverName\'s ride is waiting for approval.',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.inter(
                         fontSize: 15,
@@ -81,7 +102,7 @@ class RequestSentScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  ..._steps.map(
+                  ...steps.map(
                     (step) => Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: _StepRow(step: step),
@@ -92,8 +113,10 @@ class RequestSentScreen extends StatelessWidget {
             ),
           ),
           SamewayDarkButton(
-            label: '💬 Chat with Karim',
-            onPressed: () => context.go(AppRoutes.chatConversation),
+            label: '💬 Chat with $driverName',
+            onPressed: threadId == null
+                ? () => context.go(AppRoutes.chat)
+                : () => context.go('${AppRoutes.chatConversation}?threadId=$threadId'),
           ),
           const SizedBox(height: 10),
           SamewaySecondaryButton(

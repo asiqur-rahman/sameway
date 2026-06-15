@@ -129,7 +129,10 @@ final appRouter = GoRouter(
     GoRoute(path: AppRoutes.searchResults, builder: (_, _) => const SearchResultsScreen()),
     GoRoute(path: AppRoutes.rideDetail, builder: (_, _) => const RideDetailScreen()),
     GoRoute(path: AppRoutes.requestSent, builder: (_, _) => const RequestSentScreen()),
-    GoRoute(path: AppRoutes.chatConversation, builder: (_, _) => const ChatConversationScreen()),
+    GoRoute(path: AppRoutes.chatConversation, builder: (context, state) {
+      final threadId = state.uri.queryParameters['threadId'] ?? '';
+      return ChatConversationScreen(threadId: threadId);
+    }),
     GoRoute(path: AppRoutes.myProfile, builder: (_, _) => const MyProfileScreen()),
     GoRoute(path: AppRoutes.regularRoutes, builder: (_, _) => const RegularRoutesScreen()),
     GoRoute(path: AppRoutes.reminderSettings, builder: (_, _) => const ReminderSettingsScreen()),

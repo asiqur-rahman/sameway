@@ -72,7 +72,8 @@ See `app/README.md` for Flutter structure and flows.
 ## Integration status
 
 - **Work verification (3 steps):** work email → office on map (required) → employee ID
-- **Flutter ↔ API:** UI complete; wire `dio`/`http` to `backend/` next
+- **Flutter ↔ API:** UI + local session complete; wire `dio`/`http` to `backend/` next
+- **Backend:** Rate-limited, geo-optimized search, pooled PostgreSQL, open signup aligned with Flutter
 - **Admin web ↔ API:** Connected to `/api/v1/admin/*`
 - **Maps / chat:** Placeholders in Flutter; backend has REST + stubs for real-time
 

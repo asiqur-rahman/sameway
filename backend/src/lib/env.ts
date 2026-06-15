@@ -25,6 +25,17 @@ const envSchema = z.object({
   MAX_UPLOAD_SIZE_MB: z.coerce.number().default(5),
   GOOGLE_MAPS_API_KEY: z.string().optional(),
   APP_URL: z.string().default("http://localhost:3000"),
+  DB_POOL_MAX: z.coerce.number().int().min(1).max(200).default(25),
+  DB_POOL_MIN: z.coerce.number().int().min(0).max(50).default(2),
+  DB_POOL_IDLE_MS: z.coerce.number().int().min(1000).default(30_000),
+  DB_POOL_CONNECT_TIMEOUT_MS: z.coerce.number().int().min(1000).default(5000),
+  SEARCH_CANDIDATE_CAP: z.coerce.number().int().min(50).max(1000).default(300),
+  SEARCH_CACHE_TTL_SEC: z.coerce.number().int().min(0).max(300).default(30),
+  SEARCH_BBOX_BUFFER_KM: z.coerce.number().min(5).max(50).default(18),
+  RATE_LIMIT_ENABLED: z
+    .enum(["true", "false"])
+    .default("true")
+    .transform((v) => v === "true"),
 });
 
 function loadEnv() {

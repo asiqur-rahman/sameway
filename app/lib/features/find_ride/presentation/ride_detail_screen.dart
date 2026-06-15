@@ -8,6 +8,7 @@ import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_ui_kit.dart';
+import 'package:sameway/core/session/app_data_store.dart';
 import 'package:sameway/features/find_ride/find_ride_flow.dart';
 import 'package:sameway/features/find_ride/presentation/widgets/find_ride_widgets.dart';
 import 'package:sameway/features/home/presentation/widgets/home_widgets.dart';
@@ -128,7 +129,21 @@ class RideDetailScreen extends StatelessWidget {
             ),
             child: SamewayDarkButton(
               label: 'Request to Join →',
-              onPressed: () => context.push(AppRoutes.requestSent),
+              onPressed: () async {
+                final flow = FindRideFlow.instance;
+                final result = await AppDataStore.instance.requestJoinRide(
+                  driverName: listing.driverFullName,
+                  route: '${listing.from} → ${listing.to}',
+                  from: listing.from,
+                  to: listing.to,
+                  timeLabel: '${flow.dateLabel.isEmpty ? 'Today' : flow.dateLabel} · ${listing.departTime}',
+                  detail: 'Driver: ${listing.driverFullName} · ${listing.seats} seat${listing.seats == 1 ? '' : 's'}',
+                  matchLabel: '${listing.overlap}% match',
+                );
+                flow.lastRequestChatThreadId = result.chat.id;
+                flow.lastRequestDriverName = listing.driverName.replaceAll('.', '').split(' ').first;
+                if (context.mounted) context.push(AppRoutes.requestSent);
+              },
             ),
           ),
         ],

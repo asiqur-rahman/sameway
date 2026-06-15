@@ -5,6 +5,8 @@ import 'package:sameway/core/session/user_profile.dart';
 import 'package:sameway/core/theme/app_typography.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_placeholders.dart';
+import 'package:sameway/core/utils/commute_time_format.dart';
+import 'package:sameway/core/widgets/commute_time_select_field.dart';
 import 'package:sameway/core/widgets/sameway_text_field.dart';
 import 'package:sameway/core/widgets/sameway_ui_kit.dart';
 
@@ -27,6 +29,9 @@ class VehicleFormSectionState extends State<VehicleFormSection> {
   VehicleType vehicleType = VehicleType.car;
   int? carSeats;
 
+  TimeOfDay? _usuallyLeave;
+  TimeOfDay? _latestDepart;
+
   @override
   void initState() {
     super.initState();
@@ -37,10 +42,12 @@ class VehicleFormSectionState extends State<VehicleFormSection> {
     if (vehicle.color.isNotEmpty) {
       colorController.text = vehicle.color;
     }
-    if (vehicle.usuallyLeave.isNotEmpty) {
+    _usuallyLeave = CommuteTimeFormat.parse(vehicle.usuallyLeave);
+    _latestDepart = CommuteTimeFormat.parse(vehicle.latestDepart);
+    if (_usuallyLeave != null) {
       leaveController.text = vehicle.usuallyLeave;
     }
-    if (vehicle.latestDepart.isNotEmpty) {
+    if (_latestDepart != null) {
       latestController.text = vehicle.latestDepart;
     }
     vehicleType = vehicle.type == 'bike' ? VehicleType.bike : VehicleType.car;
@@ -87,8 +94,12 @@ class VehicleFormSectionState extends State<VehicleFormSection> {
       licensePlate: licensePlateController.text.trim(),
       color: colorController.text.trim(),
       seats: vehicleType == VehicleType.car ? (carSeats ?? 1) : 1,
-      usuallyLeave: leaveController.text.trim(),
-      latestDepart: latestController.text.trim(),
+      usuallyLeave: _usuallyLeave != null
+          ? CommuteTimeFormat.format(_usuallyLeave!)
+          : leaveController.text.trim(),
+      latestDepart: _latestDepart != null
+          ? CommuteTimeFormat.format(_latestDepart!)
+          : latestController.text.trim(),
       riderPreference: 'Anyone welcome',
     );
   }
@@ -167,20 +178,28 @@ class VehicleFormSectionState extends State<VehicleFormSection> {
         Row(
           children: [
             Expanded(
-              child: SamewayTextField(
+              child: CommuteTimeSelectField(
                 label: 'Usually Leave',
                 icon: '⏰',
-                hint: AppPlaceholders.usuallyLeave,
-                controller: leaveController,
+                value: _usuallyLeave,
+                placeholder: AppPlaceholders.usuallyLeave,
+                onSelected: (time) => setState(() {
+                  _usuallyLeave = time;
+                  leaveController.text = CommuteTimeFormat.format(time);
+                }),
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: SamewayTextField(
+              child: CommuteTimeSelectField(
                 label: 'Latest Depart',
                 icon: '⏱',
-                hint: AppPlaceholders.latestDepart,
-                controller: latestController,
+                value: _latestDepart,
+                placeholder: AppPlaceholders.latestDepart,
+                onSelected: (time) => setState(() {
+                  _latestDepart = time;
+                  latestController.text = CommuteTimeFormat.format(time);
+                }),
               ),
             ),
           ],

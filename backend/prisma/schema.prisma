@@ -230,6 +230,8 @@ model Ride {
 
   @@index([driverId])
   @@index([status, departureAt])
+  @@index([status, departureAt, startLat, startLng])
+  @@index([status, departureAt, endLat, endLng])
 }
 
 model RideRequest {
@@ -247,6 +249,8 @@ model RideRequest {
 
   @@unique([rideId, riderId])
   @@index([riderId, status])
+  @@index([rideId, status])
+  @@index([rideId, status, createdAt])
 }
 
 model RideParticipant {

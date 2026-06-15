@@ -34,7 +34,10 @@ class _SearchFiltersScreenState extends State<SearchFiltersScreen> {
   @override
   void initState() {
     super.initState();
-    final flow = FindRideFlow.instance..hydrateFromSession();
+    final flow = FindRideFlow.instance;
+    if (flow.from.isEmpty && flow.to.isEmpty) {
+      flow.hydrateFromSession();
+    }
     _fromController.text = flow.from;
     _toController.text = flow.to;
     _dateController.text = flow.dateLabel;

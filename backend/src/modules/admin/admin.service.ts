@@ -1,7 +1,8 @@
 import { db } from "@/lib/db";
 import { NotFoundError } from "@/lib/http/errors";
-import type { allowedDomainSchema, systemConfigSchema, userStatusSchema } from "./admin.schema";
+import { invalidateSystemConfigCache } from "@/lib/system-config";
 import type { z } from "zod";
+import type { allowedDomainSchema, systemConfigSchema, userStatusSchema } from "./admin.schema";
 
 export async function getDashboardStats() {
   const [users, pendingVerifications, activeRides, completedRides] = await Promise.all([
@@ -101,11 +102,13 @@ export async function getSystemConfig() {
 }
 
 export async function updateSystemConfig(data: z.infer<typeof systemConfigSchema>) {
-  return db.systemConfig.upsert({
+  const updated = await db.systemConfig.upsert({
     where: { id: "default" },
     create: data,
     update: data,
   });
+  invalidateSystemConfigCache();
+  return updated;
 }
 
 async function logActivity(event: string, userId: string | null, details?: unknown) {

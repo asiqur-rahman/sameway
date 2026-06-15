@@ -18,6 +18,8 @@ class FindRideFlow {
   int minMatchIndex = 1;
   String vehicleFilter = 'All';
   FindRideListing? selectedRide;
+  String? lastRequestChatThreadId;
+  String? lastRequestDriverName;
 
   static const vehicleOptions = ['Any', 'Car only', 'Bike ok'];
   static const genderOptions = ['No preference', 'Same gender'];

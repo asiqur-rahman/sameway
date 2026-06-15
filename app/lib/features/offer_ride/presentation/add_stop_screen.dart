@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sameway/core/routes/app_routes.dart';
+import 'package:sameway/core/session/app_data_store.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_placeholders.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
@@ -11,10 +12,30 @@ import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_text_field.dart';
 import 'package:sameway/core/widgets/sameway_ui_kit.dart';
 
-class AddStopScreen extends StatelessWidget {
-  AddStopScreen({super.key});
+class AddStopScreen extends StatefulWidget {
+  const AddStopScreen({super.key});
 
+  @override
+  State<AddStopScreen> createState() => _AddStopScreenState();
+}
+
+class _AddStopScreenState extends State<AddStopScreen> {
   final _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _confirm() async {
+    final stop = _searchController.text.trim();
+    if (stop.isNotEmpty) {
+      await AppDataStore.instance.addStop(stop);
+    }
+    if (!mounted) return;
+    context.push(AppRoutes.routeConfirmed);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +107,7 @@ class AddStopScreen extends StatelessWidget {
             child: SamewayDarkButton(
               label: 'Confirm Stop & Review Route',
               textStyle: AppTypography.buttonDark,
-              onPressed: () => context.push(AppRoutes.routeConfirmed),
+              onPressed: _confirm,
             ),
           ),
         ],

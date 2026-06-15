@@ -33,6 +33,11 @@ export function noContent() {
 
 export function fail(error: unknown): NextResponse<ApiFailure> {
   if (error instanceof AppError) {
+    const headers = new Headers();
+    if (error.code === "RATE_LIMITED" && error.details && typeof error.details === "object") {
+      const retry = (error.details as { retryAfterSec?: number }).retryAfterSec;
+      if (retry) headers.set("Retry-After", String(retry));
+    }
     return NextResponse.json(
       {
         success: false,
@@ -42,7 +47,7 @@ export function fail(error: unknown): NextResponse<ApiFailure> {
           details: error.details,
         },
       },
-      { status: error.statusCode },
+      { status: error.statusCode, headers },
     );
   }
 

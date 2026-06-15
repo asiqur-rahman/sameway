@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sameway/core/routes/app_routes.dart';
-import 'package:sameway/core/constants/app_brand.dart';
+import 'package:sameway/core/session/app_data_models.dart';
+import 'package:sameway/core/session/app_data_store.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_elevation.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
@@ -11,86 +12,68 @@ import 'package:sameway/core/widgets/sameway_ui_kit.dart';
 class IncomingRequestsScreen extends StatelessWidget {
   const IncomingRequestsScreen({super.key});
 
-  static final _requests = [
-    const _RideRequest(
-      name: 'Karim R.',
-      route: 'Uttara Sec 4 → near your route',
-      match: '92% match',
-      note: 'Regular commuter · verified',
-    ),
-    const _RideRequest(
-      name: 'Sadia K.',
-      route: 'Azampur → Motijheel area',
-      match: '87% match',
-      note: 'Prefers front seat',
-    ),
-    _RideRequest(
-      name: 'Tanvir M.',
-      route: 'House Building → Farmgate',
-      match: '81% match',
-      note: 'New to $kAppName',
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    return SamewayScreen(
-      child: Column(
-        children: [
-          MobilePageHeader(
-            title: 'Incoming Requests',
-            subtitle: 'Uttara → Motijheel · Today 8:30 AM',
-            backFallback: AppRoutes.home,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
-            child: const InfoBanner(
-              emoji: '👥',
-              text:
-                  'Review rider profiles before accepting. You can chat after confirming.',
-            ),
-          ),
-          const SizedBox(height: 16),
-          Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.screenHorizontal,
-                0,
-                AppSpacing.screenHorizontal,
-                24,
+    return ListenableBuilder(
+      listenable: AppDataStore.instance,
+      builder: (context, _) {
+        final requests = AppDataStore.instance.pendingJoinRequests;
+        final activeRide = AppDataStore.instance.activePostedRide;
+        final subtitle = activeRide?.timeLabel ?? 'Your posted ride';
+
+        return SamewayScreen(
+          child: Column(
+            children: [
+              MobilePageHeader(
+                title: 'Incoming Requests',
+                subtitle: subtitle,
+                backFallback: AppRoutes.home,
               ),
-              itemCount: _requests.length,
-              separatorBuilder: (_, index) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                final request = _requests[index];
-                return _RequestCard(request: request);
-              },
-            ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
+                child: InfoBanner(
+                  emoji: '👥',
+                  text:
+                      'Review rider profiles before accepting. You can chat after confirming.',
+                ),
+              ),
+              const SizedBox(height: 16),
+              Expanded(
+                child: requests.isEmpty
+                    ? Center(
+                        child: Text(
+                          'No pending requests',
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            color: AppColors.textMuted,
+                          ),
+                        ),
+                      )
+                    : ListView.separated(
+                        padding: const EdgeInsets.fromLTRB(
+                          AppSpacing.screenHorizontal,
+                          0,
+                          AppSpacing.screenHorizontal,
+                          24,
+                        ),
+                        itemCount: requests.length,
+                        separatorBuilder: (_, index) => const SizedBox(height: 12),
+                        itemBuilder: (context, index) =>
+                            _RequestCard(request: requests[index]),
+                      ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
-}
-
-class _RideRequest {
-  const _RideRequest({
-    required this.name,
-    required this.route,
-    required this.match,
-    required this.note,
-  });
-
-  final String name;
-  final String route;
-  final String match;
-  final String note;
 }
 
 class _RequestCard extends StatelessWidget {
   const _RequestCard({required this.request});
 
-  final _RideRequest request;
+  final JoinRequest request;
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +94,7 @@ class _RequestCard extends StatelessWidget {
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  request.name[0],
+                  request.riderName[0],
                   style: GoogleFonts.inter(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -127,7 +110,7 @@ class _RequestCard extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          request.name,
+                          request.riderName,
                           style: GoogleFonts.inter(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
@@ -155,7 +138,7 @@ class _RequestCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  request.match,
+                  request.matchLabel,
                   style: GoogleFonts.inter(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
@@ -175,7 +158,8 @@ class _RequestCard extends StatelessWidget {
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () =>
+                      AppDataStore.instance.declineJoinRequest(request.id),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.textSecondary,
                     side: const BorderSide(color: AppColors.border),
@@ -193,7 +177,8 @@ class _RequestCard extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: FilledButton(
-                  onPressed: () {},
+                  onPressed: () =>
+                      AppDataStore.instance.acceptJoinRequest(request.id),
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     shape: RoundedRectangleBorder(

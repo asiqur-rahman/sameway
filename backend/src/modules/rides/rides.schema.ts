@@ -24,6 +24,7 @@ export const searchRidesSchema = z.object({
   toAddress: z.string().optional(),
   vehicleFilter: z.enum(["ANY", "CAR", "BIKE"]).default("ANY"),
   genderPreference: z.enum(["NONE", "SAME"]).default("NONE"),
+  minMatchScore: z.coerce.number().min(0).max(100).default(50),
   maxWalkingMinutes: z.coerce.number().int().min(5).max(30).default(15),
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(50).default(20),
