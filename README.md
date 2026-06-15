@@ -1,70 +1,81 @@
 # SameWay
 
-Community carpool app for verified office commuters in Bangladesh.
+Monorepo for **SameWay** — verified office carpool for commuters in Bangladesh.
 
-## Run
+```
+Project_Sameway/
+├── app/       # Flutter mobile & web UI (39+ screens)
+├── backend/   # Next.js API (Node.js + PostgreSQL)
+└── web/       # React admin dashboard
+```
+
+## Quick start
+
+### 1. Flutter app (`app/`)
 
 ```bash
+cd app
 flutter pub get
 flutter run
-adb pair 192.168.31.68:37361
-adb connect 192.168.31.68:42805
-flutter run -d 192.168.31.68:42805
+# Physical device:
+flutter run -d 192.168.31.68:42933
+# Flutter web UI (user-facing):
 flutter run -d chrome --web-port=7357
 ```
 
-**QA navigation:** Open `/catalog` in the app (Screen Catalog) to jump to any screen.
+**QA:** Open `/catalog` in the app to jump to any screen.
 
-## What's implemented (all Figma phases)
+### 2. API backend (`backend/`)
+
+```bash
+cd backend
+cp .env.example .env    # set DATABASE_URL + JWT secrets
+npm install
+npm run db:push
+npm run db:seed
+npm run dev             # http://localhost:3000
+```
+
+**Seed admin:** `admin@sameway.local` / `Admin@12345`
+
+### 3. Admin web (`web/`)
+
+```bash
+cd web
+npm install
+npm run dev             # http://localhost:5173
+```
+
+Sign in with the admin account above. Vite proxies `/api` to the backend.
+
+## What's in each folder
+
+| Folder | Stack | Purpose |
+|--------|-------|---------|
+| `app/` | Flutter | User mobile app + in-app admin UI prototypes |
+| `backend/` | Next.js, Prisma, PostgreSQL | REST API for auth, rides, chat, admin |
+| `web/` | React, Vite, TypeScript | Browser admin: dashboard, verification, users, config |
+
+## Flutter app (`app/`)
 
 | Phase | Screens | Status |
 |-------|---------|--------|
-| A — Assets & design system | Colors, typography, status bar, UI kit | Done |
-| B — Onboarding (6) | Splash, Sign Up, Profile, Vehicle, Work Location, Office ID | Done |
-| C — Ride flows (10) | Post Ride, map pickers, route confirm, requests, search, detail | Done |
-| D — Match & chat (6) | Request Sent, Chat list/conversation, Profile, Rides, Routes | Done |
-| E — Ride day (6) | Reminders, departure, heading out, pickup, notifications | Done |
-| E — Admin (4) | Dashboard, verification, users, config | Done |
-| E — Web (7) | Landing, sign-in, dashboard, find, post, rides, profile | Done |
+| Onboarding (6) | Splash, Sign Up, Profile, Vehicle, Work Location, Office ID | Done |
+| Ride flows (10) | Post, map pickers, search, detail, requests | Done |
+| Match & chat (6) | Request sent, chat, profile, rides, routes | Done |
+| Ride day (6) | Reminders, departure, pickup, notifications | Done |
+| Admin (4) | Dashboard, verification, users, config | Done (UI) |
+| Web user (7) | Landing, sign-in, dashboard, find, post, rides | Done (UI) |
 
-**Total: 39+ screens** wired in `lib/router/app_router.dart`.
+See `app/README.md` for Flutter structure and flows.
 
-## Project structure
+## Integration status
 
-```
-lib/
-├── core/
-│   ├── routes/app_routes.dart      # All route constants
-│   ├── theme/                      # Figma tokens
-│   └── widgets/                    # Shared UI (buttons, map, chat, admin, web)
-├── features/
-│   ├── onboarding/
-│   ├── home/
-│   ├── offer_ride/
-│   ├── find_ride/
-│   ├── match/
-│   ├── ride_day/
-│   ├── admin/
-│   ├── web/
-│   └── dev/screen_catalog_screen.dart
-└── router/app_router.dart
-```
+- **Flutter ↔ API:** UI complete; wire `dio`/`http` to `backend/` next
+- **Admin web ↔ API:** Connected to `/api/v1/admin/*`
+- **Maps / chat:** Placeholders in Flutter; backend has REST + stubs for real-time
 
-## User flows
-
-```
-Splash → Sign Up → Profile Setup → Vehicle → Work Location → Office ID → Home
-Home (Offer) → Post Ride → Pick Start/End → Route Confirmed → Post → Requests
-Home (Find) → Search → Results → Ride Detail → Request Sent → Chat
-Bottom nav: Home | Rides | Chat | Profile
-```
-
-## Maps & chat (next integration)
-
-- **Maps:** UI uses `MapPlaceholder`; swap for live `google_maps_flutter` after adding API keys in `android/app/src/main/AndroidManifest.xml` and iOS `AppDelegate`.
-- **Chat:** UI shell with mock messages; connect Firebase/WebSocket for real-time.
-
-## Design tokens (from Figma)
+## Design tokens
 
 | Token | Value |
 |-------|-------|
