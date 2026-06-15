@@ -1,0 +1,374 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum CommuteType {
+  DRIVE
+  RIDE
+  BOTH
+}
+
+enum VehicleType {
+  CAR
+  BIKE
+}
+
+enum VerificationMethod {
+  ADMIN_ONLY
+  SELF_VERIFY
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum RideRepeat {
+  ONCE
+  DAILY
+  WEEKDAYS
+}
+
+enum RideStatus {
+  OPEN
+  FULL
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum RideRequestStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  CANCELLED
+}
+
+enum ParticipantRole {
+  DRIVER
+  RIDER
+}
+
+enum ParticipantStatus {
+  CONFIRMED
+  HEADING_OUT
+  AT_PICKUP
+  ON_WAY
+  LATE
+  CANCELLED
+}
+
+enum NotificationType {
+  RIDE_CONFIRMED
+  RIDE_REQUEST
+  MESSAGE
+  DRIVER_ETA
+  RATE_RIDE
+  VERIFICATION
+  SYSTEM
+}
+
+enum PlaceLabel {
+  HOME
+  OFFICE
+  CUSTOM
+}
+
+// ─── Auth & Users ────────────────────────────────────────────────────────────
+
+model User {
+  id                 String             @id @default(cuid())
+  fullName           String
+  workEmail          String             @unique
+  phone              String             @unique
+  passwordHash       String
+  photoUrl           String?
+  commuteType        CommuteType?
+  gender             Gender?
+  companyDomain      String?
+  verificationStatus VerificationStatus @default(PENDING)
+  verificationMethod VerificationMethod?
+  employeeIdImageUrl String?
+  rating             Float              @default(0)
+  rideCount          Int                @default(0)
+  role               Role               @default(USER)
+  isOnline           Boolean            @default(false)
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  vehicles        Vehicle[]
+  places          Place[]
+  regularRoutes   RegularRoute[]
+  ridesAsDriver   Ride[]                    @relation("DriverRides")
+  rideRequests    RideRequest[]
+  participations  RideParticipant[]
+  conversations   ConversationParticipant[]
+  messagesSent    Message[]
+  notifications   Notification[]
+  reminderSettings ReminderSettings?
+  refreshTokens   RefreshToken[]
+  deviceTokens    DeviceToken[]
+  reviewsGiven    Review[]                  @relation("ReviewsGiven")
+  reviewsReceived Review[]                  @relation("ReviewsReceived")
+
+  @@index([companyDomain])
+  @@index([verificationStatus])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ─── Onboarding ──────────────────────────────────────────────────────────────
+
+model Vehicle {
+  id             String      @id @default(cuid())
+  userId         String
+  type           VehicleType
+  makeModel      String
+  licensePlate   String
+  availableSeats Int         @default(1)
+  year           Int?
+  color          String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rides          Ride[]
+
+  @@unique([userId, licensePlate])
+}
+
+model Place {
+  id        String     @id @default(cuid())
+  userId    String
+  label     PlaceLabel
+  address   String
+  lat       Float
+  lng       Float
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, label])
+}
+
+// ─── Rides ───────────────────────────────────────────────────────────────────
+
+model RegularRoute {
+  id            String   @id @default(cuid())
+  userId        String
+  name          String?
+  startAddress  String
+  startLat      Float
+  startLng      Float
+  endAddress    String
+  endLat        Float
+  endLng        Float
+  stops         Json     @default("[]")
+  scheduleDays  Int[]
+  departureTime String
+  defaultSeats  Int      @default(1)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Ride {
+  id             String     @id @default(cuid())
+  driverId       String
+  vehicleId      String
+  startAddress   String
+  startLat       Float
+  startLng       Float
+  endAddress     String
+  endLat         Float
+  endLng         Float
+  stops          Json       @default("[]")
+  segments       Json       @default("[]")
+  departureAt    DateTime
+  repeat         RideRepeat @default(ONCE)
+  availableSeats Int
+  status         RideStatus @default(OPEN)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  driver         User       @relation("DriverRides", fields: [driverId], references: [id])
+  vehicle        Vehicle    @relation(fields: [vehicleId], references: [id])
+  requests       RideRequest[]
+  participants   RideParticipant[]
+  conversations  Conversation[]
+  reviews        Review[]
+
+  @@index([driverId])
+  @@index([status, departureAt])
+}
+
+model RideRequest {
+  id            String            @id @default(cuid())
+  rideId        String
+  riderId       String
+  pickupSegment Json?
+  matchScore    Float?
+  riderNote     String?
+  status        RideRequestStatus @default(PENDING)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  ride          Ride              @relation(fields: [rideId], references: [id], onDelete: Cascade)
+  rider         User              @relation(fields: [riderId], references: [id])
+
+  @@unique([rideId, riderId])
+  @@index([riderId, status])
+}
+
+model RideParticipant {
+  id        String            @id @default(cuid())
+  rideId    String
+  userId    String
+  role      ParticipantRole
+  status    ParticipantStatus @default(CONFIRMED)
+  updatedAt DateTime          @updatedAt
+  ride      Ride              @relation(fields: [rideId], references: [id], onDelete: Cascade)
+  user      User              @relation(fields: [userId], references: [id])
+
+  @@unique([rideId, userId])
+}
+
+// ─── Chat ────────────────────────────────────────────────────────────────────
+
+model Conversation {
+  id           String   @id @default(cuid())
+  rideId       String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  ride         Ride?    @relation(fields: [rideId], references: [id])
+  participants ConversationParticipant[]
+  messages     Message[]
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+  conversationId String
+  userId         String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id])
+
+  @@unique([conversationId, userId])
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  conversationId String
+  senderId       String
+  body           String
+  sentAt         DateTime     @default(now())
+  readAt         DateTime?
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender         User         @relation(fields: [senderId], references: [id])
+
+  @@index([conversationId, sentAt])
+}
+
+// ─── Notifications & Reminders ───────────────────────────────────────────────
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  title     String
+  body      String
+  payload   Json?
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read, createdAt])
+}
+
+model ReminderSettings {
+  id                 String  @id @default(cuid())
+  userId             String  @unique
+  driverDeparture    Boolean @default(true)
+  driverNotifyRiders Boolean @default(true)
+  riderPickup        Boolean @default(true)
+  riderLetDriverKnow Boolean @default(true)
+  dailySummary       Boolean @default(false)
+  user               User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model DeviceToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  platform  String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── Reviews ─────────────────────────────────────────────────────────────────
+
+model Review {
+  id           String   @id @default(cuid())
+  rideId       String
+  authorId     String
+  targetUserId String
+  rating       Int
+  comment      String?
+  createdAt    DateTime @default(now())
+  ride         Ride     @relation(fields: [rideId], references: [id])
+  author       User     @relation("ReviewsGiven", fields: [authorId], references: [id])
+  targetUser   User     @relation("ReviewsReceived", fields: [targetUserId], references: [id])
+
+  @@unique([rideId, authorId, targetUserId])
+}
+
+// ─── Admin ───────────────────────────────────────────────────────────────────
+
+model AllowedDomain {
+  id         String   @id @default(cuid())
+  domain     String   @unique
+  autoVerify Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
+
+model SystemConfig {
+  id                     String   @id @default("default")
+  maintenanceMode        Boolean  @default(false)
+  autoVerifyKnownDomains Boolean  @default(true)
+  updatedAt              DateTime @updatedAt
+}
+
+model AdminActivityLog {
+  id        String   @id @default(cuid())
+  event     String
+  userId    String?
+  details   Json?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
