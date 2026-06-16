@@ -1,0 +1,107 @@
+name: sameway-backend
+
+# Reads `.env` for secrets and shared config. Overrides below apply only inside containers.
+
+x-app-env: &app-env
+  DB_HOST: postgres
+  REDIS_URL: redis://redis:6379
+  UPLOAD_DIR: /app/uploads
+  NODE_ENV: production
+  DATABASE_URL: postgresql://${DB_USERNAME:-sameway}:${DB_PASSWORD:-sameway_dev_password}@postgres:5432/${DB_NAME:-sameway}?schema=public
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-sameway}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-sameway_dev_password}
+      POSTGRES_DB: ${DB_NAME:-sameway}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-sameway} -d ${DB_NAME:-sameway}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  db-setup:
+    build:
+      context: .
+      target: jobs
+    env_file:
+      - .env
+    environment:
+      <<: *app-env
+      RUN_DB_PUSH: "true"
+      SEED_DB: ${SEED_DB:-true}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    entrypoint: ["./docker/entrypoint.sh", "setup"]
+    restart: "no"
+
+  api:
+    build:
+      context: .
+      target: runner
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      <<: *app-env
+      RUN_DB_PUSH: "false"
+      SEED_DB: "false"
+    ports:
+      - "3000:3000"
+    volumes:
+      - uploads_data:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      db-setup:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:3000/api/v1/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 45s
+
+  outbox:
+    build:
+      context: .
+      target: jobs
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      <<: *app-env
+    entrypoint: ["./docker/entrypoint.sh", "outbox-loop"]
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:
+  uploads_data:

@@ -18,7 +18,7 @@ cd app
 flutter pub get
 flutter run
 # Physical device:
-flutter run -d 192.168.31.68:42933
+flutter run -d 192.168.31.68:39205
 # Flutter web UI (user-facing):
 flutter run -d chrome --web-port=7357
 ```
@@ -26,6 +26,17 @@ flutter run -d chrome --web-port=7357
 **QA:** Open `/catalog` in the app to jump to any screen.
 
 ### 2. API backend (`backend/`)
+
+**Docker (Postgres + Redis + API):**
+
+```bash
+cd backend
+cp .env.example .env
+docker compose up --build -d
+# Health: http://localhost:3000/api/v1/health
+```
+
+**Or local Node (same `.env`):**
 
 ```bash
 cd backend

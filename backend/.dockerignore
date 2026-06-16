@@ -1,0 +1,37 @@
+# Dependencies
+node_modules
+npm-debug.log*
+
+# Build output (rebuilt in image)
+.next
+out
+build
+
+# Local env & secrets
+.env
+.env.*
+!.env.example
+
+# Uploads (use a Docker volume at runtime)
+uploads
+
+# Git & IDE
+.git
+.gitignore
+.cursor
+.vscode
+*.md
+!README.md
+
+# Tests & coverage
+coverage
+*.test.ts
+*.spec.ts
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker build context noise
+docker-compose*.yml
+Dockerfile*

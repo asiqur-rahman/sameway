@@ -40,8 +40,21 @@ All API responses follow `{ success: true, data }` or `{ success: false, error }
 
 ### Setup
 
+**Docker (recommended — Postgres + Redis + API + outbox worker):**
+
 ```bash
-cd sameway-backend
+cd backend
+cp .env.example .env   # edit JWT secrets if needed
+docker compose up --build -d
+# API: http://localhost:3000/api/v1/health
+```
+
+Re-seed after wipe: `docker compose run --rm -e SEED_DB=true db-setup`
+
+**Local Node (without Docker):**
+
+```bash
+cd backend
 cp .env.example .env   # edit DB_* credentials and JWT secrets
 npm install
 npm run db:push        # create tables
@@ -73,6 +86,43 @@ Ride search now: **bbox DB pre-filter → capped candidate fetch → in-memory s
 Rate limits (per minute): signup 8/IP, auth 15/IP, search 45/IP + 30/user, chat send 60/user.
 
 For multi-instance deploys, swap in-memory rate limit/cache for **Redis** (same key scheme).
+
+## Docker
+
+Full stack: **PostgreSQL 16**, **Redis 7**, **API** (Next.js standalone), **outbox worker**, one-shot **db-setup**.
+
+```bash
+cd backend
+cp .env.example .env
+docker compose up --build -d
+curl http://localhost:3000/api/v1/health
+```
+
+| Service | Port | Role |
+|---------|------|------|
+| `api` | 3000 | REST API |
+| `postgres` | 5432 | Database |
+| `redis` | 6379 | Cache + rate limits |
+| `outbox` | — | FCM notification worker (polls every 30s) |
+| `db-setup` | — | One-shot schema push + seed (exits) |
+
+**Useful commands:**
+
+```bash
+docker compose logs -f api
+docker compose down
+docker compose down -v          # wipe DB + uploads volumes
+docker compose run --rm -e SEED_DB=true db-setup   # re-seed
+docker compose build --no-cache api
+```
+
+**Flutter / physical device:** point at host machine:
+
+```bash
+flutter run --dart-define=API_BASE_URL=http://<YOUR-LAN-IP>:3000/api/v1
+```
+
+Uploads persist in the `uploads_data` volume. Set `SEED_DB=false` in `.env` after first boot to skip re-seeding on `docker compose up`.
 
 ## API map (v1)
 
