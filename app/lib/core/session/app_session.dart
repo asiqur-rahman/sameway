@@ -3,6 +3,7 @@ import 'package:sameway/core/session/app_data_store.dart';
 import 'package:sameway/core/maps/search_location_resolver.dart';
 import 'package:sameway/core/api/api_client.dart';
 import 'package:sameway/core/config/env_config.dart';
+import 'package:sameway/core/api/api_error_message.dart';
 import 'package:sameway/core/api/api_exception.dart';
 import 'package:sameway/core/api/repositories/auth_repository.dart';
 import 'package:sameway/core/api/repositories/users_repository.dart';
@@ -98,9 +99,9 @@ class AppSession extends ChangeNotifier {
       notifyListeners();
       return null;
     } on ApiException catch (e) {
-      return e.message;
+      return e.displayMessage;
     } catch (e) {
-      return 'Could not create account. Is the backend running?';
+      return ApiErrorMessage.fromUnknown(e);
     } finally {
       _isAuthenticating = false;
       notifyListeners();
@@ -125,9 +126,9 @@ class AppSession extends ChangeNotifier {
       notifyListeners();
       return null;
     } on ApiException catch (e) {
-      return e.message;
-    } catch (_) {
-      return 'Could not sign in. Is the backend running?';
+      return e.displayMessage;
+    } catch (e) {
+      return ApiErrorMessage.fromUnknown(e);
     } finally {
       _isAuthenticating = false;
       notifyListeners();

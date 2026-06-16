@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sameway/core/api/api_error_message.dart';
 import 'package:sameway/core/api/api_exception.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 
@@ -69,19 +70,8 @@ class SamewayBanner {
   }
 
   static String formatError(Object error) {
-    if (error is ApiException) return error.message;
-    final raw = error.toString();
-    const prefixes = ['Exception: ', 'ApiException: ', 'StateError: ', 'FormatException: '];
-    for (final prefix in prefixes) {
-      if (raw.startsWith(prefix)) return raw.substring(prefix.length);
-    }
-    if (raw.contains('SocketException') || raw.contains('Connection refused')) {
-      return 'Could not reach the server. Check your connection and try again.';
-    }
-    if (raw.contains('Missing coordinates')) {
-      return 'Set both locations on the map before searching.';
-    }
-    return raw;
+    if (error is ApiException) return error.displayMessage;
+    return ApiErrorMessage.fromUnknown(error);
   }
 
   static void hide() {

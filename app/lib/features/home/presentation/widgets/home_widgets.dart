@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sameway/core/maps/device_location_service.dart';
 import 'package:sameway/core/maps/map_config.dart';
 import 'package:sameway/core/maps/search_location_resolver.dart';
 import 'package:sameway/core/models/map_location.dart';
 import 'package:sameway/core/models/search_location.dart';
 import 'package:sameway/core/routes/app_routes.dart';
-import 'package:sameway/core/session/app_session.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_elevation.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
@@ -435,49 +435,37 @@ class _TagChip extends StatelessWidget {
 class FindRideMapPreview extends StatelessWidget {
   const FindRideMapPreview({
     super.key,
-    this.badgeLabel = '8 rides found',
+    required this.badgeLabel,
+    this.start,
+    this.end,
   });
 
   final String badgeLabel;
+  final MapLocation? start;
+  final MapLocation? end;
+
+  bool get _hasRoute =>
+      start != null && end != null && start!.isValid && end!.isValid;
+
+  /// Badge text for the map overlay from a live or in-progress ride search.
+  static String badgeFor({
+    required bool hasRoute,
+    required bool loading,
+    int? count,
+  }) {
+    if (!hasRoute) return 'Set your route';
+    if (loading) return 'Searching…';
+    final n = count ?? 0;
+    if (n == 0) return 'No rides found';
+    return '$n ride${n == 1 ? '' : 's'} found';
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (MapConfig.useNativeMaps) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(18),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            MapPlaceholder(
-              height: 180,
-              showRoute: true,
-              liveMarkers: true,
-              hint: '',
-            ),
-            Positioned(
-              top: 10,
-              right: 10,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  badgeLabel,
-                  style: AppTypography.badge(color: Colors.white),
-                ),
-              ),
-            ),
-            Positioned(
-              left: 10,
-              bottom: 8,
-              child: _OsmMapsBadge(),
-            ),
-          ],
-        ),
-      );
-    }
+    final routeKey = _hasRoute
+        ? '${start!.lat},${start!.lng}-${end!.lat},${end!.lng}'
+        : 'no-route';
+    const emptyHint = 'Set From and To to see your route';
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(18),
@@ -487,9 +475,19 @@ class FindRideMapPreview extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            const ColoredBox(color: Color(0xFFE8F0F7)),
-            CustomPaint(painter: const _FindMapGridPainter()),
-            CustomPaint(painter: const _FindMapRoutePainter()),
+            MapPlaceholder(
+              key: ValueKey(routeKey),
+              height: 180,
+              showRoute: _hasRoute,
+              showEmptyMap: !_hasRoute,
+              mapStart: start,
+              mapEnd: end,
+              startLabel: start?.address,
+              endLabel: end?.address,
+              liveMarkers: _hasRoute,
+              hint: _hasRoute ? '' : emptyHint,
+              centerHint: !_hasRoute,
+            ),
             Positioned(
               top: 10,
               right: 10,
@@ -628,6 +626,45 @@ class _FindMapRoutePainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
+/// Circular swap control aligned on the route spine between From and To.
+class RouteSwapButton extends StatelessWidget {
+  const RouteSwapButton({super.key, required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        customBorder: const CircleBorder(),
+        child: Ink(
+          width: 34,
+          height: 34,
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            shape: BoxShape.circle,
+            border: Border.all(color: AppColors.border),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 4,
+                offset: const Offset(0, 1),
+              ),
+            ],
+          ),
+          child: const Icon(
+            Icons.swap_vert_rounded,
+            size: 20,
+            color: AppColors.primary,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class LocationFieldRow extends StatelessWidget {
   final String label;
   final String value;
@@ -763,19 +800,8 @@ Future<SearchLocation?> showHomeLocationPicker(
   String? initial,
   double? initialLat,
   double? initialLng,
-}) async {
-  final controller = TextEditingController(text: initial?.trim() ?? '');
-  final user = AppSession.instance.currentUser;
-  final saved = <({String emoji, String label, SearchLocation location})>[];
-  final home = SearchLocationResolver.savedHome();
-  if (home != null) {
-    saved.add((emoji: '🏠', label: 'Home', location: home));
-  }
-  final office = SearchLocationResolver.savedOffice();
-  if (office != null) {
-    saved.add((emoji: '🏢', label: 'Office', location: office));
-  }
-
+  bool preferCurrentLocation = false,
+}) {
   return showModalBottomSheet<SearchLocation>(
     context: context,
     isScrollControlled: true,
@@ -783,113 +809,249 @@ Future<SearchLocation?> showHomeLocationPicker(
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
-    builder: (ctx) {
-      return Padding(
-        padding: EdgeInsets.fromLTRB(
-          AppSpacing.screenHorizontal,
-          16,
-          AppSpacing.screenHorizontal,
-          16 + MediaQuery.viewInsetsOf(ctx).bottom,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(title, style: AppTypography.greetingTitle),
-            const SizedBox(height: 12),
-            TextField(
-              controller: controller,
-              autofocus: saved.isEmpty,
-              decoration: InputDecoration(
-                hintText: 'Search or enter address',
-                filled: true,
-                fillColor: AppColors.surfaceMuted,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              ),
-            ),
-            if (saved.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              Text('SAVED', style: AppTypography.sectionAccent(color: AppColors.textMuted)),
-              const SizedBox(height: 8),
-              for (final place in saved)
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: Text(place.emoji, style: const TextStyle(fontSize: 20)),
-                  title: Text(place.label, style: AppTypography.listRowTitle),
-                  subtitle: Text(
-                    place.location.address,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTypography.cardSubtitle,
-                  ),
-                  onTap: () => Navigator.pop(ctx, place.location),
-                ),
-            ],
-            const SizedBox(height: 8),
-            OutlinedButton.icon(
-              onPressed: () async {
-                final initialPin = SearchLocationResolver.hasValidCoords(initialLat, initialLng)
-                    ? MapLocation(
-                        address: initial?.trim() ?? 'Pinned location',
-                        lat: initialLat!,
-                        lng: initialLng!,
-                      )
-                    : null;
-                final picked = await ctx.push<MapLocation>(
-                  AppRoutes.pickOfficeMap,
-                  extra: initialPin,
-                );
-                if (picked != null && picked.isValid && ctx.mounted) {
-                  Navigator.pop(
-                    ctx,
-                    SearchLocation(
-                      address: picked.address,
-                      lat: picked.lat,
-                      lng: picked.lng,
-                    ),
-                  );
-                }
-              },
-              icon: const Icon(Icons.map_outlined, size: 18),
-              label: const Text('Pin on map'),
-            ),
-            const SizedBox(height: 8),
-            FilledButton(
-              onPressed: () async {
-                final text = controller.text.trim();
-                if (text.isEmpty) return;
-                final matched = SearchLocationResolver.matchSavedPlace(text);
-                if (matched != null) {
-                  if (ctx.mounted) Navigator.pop(ctx, matched);
-                  return;
-                }
-                try {
-                  final resolved = await SearchLocationResolver.geocodeOrFallback(text);
-                  if (ctx.mounted) Navigator.pop(ctx, resolved);
-                } catch (_) {
-                  if (ctx.mounted) {
-                    SamewayBanner.showWarning(
-                      ctx,
-                      'Could not geocode address — use Pin on map',
-                    );
-                  }
-                }
-              },
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              child: const Text('Use this location'),
-            ),
-            const SizedBox(height: 8),
-          ],
-        ),
-      );
-    },
+    builder: (ctx) => _HomeLocationPickerSheet(
+      title: title,
+      initial: initial,
+      initialLat: initialLat,
+      initialLng: initialLng,
+      preferCurrentLocation: preferCurrentLocation,
+    ),
   );
 }
+
+class _HomeLocationPickerSheet extends StatefulWidget {
+  const _HomeLocationPickerSheet({
+    required this.title,
+    this.initial,
+    this.initialLat,
+    this.initialLng,
+    this.preferCurrentLocation = false,
+  });
+
+  final String title;
+  final String? initial;
+  final double? initialLat;
+  final double? initialLng;
+  final bool preferCurrentLocation;
+
+  @override
+  State<_HomeLocationPickerSheet> createState() => _HomeLocationPickerSheetState();
+}
+
+class _HomeLocationPickerSheetState extends State<_HomeLocationPickerSheet> {
+  late final TextEditingController _controller;
+  SearchLocation? _gpsLocation;
+  bool _locating = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initial?.trim() ?? '');
+    if (widget.preferCurrentLocation) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _prefillCurrentLocation());
+    }
+  }
+
+  Future<void> _prefillCurrentLocation() async {
+    if (_locating) return;
+    setState(() => _locating = true);
+    final current = await DeviceLocationService.getCurrentSearchLocation();
+    if (!mounted) return;
+    if (current == null) {
+      setState(() => _locating = false);
+      return;
+    }
+    setState(() {
+      _gpsLocation = current;
+      _locating = false;
+      _controller.text = current.address;
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  List<({String emoji, String label, SearchLocation location})> get _saved {
+    final saved = <({String emoji, String label, SearchLocation location})>[];
+    final home = SearchLocationResolver.savedHome();
+    if (home != null) {
+      saved.add((emoji: '🏠', label: 'Home', location: home));
+    }
+    final office = SearchLocationResolver.savedOffice();
+    if (office != null) {
+      saved.add((emoji: '🏢', label: 'Office', location: office));
+    }
+    return saved;
+  }
+
+  Future<void> _useCurrentLocation() async {
+    if (_locating) return;
+    setState(() => _locating = true);
+    final current = await DeviceLocationService.getCurrentSearchLocation();
+    if (!mounted) return;
+    if (current == null) {
+      setState(() => _locating = false);
+      SamewayBanner.showWarning(
+        context,
+        'Could not get GPS — enable location permission in settings',
+      );
+      return;
+    }
+    setState(() {
+      _gpsLocation = current;
+      _locating = false;
+      _controller.text = current.address;
+    });
+  }
+
+  Future<void> _pinOnMap() async {
+    final savedLabel = widget.initial?.trim();
+    final typedLabel = _controller.text.trim();
+    final initialPin = SearchLocationResolver.hasValidCoords(widget.initialLat, widget.initialLng)
+        ? MapLocation(
+            address: (savedLabel != null && savedLabel.isNotEmpty)
+                ? savedLabel
+                : (typedLabel.isNotEmpty ? typedLabel : 'Pinned location'),
+            lat: widget.initialLat!,
+            lng: widget.initialLng!,
+          )
+        : _gpsLocation != null
+            ? MapLocation(
+                address: _gpsLocation!.address,
+                lat: _gpsLocation!.lat,
+                lng: _gpsLocation!.lng,
+              )
+            : null;
+    final picked = await context.push<MapLocation>(
+      AppRoutes.pickOfficeMap,
+      extra: initialPin,
+    );
+    if (picked != null && picked.isValid && mounted) {
+      Navigator.pop(
+        context,
+        SearchLocation(
+          address: picked.address,
+          lat: picked.lat,
+          lng: picked.lng,
+        ),
+      );
+    }
+  }
+
+  Future<void> _confirmTyped() async {
+    final text = _controller.text.trim();
+    if (text.isEmpty) return;
+    if (_gpsLocation != null && text == _gpsLocation!.address) {
+      Navigator.pop(context, _gpsLocation);
+      return;
+    }
+    final matched = SearchLocationResolver.matchSavedPlace(text);
+    if (matched != null) {
+      Navigator.pop(context, matched);
+      return;
+    }
+    try {
+      final resolved = await SearchLocationResolver.geocodeOrFallback(text);
+      if (mounted) Navigator.pop(context, resolved);
+    } catch (_) {
+      if (mounted) {
+        SamewayBanner.showWarning(
+          context,
+          'Could not geocode address — use Pin on map',
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final saved = _saved;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.screenHorizontal,
+        16,
+        AppSpacing.screenHorizontal,
+        16 + MediaQuery.viewInsetsOf(context).bottom,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(widget.title, style: AppTypography.greetingTitle),
+          const SizedBox(height: 12),
+          FilledButton.icon(
+            onPressed: _locating ? null : () => _useCurrentLocation(),
+            icon: _locating
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                  )
+                : const Icon(Icons.my_location, size: 18),
+            label: Text(_locating ? 'Getting location…' : 'Use current location'),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.accentBlue,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+          const SizedBox(height: 12),
+          TextField(
+            controller: _controller,
+            autofocus: saved.isEmpty && !widget.preferCurrentLocation,
+            decoration: InputDecoration(
+              hintText: 'Search or enter address',
+              filled: true,
+              fillColor: AppColors.surfaceMuted,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            ),
+          ),
+          if (saved.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Text('SAVED', style: AppTypography.sectionAccent(color: AppColors.textMuted)),
+            const SizedBox(height: 8),
+            for (final place in saved)
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Text(place.emoji, style: const TextStyle(fontSize: 20)),
+                title: Text(place.label, style: AppTypography.listRowTitle),
+                subtitle: Text(
+                  place.location.address,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTypography.cardSubtitle,
+                ),
+                onTap: () => Navigator.pop(context, place.location),
+              ),
+          ],
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: _pinOnMap,
+            icon: const Icon(Icons.map_outlined, size: 18),
+            label: const Text('Pin on map'),
+          ),
+          const SizedBox(height: 8),
+          FilledButton(
+            onPressed: _confirmTyped,
+            style: FilledButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('Use this location'),
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+}
+

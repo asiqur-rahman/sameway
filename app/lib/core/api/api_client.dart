@@ -93,10 +93,7 @@ class ApiClient {
     }
     final error = body['error'];
     if (error is Map<String, dynamic>) {
-      throw ApiException(
-        error['message'] as String? ?? 'Request failed',
-        code: error['code'] as String?,
-      );
+      throw ApiException.fromErrorMap(error);
     }
     throw ApiException('Request failed');
   }
@@ -115,10 +112,7 @@ class ApiClient {
     }
     final error = body['error'];
     if (error is Map<String, dynamic>) {
-      throw ApiException(
-        error['message'] as String? ?? 'Request failed',
-        code: error['code'] as String?,
-      );
+      throw ApiException.fromErrorMap(error);
     }
     throw ApiException('Request failed');
   }
@@ -193,10 +187,8 @@ class ApiClient {
   ApiException _fromDio(DioException e) {
     final body = e.response?.data;
     if (body is Map<String, dynamic> && body['error'] is Map<String, dynamic>) {
-      final err = body['error'] as Map<String, dynamic>;
-      return ApiException(
-        err['message'] as String? ?? e.message ?? 'Network error',
-        code: err['code'] as String?,
+      return ApiException.fromErrorMap(
+        body['error'] as Map<String, dynamic>,
         statusCode: e.response?.statusCode,
       );
     }

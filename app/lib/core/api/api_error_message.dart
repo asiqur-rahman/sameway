@@ -65,4 +65,31 @@ abstract final class ApiErrorMessage {
     if (messages.isEmpty) return null;
     return messages.join('\n');
   }
+
+  static String compose({
+    required String message,
+    String? code,
+    dynamic details,
+  }) {
+    return fromErrorMap({
+      'message': message,
+      if (code != null) 'code': code,
+      if (details != null) 'details': details,
+    });
+  }
+
+  static String fromUnknown(Object error) {
+    final raw = error.toString();
+    const prefixes = ['Exception: ', 'ApiException: ', 'StateError: ', 'FormatException: '];
+    for (final prefix in prefixes) {
+      if (raw.startsWith(prefix)) return raw.substring(prefix.length);
+    }
+    if (raw.contains('SocketException') || raw.contains('Connection refused')) {
+      return 'Could not reach the server. Check your connection and try again.';
+    }
+    if (raw.contains('Missing coordinates')) {
+      return 'Set both locations on the map before searching.';
+    }
+    return raw;
+  }
 }

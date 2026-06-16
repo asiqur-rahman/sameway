@@ -59,6 +59,44 @@ class _SearchFiltersScreenState extends State<SearchFiltersScreen> {
     super.dispose();
   }
 
+  Future<void> _pickFrom() async {
+    final flow = FindRideFlow.instance;
+    final picked = await showHomeLocationPicker(
+      context,
+      title: 'From — where are you leaving?',
+      initial: _fromController.text,
+      initialLat: flow.fromLat,
+      initialLng: flow.fromLng,
+      preferCurrentLocation: true,
+    );
+    if (picked != null && picked.isValid && mounted) {
+      _fromController.text = picked.address;
+      flow.setFromLocation(picked);
+    }
+  }
+
+  Future<void> _pickTo() async {
+    final flow = FindRideFlow.instance;
+    final picked = await showHomeLocationPicker(
+      context,
+      title: 'To — where are you going?',
+      initial: _toController.text,
+      initialLat: flow.toLat,
+      initialLng: flow.toLng,
+    );
+    if (picked != null && picked.isValid && mounted) {
+      _toController.text = picked.address;
+      flow.setToLocation(picked);
+    }
+  }
+
+  void _swapFromTo() {
+    FindRideFlow.instance.swapEndpoints();
+    final flow = FindRideFlow.instance;
+    _fromController.text = flow.from;
+    _toController.text = flow.to;
+  }
+
   Future<void> _search() async {
     final flow = FindRideFlow.instance;
     flow
@@ -78,12 +116,9 @@ class _SearchFiltersScreenState extends State<SearchFiltersScreen> {
       await flow.persistMatchedSavedPlaces();
       if (!mounted) return;
       context.push(AppRoutes.searchResults);
-    } catch (_) {
+    } catch (e) {
       if (!mounted) return;
-      SamewayBanner.showWarning(
-        context,
-        'Could not resolve map coordinates. Pick Home/Office or use Pin on map.',
-      );
+      SamewayBanner.showError(context, e);
     } finally {
       if (mounted) setState(() => _searching = false);
     }
@@ -110,6 +145,9 @@ class _SearchFiltersScreenState extends State<SearchFiltersScreen> {
                 FindRouteFieldStack(
                   fromController: _fromController,
                   toController: _toController,
+                  onFromTap: _pickFrom,
+                  onToTap: _pickTo,
+                  onSwap: _swapFromTo,
                 ),
                 const SizedBox(height: 12),
                 Row(

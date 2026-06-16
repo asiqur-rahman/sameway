@@ -24,6 +24,7 @@ class SamewayMapView extends StatefulWidget {
     this.showMyLocation = false,
     this.zoom,
     this.hint,
+    this.centerHint = false,
     this.borderRadius,
     this.onPickerChanged,
     this.pickerAddress,
@@ -39,6 +40,7 @@ class SamewayMapView extends StatefulWidget {
   final bool showMyLocation;
   final double? zoom;
   final String? hint;
+  final bool centerHint;
   final double? borderRadius;
   final ValueChanged<MapLocation>? onPickerChanged;
   final String? pickerAddress;
@@ -117,11 +119,31 @@ class _SamewayMapViewState extends State<SamewayMapView>
   @override
   void didUpdateWidget(covariant SamewayMapView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.liveMarkers != oldWidget.liveMarkers ||
-        widget.start != oldWidget.start ||
-        widget.end != oldWidget.end) {
-      _interpolator = RouteInterpolator(_routePoints);
-      _liveDriverPosition = _interpolator?.positionAt(_liveAnim?.value ?? 0);
+    final routeChanged = widget.start != oldWidget.start ||
+        widget.end != oldWidget.end ||
+        widget.stops != oldWidget.stops;
+
+    if (widget.liveMarkers != oldWidget.liveMarkers || routeChanged) {
+      _liveAnim?.dispose();
+      _liveAnim = null;
+      _interpolator = null;
+      _liveDriverPosition = null;
+      if (widget.liveMarkers && _routePoints.length >= 2) {
+        _interpolator = RouteInterpolator(_routePoints);
+        _liveAnim = AnimationController(
+          vsync: this,
+          duration: const Duration(seconds: 28),
+        )..repeat();
+        _liveAnim!.addListener(_tickLiveMarker);
+        _liveDriverPosition = _interpolator!.positionAt(0);
+      }
+    }
+
+    if (routeChanged && !widget.pickerMode) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        _fitRoute();
+      });
     }
     if (widget.pickerMode && widget.initialCenter != oldWidget.initialCenter) {
       _pickerPosition = widget.initialCenter?.toLatLng();
@@ -145,6 +167,7 @@ class _SamewayMapViewState extends State<SamewayMapView>
           _pickerPosition = LatLng(pos.latitude, pos.longitude);
         });
         _mapController.move(_pickerPosition!, MapConfig.pickerZoom);
+        _notifyPicker();
       }
     } catch (_) {}
   }
@@ -166,7 +189,11 @@ class _SamewayMapViewState extends State<SamewayMapView>
   }
 
   void _fitRoute() {
-    if (_routePoints.length < 2) return;
+    if (_routePoints.isEmpty) return;
+    if (_routePoints.length == 1) {
+      _mapController.move(_routePoints.first, MapConfig.pickerZoom);
+      return;
+    }
     final bounds = LatLngBounds.fromPoints(_routePoints);
     _mapController.fitCamera(
       CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(48)),
@@ -351,33 +378,53 @@ class _SamewayMapViewState extends State<SamewayMapView>
                   ),
                 ),
               ),
-            if (widget.hint != null)
-              Positioned(
-                left: 12,
-                right: 12,
-                bottom: 28,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.92),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: AppColors.border),
-                  ),
-                  child: Text(
-                    widget.hint!,
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      color: AppColors.textSecondary,
+            if (widget.hint != null && widget.hint!.trim().isNotEmpty)
+              widget.centerHint
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 28),
+                        child: _MapHintChip(text: widget.hint!),
+                      ),
+                    )
+                  : Positioned(
+                      left: 12,
+                      right: 12,
+                      bottom: 28,
+                      child: _MapHintChip(text: widget.hint!),
                     ),
-                  ),
-                ),
-              ),
             if (!_mapReady)
               const ColoredBox(
                 color: Color(0xFFE8EDF2),
                 child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
               ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MapHintChip extends StatelessWidget {
+  const _MapHintChip({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: GoogleFonts.inter(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          color: AppColors.textSecondary,
         ),
       ),
     );

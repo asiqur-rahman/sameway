@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sameway/core/maps/map_route_resolver.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_elevation.dart';
 import 'package:sameway/core/theme/app_typography.dart';
@@ -13,59 +14,78 @@ class FindRouteFieldStack extends StatelessWidget {
     super.key,
     required this.fromController,
     required this.toController,
+    this.onFromTap,
+    this.onToTap,
+    this.onSwap,
   });
 
   final TextEditingController fromController;
   final TextEditingController toController;
+  final VoidCallback? onFromTap;
+  final VoidCallback? onToTap;
+  final VoidCallback? onSwap;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 30),
-          child: Column(
-            children: [
-              Container(
-                width: 10,
-                height: 10,
-                decoration: const BoxDecoration(
-                  color: AppColors.primary,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              Container(width: 2, height: 28, color: AppColors.border),
-              Container(
-                width: 10,
-                height: 10,
-                decoration: BoxDecoration(
-                  color: AppColors.textPrimary,
-                  borderRadius: BorderRadius.circular(3),
-                ),
-              ),
-            ],
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 34),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _RouteSpineDot(isOrigin: true),
+                if (onSwap != null)
+                  RouteSwapButton(onPressed: onSwap!)
+                else
+                  Container(width: 2, height: 28, color: AppColors.border),
+                _RouteSpineDot(isOrigin: false),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            children: [
-              _RouteInputField(
-                label: 'From',
-                icon: '📍',
-                controller: fromController,
-              ),
-              const SizedBox(height: 8),
-              _RouteInputField(
-                label: 'To',
-                icon: '🏢',
-                controller: toController,
-              ),
-            ],
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              children: [
+                _RouteInputField(
+                  label: 'From',
+                  icon: '📍',
+                  controller: fromController,
+                  onTap: onFromTap,
+                ),
+                const SizedBox(height: 8),
+                _RouteInputField(
+                  label: 'To',
+                  icon: '🏢',
+                  controller: toController,
+                  onTap: onToTap,
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
+    );
+  }
+}
+
+class _RouteSpineDot extends StatelessWidget {
+  const _RouteSpineDot({required this.isOrigin});
+
+  final bool isOrigin;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 10,
+      height: 10,
+      decoration: BoxDecoration(
+        color: isOrigin ? AppColors.primary : AppColors.textPrimary,
+        shape: isOrigin ? BoxShape.circle : BoxShape.rectangle,
+        borderRadius: isOrigin ? null : BorderRadius.circular(3),
+      ),
     );
   }
 }
@@ -75,15 +95,17 @@ class _RouteInputField extends StatelessWidget {
     required this.label,
     required this.icon,
     required this.controller,
+    this.onTap,
   });
 
   final String label;
   final String icon;
   final TextEditingController controller;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    final field = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: AppTypography.fieldLabel),
@@ -98,6 +120,8 @@ class _RouteInputField extends StatelessWidget {
               Expanded(
                 child: TextField(
                   controller: controller,
+                  readOnly: onTap != null,
+                  onTap: onTap,
                   style: AppTypography.locationValue,
                   decoration: InputDecoration(
                     isDense: true,
@@ -112,11 +136,16 @@ class _RouteInputField extends StatelessWidget {
                   ),
                 ),
               ),
+              if (onTap != null)
+                Icon(Icons.chevron_right, size: 20, color: AppColors.textMuted),
             ],
           ),
         ),
       ],
     );
+
+    if (onTap == null) return field;
+    return GestureDetector(onTap: onTap, behavior: HitTestBehavior.opaque, child: field);
   }
 }
 
@@ -227,17 +256,28 @@ class FindResultsMapStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final start = MapRouteResolver.optionalSearchStart;
+    final end = MapRouteResolver.optionalSearchEnd;
+    final hasRoute =
+        start != null && end != null && start.isValid && end.isValid;
+    final routeKey = hasRoute
+        ? '${start.lat},${start.lng}-${end.lat},${end.lng}'
+        : 'no-route';
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(14),
       child: Stack(
         children: [
           MapPlaceholder(
+            key: ValueKey(routeKey),
             height: 120,
-            showRoute: true,
-            liveMarkers: true,
-            startLabel: FindRideFlow.instance.from,
-            endLabel: FindRideFlow.instance.to,
-            hint: 'Matching routes',
+            showRoute: hasRoute,
+            mapStart: start,
+            mapEnd: end,
+            startLabel: start?.address ?? FindRideFlow.instance.from,
+            endLabel: end?.address ?? FindRideFlow.instance.to,
+            liveMarkers: hasRoute,
+            hint: hasRoute ? 'Matching routes' : 'Route map',
           ),
           Positioned(
             right: 10,

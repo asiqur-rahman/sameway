@@ -81,6 +81,8 @@ class MapPlaceholder extends StatelessWidget {
     this.onMapPicked,
     this.pickerInitial,
     this.showMyLocation = false,
+    this.centerHint = false,
+    this.showEmptyMap = false,
   });
 
   final double height;
@@ -99,11 +101,17 @@ class MapPlaceholder extends StatelessWidget {
   final ValueChanged<MapLocation>? onMapPicked;
   final MapLocation? pickerInitial;
   final bool showMyLocation;
+  final bool centerHint;
+  final bool showEmptyMap;
 
   @override
   Widget build(BuildContext context) {
     if (MapConfig.useNativeMaps &&
-        (showRoute || interactive || pickerMode || mapStart != null)) {
+        (showRoute ||
+            interactive ||
+            pickerMode ||
+            mapStart != null ||
+            showEmptyMap)) {
       final resolverStart = MapRouteResolver.searchStart;
       final resolverEnd = MapRouteResolver.searchEnd;
       final start = mapStart ??
@@ -131,7 +139,8 @@ class MapPlaceholder extends StatelessWidget {
         pickerMode: pickerMode || interactive,
         liveMarkers: liveMarkers || (showRoute && !pickerMode && !interactive),
         showMyLocation: showMyLocation || interactive,
-        hint: hint,
+        hint: hint.trim().isEmpty ? null : hint,
+        centerHint: centerHint,
         borderRadius: postRideShell ? AppRadius.xl : AppRadius.md,
         onPickerChanged: onMapPicked,
         pickerAddress: pickerInitial?.address,

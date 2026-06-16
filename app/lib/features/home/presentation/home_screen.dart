@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:sameway/core/api/repositories/rides_repository.dart';
+import 'package:sameway/core/maps/device_location_service.dart';
+import 'package:sameway/core/maps/map_route_resolver.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/session/app_data_store.dart';
 import 'package:sameway/core/session/app_session.dart';
@@ -355,11 +358,25 @@ class _FindTabContentState extends State<_FindTabContent> {
   late bool _carSelected;
   late bool _bikeSelected;
   late bool _anyGenderSelected;
+  int? _nearbyRideCount;
+  bool _loadingRideCount = false;
 
   @override
   void initState() {
     super.initState();
     _loadFromFlow();
+    _syncFlowText();
+    _autoFillFromCurrentLocation();
+    _refreshRideCount();
+  }
+
+  Future<void> _autoFillFromCurrentLocation() async {
+    if (!_fromIsPlaceholder) return;
+    final current = await DeviceLocationService.getCurrentSearchLocation();
+    if (current == null || !mounted) return;
+    setState(() => _from = current.address);
+    FindRideFlow.instance.setFromLocation(current);
+    _refreshRideCount();
   }
 
   void _loadFromFlow() {
@@ -398,6 +415,79 @@ class _FindTabContentState extends State<_FindTabContent> {
 
   bool get _toIsPlaceholder => _to.trim().isEmpty;
 
+  bool get _hasRoute => !_fromIsPlaceholder && !_toIsPlaceholder;
+
+  void _syncFlowText() {
+    final flow = FindRideFlow.instance;
+    if (!_fromIsPlaceholder) flow.from = _from.trim();
+    if (!_toIsPlaceholder) flow.to = _to.trim();
+  }
+
+  Future<void> _refreshRideCount() async {
+    if (!_hasRoute) {
+      if (mounted) {
+        setState(() {
+          _nearbyRideCount = null;
+          _loadingRideCount = false;
+        });
+      }
+      return;
+    }
+
+    setState(() => _loadingRideCount = true);
+    _syncFlowText();
+
+    final flow = FindRideFlow.instance;
+    flow
+      ..vehicleIndex = _vehicleIndex()
+      ..genderIndex = _anyGenderSelected ? 0 : 1;
+
+    try {
+      await flow.ensureSearchCoordinates();
+      if (!flow.hasValidSearchCoordinates) {
+        if (mounted) {
+          setState(() {
+            _nearbyRideCount = null;
+            _loadingRideCount = false;
+          });
+        }
+        return;
+      }
+
+      final vehicleFilter = switch (flow.vehicleIndex) {
+        1 => 'CAR',
+        2 => 'BIKE',
+        _ => 'ANY',
+      };
+      final genderPreference = flow.genderIndex == 1 ? 'SAME' : 'NONE';
+
+      final results = await RidesRepository.instance.search(
+        fromLat: flow.fromLat!,
+        fromLng: flow.fromLng!,
+        toLat: flow.toLat!,
+        toLng: flow.toLng!,
+        fromAddress: flow.from,
+        toAddress: flow.to,
+        vehicleFilter: vehicleFilter,
+        genderPreference: genderPreference,
+        minMatchScore: 50,
+        maxWalkingMinutes: flow.maxWalkMinutes,
+      );
+
+      if (!mounted) return;
+      setState(() {
+        _nearbyRideCount = results.length;
+        _loadingRideCount = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _nearbyRideCount = null;
+        _loadingRideCount = false;
+      });
+    }
+  }
+
   Future<void> _editFrom() async {
     final flow = FindRideFlow.instance;
     final picked = await showHomeLocationPicker(
@@ -406,10 +496,12 @@ class _FindTabContentState extends State<_FindTabContent> {
       initial: _from.trim().isEmpty ? null : _from,
       initialLat: flow.fromLat,
       initialLng: flow.fromLng,
+      preferCurrentLocation: true,
     );
     if (picked != null && picked.isValid && mounted) {
       setState(() => _from = picked.address);
       flow.setFromLocation(picked);
+      _refreshRideCount();
     }
   }
 
@@ -425,6 +517,7 @@ class _FindTabContentState extends State<_FindTabContent> {
     if (picked != null && picked.isValid && mounted) {
       setState(() => _to = picked.address);
       flow.setToLocation(picked);
+      _refreshRideCount();
     }
   }
 
@@ -435,6 +528,7 @@ class _FindTabContentState extends State<_FindTabContent> {
       _from = flow.from;
       _to = flow.to;
     });
+    _refreshRideCount();
   }
 
   Future<void> _pickDate() async {
@@ -507,48 +601,49 @@ class _FindTabContentState extends State<_FindTabContent> {
         16,
       ),
       children: [
-        const FindRideMapPreview(),
+        FindRideMapPreview(
+          badgeLabel: FindRideMapPreview.badgeFor(
+            hasRoute: _hasRoute,
+            loading: _loadingRideCount,
+            count: _nearbyRideCount,
+          ),
+          start: MapRouteResolver.optionalSearchStart,
+          end: MapRouteResolver.optionalSearchEnd,
+        ),
         const SizedBox(height: 12),
         Transform.translate(
           offset: const Offset(0, -18),
           child: Container(
             decoration: SamewayDecorations.card(radius: 18),
-            child: Column(
+            child: Stack(
+              clipBehavior: Clip.none,
               children: [
-                LocationFieldRow(
-                  label: 'From',
-                  value: _displayFrom(),
-                  isOrigin: true,
-                  mutedValue: _fromIsPlaceholder,
-                  onTap: _editFrom,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 38),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: GestureDetector(
-                      onTap: _swapFromTo,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceMuted,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          '↕ Swap',
-                          style: AppTypography.chipLabel(color: AppColors.textSecondary),
-                        ),
-                      ),
+                Column(
+                  children: [
+                    LocationFieldRow(
+                      label: 'From',
+                      value: _displayFrom(),
+                      isOrigin: true,
+                      mutedValue: _fromIsPlaceholder,
+                      onTap: _editFrom,
                     ),
-                  ),
+                    const Divider(height: 1, indent: 38, endIndent: 16),
+                    LocationFieldRow(
+                      label: 'To',
+                      value: _displayTo(),
+                      isOrigin: false,
+                      mutedValue: _toIsPlaceholder,
+                      onTap: _editTo,
+                    ),
+                  ],
                 ),
-                const Divider(height: 1, indent: 38),
-                LocationFieldRow(
-                  label: 'To',
-                  value: _displayTo(),
-                  isOrigin: false,
-                  mutedValue: _toIsPlaceholder,
-                  onTap: _editTo,
+                Positioned(
+                  left: 3,
+                  top: 0,
+                  bottom: 0,
+                  child: Center(
+                    child: RouteSwapButton(onPressed: _swapFromTo),
+                  ),
                 ),
               ],
             ),
@@ -582,9 +677,18 @@ class _FindTabContentState extends State<_FindTabContent> {
           carSelected: _carSelected,
           bikeSelected: _bikeSelected,
           anyGenderSelected: _anyGenderSelected,
-          onCarChanged: (v) => setState(() => _carSelected = v),
-          onBikeChanged: (v) => setState(() => _bikeSelected = v),
-          onAnyGenderChanged: (v) => setState(() => _anyGenderSelected = v),
+          onCarChanged: (v) {
+            setState(() => _carSelected = v);
+            _refreshRideCount();
+          },
+          onBikeChanged: (v) {
+            setState(() => _bikeSelected = v);
+            _refreshRideCount();
+          },
+          onAnyGenderChanged: (v) {
+            setState(() => _anyGenderSelected = v);
+            _refreshRideCount();
+          },
         ),
         const SizedBox(height: 12),
         SamewayDarkButton(
