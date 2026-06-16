@@ -1,4 +1,4 @@
-import { apiRoute, parseBody, parseQuery } from "@/lib/http/api-route";
+import { apiRoute, parseBody } from "@/lib/http/api-route";
 import { ok } from "@/lib/http/response";
 import { requireAuth } from "@/lib/auth/session";
 import { env } from "@/lib/env";
@@ -16,20 +16,7 @@ export const POST = apiRoute(async (request) => {
     });
   }
 
-  let query;
-  const contentType = request.headers.get("content-type") ?? "";
-  if (contentType.includes("application/json")) {
-    const body = await request.json();
-    const parsed = searchRidesSchema.safeParse(body);
-    if (!parsed.success) {
-      query = parseQuery(request, searchRidesSchema);
-    } else {
-      query = parsed.data;
-    }
-  } else {
-    query = parseQuery(request, searchRidesSchema);
-  }
-
+  const query = await parseBody(request, searchRidesSchema);
   const results = await ridesService.searchRides(session.id, query);
   return ok(results);
 });

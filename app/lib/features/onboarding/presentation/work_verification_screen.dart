@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:sameway/core/maps/search_location_resolver.dart';
 import 'package:sameway/core/models/map_location.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
@@ -115,11 +116,12 @@ class _WorkVerificationScreenState extends State<WorkVerificationScreen> {
 
     final home = _homeController.text.trim();
     if (home.isNotEmpty) {
+      final resolved = await SearchLocationResolver.geocodeOrFallback(home);
       await AppSession.instance.syncPlace(
         label: 'HOME',
-        address: home,
-        lat: AppSession.instance.currentUser?.homeLat ?? 23.8759,
-        lng: AppSession.instance.currentUser?.homeLng ?? 90.3795,
+        address: resolved.address,
+        lat: resolved.lat,
+        lng: resolved.lng,
       );
     }
 

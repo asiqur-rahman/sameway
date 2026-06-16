@@ -39,12 +39,20 @@ type Handler = (
   context: RouteContext,
 ) => Promise<Response>;
 
+function requestContext(request: NextRequest) {
+  return {
+    method: request.method,
+    path: request.nextUrl.pathname,
+    requestId: request.headers.get("x-request-id") ?? undefined,
+  };
+}
+
 export function apiRoute(handler: Handler): Handler {
   return async (request, context) => {
     try {
       return await handler(request, context);
     } catch (error) {
-      return fail(error);
+      return fail(error, requestContext(request));
     }
   };
 }

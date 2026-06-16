@@ -56,6 +56,8 @@ function buildGeoWhere(
   };
 }
 
+export const SEARCH_CACHE_PREFIX = "search:";
+
 export class SearchRidesUseCase {
   constructor(
     private readonly rides: IRideRepository,
@@ -64,7 +66,7 @@ export class SearchRidesUseCase {
 
   async execute(userId: string, input: SearchRidesInput): Promise<SearchRidesResult> {
     const { page, limit, fromLat, fromLng, toLat, toLng, vehicleFilter } = input;
-    const cacheKey = `${userId}:${searchCacheKey(input)}`;
+    const cacheKey = `${SEARCH_CACHE_PREFIX}${userId}:${searchCacheKey(input)}`;
 
     if (env.SEARCH_CACHE_TTL_SEC > 0) {
       const cached = await this.cache.get<SearchRidesResult>(cacheKey);
@@ -128,7 +130,8 @@ export class SearchRidesUseCase {
     return result;
   }
 
+  /** Invalidate only ride-search entries (keeps geocode cache warm at scale). */
   async invalidateCache(): Promise<void> {
-    await this.cache.clear();
+    await this.cache.deleteByPrefix(SEARCH_CACHE_PREFIX);
   }
 }

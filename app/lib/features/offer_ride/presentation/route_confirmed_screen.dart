@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sameway/core/routes/app_routes.dart';
+import 'package:sameway/core/maps/map_route_resolver.dart';
 import 'package:sameway/core/session/app_data_store.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/theme/app_typography.dart';
@@ -42,8 +43,20 @@ class RouteConfirmedScreen extends StatelessWidget {
                       height: 130,
                       postRideShell: true,
                       showRoute: true,
+                      liveMarkers: true,
                       startLabel: _short(start),
                       endLabel: _short(end),
+                      mapStart: MapRouteResolver.postRideStart(
+                        draft.startAddress,
+                        draft.startLat,
+                        draft.startLng,
+                      ),
+                      mapEnd: MapRouteResolver.postRideEnd(
+                        draft.endAddress,
+                        draft.endLat,
+                        draft.endLng,
+                      ),
+                      hint: 'Route confirmed on map',
                     ),
                     const SizedBox(height: 20),
                     PostRideRoutePoint(

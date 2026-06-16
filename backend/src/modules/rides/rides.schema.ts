@@ -1,5 +1,26 @@
 import { z } from "zod";
 import { geoPointSchema, stopSchema } from "@/lib/shared";
+import { isValidCoordinate } from "@/modules/places/places.service";
+
+function coordinateRefinement(
+  data: { fromLat: number; fromLng: number; toLat: number; toLng: number },
+  ctx: z.RefinementCtx,
+) {
+  if (!isValidCoordinate(data.fromLat, data.fromLng)) {
+    ctx.addIssue({
+      code: "custom",
+      message: "Start location coordinates are required for search",
+      path: ["fromLat"],
+    });
+  }
+  if (!isValidCoordinate(data.toLat, data.toLng)) {
+    ctx.addIssue({
+      code: "custom",
+      message: "Destination coordinates are required for search",
+      path: ["toLat"],
+    });
+  }
+}
 
 export const createRideSchema = z.object({
   vehicleId: z.string().min(1),
@@ -15,20 +36,22 @@ export const updateRideSchema = createRideSchema.partial().extend({
   status: z.enum(["OPEN", "FULL", "IN_PROGRESS", "COMPLETED", "CANCELLED"]).optional(),
 });
 
-export const searchRidesSchema = z.object({
-  fromLat: z.coerce.number(),
-  fromLng: z.coerce.number(),
-  fromAddress: z.string().optional(),
-  toLat: z.coerce.number(),
-  toLng: z.coerce.number(),
-  toAddress: z.string().optional(),
-  vehicleFilter: z.enum(["ANY", "CAR", "BIKE"]).default("ANY"),
-  genderPreference: z.enum(["NONE", "SAME"]).default("NONE"),
-  minMatchScore: z.coerce.number().min(0).max(100).default(50),
-  maxWalkingMinutes: z.coerce.number().int().min(5).max(30).default(15),
-  page: z.coerce.number().int().min(1).default(1),
-  limit: z.coerce.number().int().min(1).max(50).default(20),
-});
+export const searchRidesSchema = z
+  .object({
+    fromLat: z.coerce.number(),
+    fromLng: z.coerce.number(),
+    fromAddress: z.string().optional(),
+    toLat: z.coerce.number(),
+    toLng: z.coerce.number(),
+    toAddress: z.string().optional(),
+    vehicleFilter: z.enum(["ANY", "CAR", "BIKE"]).default("ANY"),
+    genderPreference: z.enum(["NONE", "SAME"]).default("NONE"),
+    minMatchScore: z.coerce.number().min(0).max(100).default(50),
+    maxWalkingMinutes: z.coerce.number().int().min(5).max(30).default(15),
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).max(50).default(20),
+  })
+  .superRefine(coordinateRefinement);
 
 export const rideRequestSchema = z.object({
   riderNote: z.string().max(500).optional(),

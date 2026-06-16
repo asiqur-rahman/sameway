@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sameway/core/maps/map_config.dart';
-import 'package:sameway/core/maps/map_route_resolver.dart';
 import 'package:sameway/core/maps/sameway_map_view.dart';
 import 'package:sameway/core/models/map_location.dart';
 import 'package:sameway/core/routes/app_routes.dart';
@@ -49,22 +47,12 @@ class _PickOfficeMapScreenState extends State<PickOfficeMapScreen> {
       _selected = location;
       _searchController.text = location.address;
     });
-    AppDataStore.instance.updatePostRideDraft((d) {
-      d.startLat = location.lat;
-      d.startLng = location.lng;
-      d.startAddress = location.address;
-    });
   }
 
   void _onMapPicked(MapLocation location) {
     setState(() {
-      _selected = location.address;
+      _selected = location;
       _searchController.text = location.address;
-    });
-    AppDataStore.instance.updatePostRideDraft((d) {
-      d.startLat = location.lat;
-      d.startLng = location.lng;
-      d.startAddress = location.address;
     });
   }
 
@@ -116,12 +104,7 @@ class _PickOfficeMapScreenState extends State<PickOfficeMapScreen> {
                   pickerMode: true,
                   pickerInitial: _selected,
                   showMyLocation: true,
-                  onMapPicked: (location) {
-                    setState(() {
-                      _selected = location;
-                      _searchController.text = location.address;
-                    });
-                  },
+                  onMapPicked: _onMapPicked,
                 ),
                 if (_selected != null) ...[
                   const SizedBox(height: 12),

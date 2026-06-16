@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sameway/core/maps/map_config.dart';
+import 'package:sameway/core/maps/search_location_resolver.dart';
+import 'package:sameway/core/models/map_location.dart';
+import 'package:sameway/core/models/search_location.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/session/app_session.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_elevation.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/theme/app_typography.dart';
+import 'package:sameway/core/widgets/sameway_ui_kit.dart';
 
 class SectionLabel extends StatelessWidget {
   const SectionLabel({
@@ -436,6 +441,43 @@ class FindRideMapPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (MapConfig.useNativeMaps) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(18),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            MapPlaceholder(
+              height: 180,
+              showRoute: true,
+              liveMarkers: true,
+              hint: '',
+            ),
+            Positioned(
+              top: 10,
+              right: 10,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  badgeLabel,
+                  style: AppTypography.badge(color: Colors.white),
+                ),
+              ),
+            ),
+            Positioned(
+              left: 10,
+              bottom: 8,
+              child: _GoogleMapsBadge(),
+            ),
+          ],
+        ),
+      );
+    }
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(18),
       child: SizedBox(
@@ -714,22 +756,26 @@ class DateTimeFieldTile extends StatelessWidget {
 }
 
 /// Bottom sheet to pick or type a commute location (home Find tab).
-Future<String?> showHomeLocationPicker(
+Future<SearchLocation?> showHomeLocationPicker(
   BuildContext context, {
   required String title,
   String? initial,
+  double? initialLat,
+  double? initialLng,
 }) async {
   final controller = TextEditingController(text: initial?.trim() ?? '');
   final user = AppSession.instance.currentUser;
-  final saved = <({String emoji, String label, String address})>[];
-  if (user?.homeAddress?.trim().isNotEmpty == true) {
-    saved.add((emoji: '🏠', label: 'Home', address: user!.homeAddress!));
+  final saved = <({String emoji, String label, SearchLocation location})>[];
+  final home = SearchLocationResolver.savedHome();
+  if (home != null) {
+    saved.add((emoji: '🏠', label: 'Home', location: home));
   }
-  if (user?.officeAddress?.trim().isNotEmpty == true) {
-    saved.add((emoji: '🏢', label: 'Office', address: user!.officeAddress!));
+  final office = SearchLocationResolver.savedOffice();
+  if (office != null) {
+    saved.add((emoji: '🏢', label: 'Office', location: office));
   }
 
-  return showModalBottomSheet<String>(
+  return showModalBottomSheet<SearchLocation>(
     context: context,
     isScrollControlled: true,
     backgroundColor: AppColors.surface,
@@ -774,20 +820,64 @@ Future<String?> showHomeLocationPicker(
                   leading: Text(place.emoji, style: const TextStyle(fontSize: 20)),
                   title: Text(place.label, style: AppTypography.listRowTitle),
                   subtitle: Text(
-                    place.address,
+                    place.location.address,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: AppTypography.cardSubtitle,
                   ),
-                  onTap: () => Navigator.pop(ctx, place.address),
+                  onTap: () => Navigator.pop(ctx, place.location),
                 ),
             ],
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              onPressed: () async {
+                final initialPin = SearchLocationResolver.hasValidCoords(initialLat, initialLng)
+                    ? MapLocation(
+                        address: initial?.trim() ?? 'Pinned location',
+                        lat: initialLat!,
+                        lng: initialLng!,
+                      )
+                    : null;
+                final picked = await ctx.push<MapLocation>(
+                  AppRoutes.pickOfficeMap,
+                  extra: initialPin,
+                );
+                if (picked != null && picked.isValid && ctx.mounted) {
+                  Navigator.pop(
+                    ctx,
+                    SearchLocation(
+                      address: picked.address,
+                      lat: picked.lat,
+                      lng: picked.lng,
+                    ),
+                  );
+                }
+              },
+              icon: const Icon(Icons.map_outlined, size: 18),
+              label: const Text('Pin on map'),
+            ),
+            const SizedBox(height: 8),
             FilledButton(
-              onPressed: () {
+              onPressed: () async {
                 final text = controller.text.trim();
                 if (text.isEmpty) return;
-                Navigator.pop(ctx, text);
+                final matched = SearchLocationResolver.matchSavedPlace(text);
+                if (matched != null) {
+                  if (ctx.mounted) Navigator.pop(ctx, matched);
+                  return;
+                }
+                try {
+                  final resolved = await SearchLocationResolver.geocodeOrFallback(text);
+                  if (ctx.mounted) Navigator.pop(ctx, resolved);
+                } catch (_) {
+                  if (ctx.mounted) {
+                    ScaffoldMessenger.of(ctx).showSnackBar(
+                      const SnackBar(
+                        content: Text('Could not geocode address — use Pin on map'),
+                      ),
+                    );
+                  }
+                }
               },
               style: FilledButton.styleFrom(
                 backgroundColor: AppColors.primary,

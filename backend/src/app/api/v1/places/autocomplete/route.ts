@@ -2,15 +2,12 @@ import { apiRoute, parseQuery } from "@/lib/http/api-route";
 import { ok } from "@/lib/http/response";
 import { requireAuth } from "@/lib/auth/session";
 import { env } from "@/lib/env";
-import { z } from "zod";
-
-const querySchema = z.object({
-  q: z.string().min(1),
-});
+import { autocompleteQuerySchema } from "@/modules/places/places.schema";
+import * as placesService from "@/modules/places/places.service";
 
 export const GET = apiRoute(async (request) => {
   await requireAuth(request);
-  const { q } = parseQuery(request, querySchema);
+  const { q } = parseQuery(request, autocompleteQuerySchema);
 
   if (!env.GOOGLE_MAPS_API_KEY) {
     return ok({
@@ -20,12 +17,6 @@ export const GET = apiRoute(async (request) => {
     });
   }
 
-  const url = new URL("https://maps.googleapis.com/maps/api/place/autocomplete/json");
-  url.searchParams.set("input", q);
-  url.searchParams.set("key", env.GOOGLE_MAPS_API_KEY);
-  url.searchParams.set("components", "country:bd");
-
-  const res = await fetch(url);
-  const data = await res.json();
+  const data = await placesService.autocompletePlaces(q);
   return ok(data);
 });

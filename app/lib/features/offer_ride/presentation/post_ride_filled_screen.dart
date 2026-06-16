@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:sameway/core/routes/app_routes.dart';
+import 'package:sameway/core/maps/map_route_resolver.dart';
 import 'package:sameway/core/session/app_data_store.dart';
 import 'package:sameway/core/session/app_session.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
@@ -123,9 +124,20 @@ class _PostRideFilledScreenState extends State<PostRideFilledScreen> {
                       height: 130,
                       postRideShell: true,
                       showRoute: true,
+                      liveMarkers: true,
                       startLabel: start.split(',').first.trim(),
                       endLabel: end.split(',').first.trim(),
-                      hint: 'Custom multi-stop route',
+                      mapStart: MapRouteResolver.postRideStart(
+                        draft.startAddress,
+                        draft.startLat,
+                        draft.startLng,
+                      ),
+                      mapEnd: MapRouteResolver.postRideEnd(
+                        draft.endAddress,
+                        draft.endLat,
+                        draft.endLng,
+                      ),
+                      hint: 'Live route preview',
                     ),
                     const SizedBox(height: 20),
                     const SectionHeader('YOUR ROUTE'),

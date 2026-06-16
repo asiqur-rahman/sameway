@@ -398,32 +398,41 @@ class _FindTabContentState extends State<_FindTabContent> {
   bool get _toIsPlaceholder => _to.trim().isEmpty;
 
   Future<void> _editFrom() async {
+    final flow = FindRideFlow.instance;
     final picked = await showHomeLocationPicker(
       context,
       title: 'From — where are you leaving?',
       initial: _from.trim().isEmpty ? null : _from,
+      initialLat: flow.fromLat,
+      initialLng: flow.fromLng,
     );
-    if (picked != null && picked.trim().isNotEmpty) {
-      setState(() => _from = picked.trim());
+    if (picked != null && picked.isValid && mounted) {
+      setState(() => _from = picked.address);
+      flow.setFromLocation(picked);
     }
   }
 
   Future<void> _editTo() async {
+    final flow = FindRideFlow.instance;
     final picked = await showHomeLocationPicker(
       context,
       title: 'To — where are you going?',
       initial: _to.trim().isEmpty ? null : _to,
+      initialLat: flow.toLat,
+      initialLng: flow.toLng,
     );
-    if (picked != null && picked.trim().isNotEmpty) {
-      setState(() => _to = picked.trim());
+    if (picked != null && picked.isValid && mounted) {
+      setState(() => _to = picked.address);
+      flow.setToLocation(picked);
     }
   }
 
   void _swapFromTo() {
+    FindRideFlow.instance.swapEndpoints();
+    final flow = FindRideFlow.instance;
     setState(() {
-      final temp = _from;
-      _from = _to;
-      _to = temp;
+      _from = flow.from;
+      _to = flow.to;
     });
   }
 
@@ -473,7 +482,8 @@ class _FindTabContentState extends State<_FindTabContent> {
       );
       return;
     }
-    FindRideFlow.instance
+    final flow = FindRideFlow.instance;
+    flow
       ..from = _from.trim()
       ..to = _to.trim()
       ..dateLabel = _dateLabel

@@ -24,6 +24,14 @@ export class MemoryCache<T> {
     this.store.delete(key);
   }
 
+  deleteByPrefix(prefix: string) {
+    for (const key of this.store.keys()) {
+      if (key.startsWith(prefix)) {
+        this.store.delete(key);
+      }
+    }
+  }
+
   clear() {
     this.store.clear();
   }

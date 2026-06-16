@@ -69,6 +69,17 @@ Sign in with the admin account above. Vite proxies `/api` to the backend.
 
 See `app/README.md` for Flutter structure and flows.
 
+## Production scale (1000+ users)
+
+Designed for real commute-hour load, not demo-only:
+
+- **Search:** DB geo pre-filter, 300 candidate cap, 30s result cache per corridor
+- **Geocode:** 24h shared server cache (same address geocoded once for all users)
+- **Redis:** Set `REDIS_URL` in `backend/.env` when running multiple API instances
+- **User coords:** Stored in `Place` table (HOME/OFFICE) — one row per user per label
+
+See `backend/ARCHITECTURE.md` and `backend/.env.example` for tuning.
+
 ## Integration status
 
 - **Work verification (3 steps):** work email → office on map (required) → employee ID

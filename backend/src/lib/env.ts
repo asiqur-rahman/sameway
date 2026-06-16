@@ -36,6 +36,9 @@ const envSchema = z.object({
     .enum(["true", "false"])
     .default("true")
     .transform((v) => v === "true"),
+  REDIS_URL: z.string().url().optional(),
+  GEOCODE_CACHE_TTL_SEC: z.coerce.number().int().min(60).max(604_800).default(86_400),
+  CACHE_MAX_ENTRIES: z.coerce.number().int().min(1000).max(500_000).default(20_000),
 });
 
 function loadEnv() {

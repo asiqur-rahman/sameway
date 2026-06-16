@@ -1,10 +1,21 @@
 import { z } from "zod";
+import { isValidCoordinate } from "@/modules/places/places.service";
 
-export const geoPointSchema = z.object({
-  address: z.string().min(1),
-  lat: z.number().min(-90).max(90),
-  lng: z.number().min(-180).max(180),
-});
+export const geoPointSchema = z
+  .object({
+    address: z.string().min(1),
+    lat: z.number().min(-90).max(90),
+    lng: z.number().min(-180).max(180),
+  })
+  .superRefine((data, ctx) => {
+    if (!isValidCoordinate(data.lat, data.lng)) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Valid map coordinates are required",
+        path: ["lat"],
+      });
+    }
+  });
 
 export const stopSchema = geoPointSchema.extend({
   order: z.number().int().min(0).optional(),

@@ -51,3 +51,15 @@ export class TooManyRequestsError extends AppError {
     super(429, "Too many requests", "RATE_LIMITED", { retryAfterSec });
   }
 }
+
+export class ServiceUnavailableError extends AppError {
+  constructor(message = "Service temporarily unavailable") {
+    super(503, message, "SERVICE_UNAVAILABLE");
+  }
+}
+
+export class InternalServerError extends AppError {
+  constructor() {
+    super(500, "Internal server error", "INTERNAL_ERROR");
+  }
+}

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:sameway/core/session/app_data_store.dart';
+import 'package:sameway/core/maps/search_location_resolver.dart';
 import 'package:sameway/core/api/api_client.dart';
 import 'package:sameway/core/api/api_config.dart';
 import 'package:sameway/core/api/api_exception.dart';
@@ -124,6 +125,7 @@ class AppSession extends ChangeNotifier {
   Future<void> signOut() async {
     await AuthRepository.instance.signOut();
     _currentUser = null;
+    SearchLocationResolver.clearSessionCache();
     AppDataStore.instance.clearOnSignOut();
     OnboardingState.instance.reset();
     notifyListeners();
@@ -186,6 +188,20 @@ class AppSession extends ChangeNotifier {
     required double lat,
     required double lng,
   }) async {
+    final user = _currentUser;
+    if (user != null) {
+      if (label == 'HOME') {
+        user.homeAddress = address;
+        user.homeLat = lat;
+        user.homeLng = lng;
+      } else if (label == 'OFFICE') {
+        user.officeAddress = address;
+        user.officeLat = lat;
+        user.officeLng = lng;
+      }
+      notifyListeners();
+    }
+
     try {
       await UsersRepository.instance.savePlace(
         label: label,

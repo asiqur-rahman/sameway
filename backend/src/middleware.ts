@@ -77,7 +77,13 @@ export function middleware(request: NextRequest) {
       headers.forEach((value, key) => res.headers.set(key, value));
       return res;
     }
-    throw error;
+    console.error("[Middleware Error]", error);
+    const res = NextResponse.json(
+      { success: false, error: { message: "Internal server error", code: "INTERNAL_ERROR" } },
+      { status: 500 },
+    );
+    headers.forEach((value, key) => res.headers.set(key, value));
+    return res;
   }
 
   const response = NextResponse.next();

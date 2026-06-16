@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { AppError, ValidationError } from "./errors";
+import {
+  type ErrorLogContext,
+  logServerError,
+  normalizeError,
+  sanitizeErrorForClient,
+} from "./error-handler";
 
 export type ApiSuccess<T> = {
   success: true;
@@ -31,37 +37,39 @@ export function noContent() {
   return new NextResponse(null, { status: 204 });
 }
 
-export function fail(error: unknown): NextResponse<ApiFailure> {
-  if (error instanceof AppError) {
-    const headers = new Headers();
-    if (error.code === "RATE_LIMITED" && error.details && typeof error.details === "object") {
-      const retry = (error.details as { retryAfterSec?: number }).retryAfterSec;
-      if (retry) headers.set("Retry-After", String(retry));
-    }
-    return NextResponse.json(
-      {
-        success: false,
-        error: {
-          message: error.message,
-          code: error.code,
-          details: error.details,
-        },
-      },
-      { status: error.statusCode, headers },
-    );
-  }
-
+export function fail(error: unknown, context?: ErrorLogContext): NextResponse<ApiFailure> {
   if (error instanceof ZodError) {
-    const validation = new ValidationError(error.flatten());
-    return fail(validation);
+    return fail(new ValidationError(error.flatten()), context);
   }
 
-  console.error("[API Error]", error);
+  const original = error;
+  const normalized = normalizeError(error);
+
+  const shouldLog =
+    !(original instanceof AppError) ||
+    normalized.statusCode >= 500 ||
+    isPrismaClientError(original);
+
+  if (shouldLog) {
+    logServerError(original, context);
+  }
+
+  const headers = new Headers();
+  if (normalized.code === "RATE_LIMITED" && normalized.details && typeof normalized.details === "object") {
+    const retry = (normalized.details as { retryAfterSec?: number }).retryAfterSec;
+    if (retry) headers.set("Retry-After", String(retry));
+  }
+
+  const clientError = sanitizeErrorForClient(normalized);
+
   return NextResponse.json(
-    {
-      success: false,
-      error: { message: "Internal server error", code: "INTERNAL_ERROR" },
-    },
-    { status: 500 },
+    { success: false, error: clientError },
+    { status: normalized.statusCode, headers },
   );
+}
+
+/** True for Prisma client errors that should always be logged with meta. */
+function isPrismaClientError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  return error.name.startsWith("PrismaClient");
 }

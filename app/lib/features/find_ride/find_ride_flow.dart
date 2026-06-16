@@ -1,4 +1,6 @@
 import 'package:intl/intl.dart';
+import 'package:sameway/core/maps/search_location_resolver.dart';
+import 'package:sameway/core/models/search_location.dart';
 import 'package:sameway/core/session/app_session.dart';
 import 'package:sameway/core/theme/app_placeholders.dart';
 
@@ -77,6 +79,86 @@ class FindRideFlow {
 
   String displayArriveBy() =>
       arriveBy.isEmpty ? AppPlaceholders.arriveBy : arriveBy;
+
+  bool get hasValidSearchCoordinates =>
+      SearchLocationResolver.hasValidCoords(fromLat, fromLng) &&
+      SearchLocationResolver.hasValidCoords(toLat, toLng);
+
+  /// Persist from/to text + coordinates on the flow (does not hit API).
+  void setFromLocation(SearchLocation location) {
+    from = location.address;
+    fromLat = location.lat;
+    fromLng = location.lng;
+  }
+
+  void setToLocation(SearchLocation location) {
+    to = location.address;
+    toLat = location.lat;
+    toLng = location.lng;
+  }
+
+  void swapEndpoints() {
+    final tempAddress = from;
+    from = to;
+    to = tempAddress;
+    final tempLat = fromLat;
+    fromLat = toLat;
+    toLat = tempLat;
+    final tempLng = fromLng;
+    fromLng = toLng;
+    toLng = tempLng;
+  }
+
+  /// Resolve coordinates from saved places or geocoding before search API call.
+  Future<void> ensureSearchCoordinates() async {
+    if (from.trim().isEmpty || to.trim().isEmpty) {
+      throw StateError('Set both From and To before searching');
+    }
+
+    if (hasValidSearchCoordinates) {
+      return;
+    }
+
+    final resolvedFrom = await SearchLocationResolver.resolveEndpoint(
+      address: from,
+      lat: fromLat,
+      lng: fromLng,
+    );
+    final resolvedTo = await SearchLocationResolver.resolveEndpoint(
+      address: to,
+      lat: toLat,
+      lng: toLng,
+    );
+
+    setFromLocation(resolvedFrom);
+    setToLocation(resolvedTo);
+  }
+
+  /// Save resolved search endpoints as the user's HOME/OFFICE when they match.
+  Future<void> persistMatchedSavedPlaces() async {
+    final user = AppSession.instance.currentUser;
+    if (user == null) return;
+
+    final home = SearchLocationResolver.savedHome();
+    if (home != null && SearchLocationResolver.addressesMatch(from, home.address)) {
+      await AppSession.instance.syncPlace(
+        label: 'HOME',
+        address: from,
+        lat: fromLat!,
+        lng: fromLng!,
+      );
+    }
+
+    final office = SearchLocationResolver.savedOffice();
+    if (office != null && SearchLocationResolver.addressesMatch(to, office.address)) {
+      await AppSession.instance.syncPlace(
+        label: 'OFFICE',
+        address: to,
+        lat: toLat!,
+        lng: toLng!,
+      );
+    }
+  }
 }
 
 class FindRideListing {

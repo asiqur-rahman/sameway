@@ -1,4 +1,5 @@
 import { MemoryCache } from "@/lib/cache/memory-cache";
+import { env } from "@/lib/env";
 import type { ICacheStore } from "@/domain/ports/cache.port";
 
 export class MemoryCacheStore implements ICacheStore {
@@ -10,10 +11,15 @@ export class MemoryCacheStore implements ICacheStore {
 
   async set<T>(key: string, value: T, ttlMs: number): Promise<void> {
     this.cache.set(key, value, ttlMs);
+    this.cache.prune(env.CACHE_MAX_ENTRIES);
   }
 
   async delete(key: string): Promise<void> {
     this.cache.delete(key);
+  }
+
+  async deleteByPrefix(prefix: string): Promise<void> {
+    this.cache.deleteByPrefix(prefix);
   }
 
   async clear(): Promise<void> {

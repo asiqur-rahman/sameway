@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sameway/core/maps/sameway_map_view.dart';
+import 'package:sameway/core/models/map_location.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/session/app_data_store.dart';
 import 'package:sameway/core/session/app_session.dart';
@@ -23,12 +25,21 @@ class PickEndLocationScreen extends StatefulWidget {
 class _PickEndLocationScreenState extends State<PickEndLocationScreen> {
   final _searchController = TextEditingController();
   String? _selected;
+  MapLocation? _pinned;
 
   @override
   void initState() {
     super.initState();
     _selected = AppDataStore.instance.postRideDraft.endAddress;
     if (_selected != null) _searchController.text = _selected!;
+    final draft = AppDataStore.instance.postRideDraft;
+    if (draft.endLat != null && draft.endLng != null && _selected != null) {
+      _pinned = MapLocation(
+        address: _selected!,
+        lat: draft.endLat!,
+        lng: draft.endLng!,
+      );
+    }
   }
 
   @override
@@ -96,12 +107,26 @@ class _PickEndLocationScreenState extends State<PickEndLocationScreen> {
                 24,
               ),
               children: [
-                const MapPlaceholder(
+                const MapKeyBanner(),
+                MapPlaceholder(
                   height: 400,
                   postRideShell: true,
-                  hint: 'Drag to adjust pin',
-                  interactive: true,
-                  showZoomControls: true,
+                  hint: 'Drag the map to adjust your destination pin',
+                  pickerMode: true,
+                  pickerInitial: _pinned,
+                  showMyLocation: true,
+                  onMapPicked: (location) {
+                    setState(() {
+                      _pinned = location;
+                      _selected = location.address;
+                      _searchController.text = location.address;
+                    });
+                    AppDataStore.instance.updatePostRideDraft((d) {
+                      d.endLat = location.lat;
+                      d.endLng = location.lng;
+                      d.endAddress = location.address;
+                    });
+                  },
                 ),
                 const SizedBox(height: 16),
                 SamewayTextField(

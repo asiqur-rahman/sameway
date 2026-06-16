@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:sameway/core/session/app_session.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_placeholders.dart';
@@ -31,6 +30,7 @@ class _SearchFiltersScreenState extends State<SearchFiltersScreen> {
   late int _genderIndex;
   late int _walkMinutes;
   late int _minMatchIndex;
+  bool _searching = false;
 
   @override
   void initState() {
@@ -58,15 +58,11 @@ class _SearchFiltersScreenState extends State<SearchFiltersScreen> {
     super.dispose();
   }
 
-  void _search() {
-    final user = AppSession.instance.currentUser;
-    FindRideFlow.instance
+  Future<void> _search() async {
+    final flow = FindRideFlow.instance;
+    flow
       ..from = _fromController.text.trim()
       ..to = _toController.text.trim()
-      ..fromLat = user?.homeLat
-      ..fromLng = user?.homeLng
-      ..toLat = user?.officeLat
-      ..toLng = user?.officeLng
       ..dateLabel = _dateController.text.trim()
       ..arriveBy = _arriveController.text.trim()
       ..vehicleIndex = _vehicleIndex
@@ -74,7 +70,25 @@ class _SearchFiltersScreenState extends State<SearchFiltersScreen> {
       ..maxWalkMinutes = _walkMinutes
       ..minMatchIndex = _minMatchIndex
       ..vehicleFilter = 'All';
-    context.push(AppRoutes.searchResults);
+
+    setState(() => _searching = true);
+    try {
+      await flow.ensureSearchCoordinates();
+      await flow.persistMatchedSavedPlaces();
+      if (!mounted) return;
+      context.push(AppRoutes.searchResults);
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Could not resolve map coordinates. Pick Home/Office or use Pin on map.',
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _searching = false);
+    }
   }
 
   @override
@@ -164,7 +178,8 @@ class _SearchFiltersScreenState extends State<SearchFiltersScreen> {
             child: SamewayDarkButton(
               label: 'Search Rides',
               textStyle: AppTypography.buttonDark,
-              onPressed: _search,
+              isLoading: _searching,
+              onPressed: _searching ? null : _search,
             ),
           ),
         ],

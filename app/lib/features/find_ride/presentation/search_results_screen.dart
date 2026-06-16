@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sameway/core/api/repositories/rides_repository.dart';
+import 'package:sameway/core/maps/search_location_resolver.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
@@ -55,10 +56,12 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
     });
     final flow = FindRideFlow.instance;
     try {
-      final fromLat = flow.fromLat ?? 23.8759;
-      final fromLng = flow.fromLng ?? 90.3795;
-      final toLat = flow.toLat ?? 23.7330;
-      final toLng = flow.toLng ?? 90.4172;
+      await flow.ensureSearchCoordinates();
+
+      if (!SearchLocationResolver.hasValidCoords(flow.fromLat, flow.fromLng) ||
+          !SearchLocationResolver.hasValidCoords(flow.toLat, flow.toLng)) {
+        throw StateError('Missing coordinates');
+      }
 
       final vehicleFilter = switch (flow.vehicleIndex) {
         1 => 'CAR',
@@ -73,10 +76,10 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
       };
 
       final results = await RidesRepository.instance.search(
-        fromLat: fromLat,
-        fromLng: fromLng,
-        toLat: toLat,
-        toLng: toLng,
+        fromLat: flow.fromLat!,
+        fromLng: flow.fromLng!,
+        toLat: flow.toLat!,
+        toLng: flow.toLng!,
         fromAddress: flow.from.isNotEmpty ? flow.from : null,
         toAddress: flow.to.isNotEmpty ? flow.to : null,
         vehicleFilter: vehicleFilter,
@@ -93,8 +96,8 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = 'Could not search rides. Pull down to retry.';
-        _listings = sampleFindRideListings;
+        _error = 'Could not search rides. Check locations have map coordinates and pull to retry.';
+        _listings = [];
         _loading = false;
         _refreshing = false;
       });

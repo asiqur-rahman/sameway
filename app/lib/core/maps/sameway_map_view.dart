@@ -199,7 +199,7 @@ class _SamewayMapViewState extends State<SamewayMapView>
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
         anchor: const Offset(0.5, 0.5),
         infoWindow: const InfoWindow(title: 'Driver', snippet: 'En route'),
-        zIndex: 2,
+        zIndexInt: 2,
       ));
     }
 

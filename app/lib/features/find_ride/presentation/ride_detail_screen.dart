@@ -49,10 +49,13 @@ class RideDetailScreen extends StatelessWidget {
                 const SizedBox(height: 10),
                 _RouteCard(listing: listing),
                 const SizedBox(height: 12),
-                const MapPlaceholder(
+                MapPlaceholder(
                   height: 110,
                   showRoute: true,
-                  hint: 'Tap to view full route',
+                  liveMarkers: true,
+                  startLabel: listing.from,
+                  endLabel: listing.to,
+                  hint: 'Driver en route · live position',
                 ),
                 const SizedBox(height: 12),
                 FindRouteMatchCard(overlap: listing.overlap),

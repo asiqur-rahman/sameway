@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isValidCoordinate } from "@/modules/places/places.service";
 
 export const updateProfileSchema = z.object({
   fullName: z.string().min(2).max(100).optional(),
@@ -38,10 +39,13 @@ export const placeSchema = z.object({
   lat: z.number().min(-90).max(90),
   lng: z.number().min(-180).max(180),
 }).superRefine((data, ctx) => {
-  if (data.label === "OFFICE" && data.lat === 0 && data.lng === 0) {
+  if ((data.label === "OFFICE" || data.label === "HOME") && !isValidCoordinate(data.lat, data.lng)) {
     ctx.addIssue({
       code: "custom",
-      message: "Office address must be selected on the map",
+      message:
+        data.label === "OFFICE"
+          ? "Office address must be selected on the map"
+          : "Home address must include map coordinates — pin on map or geocode",
       path: ["lat"],
     });
   }

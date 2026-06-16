@@ -231,9 +231,12 @@ class FindResultsMapStrip extends StatelessWidget {
       borderRadius: BorderRadius.circular(14),
       child: Stack(
         children: [
-          const MapPlaceholder(
+          MapPlaceholder(
             height: 120,
             showRoute: true,
+            liveMarkers: true,
+            startLabel: FindRideFlow.instance.from,
+            endLabel: FindRideFlow.instance.to,
             hint: 'Matching routes',
           ),
           Positioned(

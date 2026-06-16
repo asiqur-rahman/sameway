@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { NotFoundError, ValidationError } from "@/lib/http/errors";
+import { NotFoundError } from "@/lib/http/errors";
 import type {
   commutePreferencesSchema,
   deviceTokenSchema,
@@ -55,13 +55,6 @@ export async function getReminderSettings(userId: string) {
 }
 
 export async function upsertPlace(userId: string, data: z.infer<typeof placeSchema>) {
-  if (data.label === "OFFICE" && data.lat === 0 && data.lng === 0) {
-    throw new ValidationError({
-      formErrors: ["Office address must be selected on the map"],
-      fieldErrors: {},
-    });
-  }
-
   const place = await db.place.upsert({
     where: { userId_label: { userId, label: data.label } },
     create: { ...data, userId },
