@@ -8,6 +8,9 @@ x-app-env: &app-env
   UPLOAD_DIR: /app/uploads
   NODE_ENV: production
   DATABASE_URL: postgresql://${DB_USERNAME:-sameway}:${DB_PASSWORD:-sameway_dev_password}@postgres:5432/${DB_NAME:-sameway}?schema=public
+  OSRM_URL: ${OSRM_URL:-http://osrm:5000}
+
+x-osrm-image: &osrm-image ghcr.io/project-osrm/osrm-backend:latest
 
 services:
   postgres:
@@ -58,6 +61,48 @@ services:
     entrypoint: ["./docker/entrypoint.sh", "setup"]
     restart: "no"
 
+  # First `docker compose up` downloads + preprocesses Bangladesh OSM (~15 min).
+  # Re-runs are instant when data already exists in the volume.
+  osrm-setup:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.osrm-setup
+    environment:
+      OSRM_EXTRACT_THREADS: "2"
+    volumes:
+      - osrm_data:/data
+    restart: "no"
+
+  osrm:
+    image: *osrm-image
+    restart: unless-stopped
+    volumes:
+      - osrm_data:/data
+    command:
+      - "osrm-routed"
+      - "--algorithm"
+      - "mld"
+      - "--max-table-size"
+      - "2000"
+      - "--max-trip-size"
+      - "200"
+      - "/data/bangladesh-latest.osrm"
+    ports:
+      - "5000:5000"
+    depends_on:
+      osrm-setup:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget -qO- 'http://127.0.0.1:5000/nearest/v1/driving/90.4125,23.8103' || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
   api:
     build:
       context: .
@@ -71,9 +116,6 @@ services:
       SEED_DB: "false"
     ports:
       - "3000:3000"
-    extra_hosts:
-      # Lets the API container reach OSRM on the host (docker-compose.osrm.yml :5000).
-      - "host.docker.internal:host-gateway"
     volumes:
       - uploads_data:/app/uploads
     depends_on:
@@ -108,3 +150,5 @@ volumes:
   postgres_data:
   redis_data:
   uploads_data:
+  osrm_data:
+    name: sameway_osrm_data

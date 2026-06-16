@@ -1,0 +1,10 @@
+FROM ghcr.io/project-osrm/osrm-backend:latest
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends wget ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
+COPY docker/osrm-init.sh /docker/osrm-init.sh
+RUN sed -i 's/\r$//' /docker/osrm-init.sh && chmod +x /docker/osrm-init.sh
+
+ENTRYPOINT ["/bin/bash", "/docker/osrm-init.sh"]

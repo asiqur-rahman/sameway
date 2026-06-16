@@ -1,33 +1,26 @@
-# =============================================================================
-# Sameway — OSRM self-hosted routing engine (standalone)
-# =============================================================================
+# OSRM is included in the main stack — use:
+#   docker compose up -d
 #
-# Quick start
-# ───────────
-#   1. One-time data prep (~15 min):
-#        bash docker/osrm-setup.sh
-#
-#   2. Start OSRM:
-#        docker compose -f docker-compose.osrm.yml up -d
-#
-#   3. Test:
-#        curl "http://localhost:5000/nearest/v1/driving/90.4125,23.8103"
-#
-#   4. Add to backend/.env (pick the line that matches how you run the API):
-#        OSRM_URL=http://localhost:5000              # npm run dev on host
-#        OSRM_URL=http://host.docker.internal:5000   # API in Docker (WSL/Windows)
-#
-# To stop:  docker compose -f docker-compose.osrm.yml down
-# Refresh:  docker compose -f docker-compose.osrm.yml down
-#           docker volume rm sameway_osrm_data
-#           bash docker/osrm-setup.sh
-# =============================================================================
+# This file is kept for OSRM-only runs (same one-command flow):
+#   docker compose -f docker-compose.osrm.yml up -d
 
 name: sameway-osrm
 
+x-osrm-image: &osrm-image ghcr.io/project-osrm/osrm-backend:latest
+
 services:
+  osrm-setup:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.osrm-setup
+    environment:
+      OSRM_EXTRACT_THREADS: "2"
+    volumes:
+      - osrm_data:/data
+    restart: "no"
+
   osrm:
-    image: ghcr.io/project-osrm/osrm-backend:latest
+    image: *osrm-image
     restart: unless-stopped
     volumes:
       - osrm_data:/data
@@ -42,6 +35,9 @@ services:
       - "/data/bangladesh-latest.osrm"
     ports:
       - "5000:5000"
+    depends_on:
+      osrm-setup:
+        condition: service_completed_successfully
     healthcheck:
       test:
         [
@@ -52,13 +48,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
-    logging:
-      driver: json-file
-      options:
-        max-size: "10m"
-        max-file: "3"
 
 volumes:
-  # Same fixed name used by docker/osrm-setup.sh — run the setup script first.
   osrm_data:
     name: sameway_osrm_data
