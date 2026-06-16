@@ -1,27 +1,25 @@
 import 'package:flutter/foundation.dart';
-import 'package:sameway/core/api/api_config.dart';
+import 'package:sameway/core/config/env_config.dart';
 import 'package:sameway/core/api/repositories/users_repository.dart';
 
 /// Registers device tokens with the backend for push delivery.
 ///
-/// For dev/testing without Firebase project files, pass:
-/// `--dart-define=FCM_DEV_TOKEN=your-test-token`
+/// For dev/testing without Firebase, set `FCM_DEV_TOKEN` in `dart_defines.json`.
 class PushService {
   PushService._();
 
   static final PushService instance = PushService._();
 
-  static const String _devToken = String.fromEnvironment('FCM_DEV_TOKEN');
-
   Future<void> initialize() async {
-    if (!ApiConfig.enabled) return;
+    if (!EnvConfig.apiEnabled) return;
     await registerToken();
   }
 
   Future<void> registerToken() async {
-    if (!ApiConfig.enabled) return;
+    if (!EnvConfig.apiEnabled) return;
 
-    final token = _devToken.isNotEmpty ? _devToken : await _fetchNativeToken();
+    final devToken = EnvConfig.fcmDevToken;
+    final token = devToken.isNotEmpty ? devToken : await _fetchNativeToken();
     if (token == null || token.isEmpty) {
       if (kDebugMode) {
         debugPrint('[PushService] no token — set FCM_DEV_TOKEN or configure Firebase');

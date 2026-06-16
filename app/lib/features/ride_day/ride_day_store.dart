@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:sameway/core/api/api_config.dart';
+import 'package:sameway/core/config/env_config.dart';
 import 'package:sameway/core/api/models/reminder_settings.dart';
 import 'package:sameway/core/api/repositories/notifications_repository.dart';
 import 'package:sameway/core/api/repositories/rides_repository.dart';
@@ -37,7 +37,7 @@ class RideDayStore extends ChangeNotifier {
   String? get error => _error;
 
   Future<void> refreshToday() async {
-    if (!ApiConfig.enabled) return;
+    if (!EnvConfig.apiEnabled) return;
     _loadingToday = true;
     _error = null;
     notifyListeners();
@@ -54,7 +54,7 @@ class RideDayStore extends ChangeNotifier {
 
   Future<void> refreshLive() async {
     final rideId = _today?.rideId ?? _live?.id;
-    if (rideId == null || !ApiConfig.enabled) return;
+    if (rideId == null || !EnvConfig.apiEnabled) return;
     _loadingLive = true;
     notifyListeners();
     try {
@@ -77,7 +77,7 @@ class RideDayStore extends ChangeNotifier {
   }
 
   Future<void> refreshNotifications() async {
-    if (!ApiConfig.enabled) return;
+    if (!EnvConfig.apiEnabled) return;
     _loadingNotifications = true;
     notifyListeners();
     try {
@@ -91,7 +91,7 @@ class RideDayStore extends ChangeNotifier {
   }
 
   Future<void> refreshReminderSettings() async {
-    if (!ApiConfig.enabled) return;
+    if (!EnvConfig.apiEnabled) return;
     try {
       _reminders = await UsersRepository.instance.getReminderSettings();
       notifyListeners();

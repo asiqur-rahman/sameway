@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sameway/core/api/repositories/places_repository.dart';
+import 'package:sameway/core/config/env_config.dart';
 import 'package:sameway/core/maps/sameway_map_view.dart';
 import 'package:sameway/core/models/map_location.dart';
+import 'package:sameway/dev/dev_office_presets.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_placeholders.dart';
@@ -169,19 +171,21 @@ class _PickOfficeMapScreenState extends State<PickOfficeMapScreen> {
                   controller: _searchController,
                   readOnly: true,
                 ),
-                const SizedBox(height: 20),
-                const SectionHeader('SUGGESTED OFFICES'),
-                const SizedBox(height: 10),
-                ...OfficeMapPresets.offices.map(
-                  (office) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: _OfficePresetTile(
-                      location: office,
-                      selected: _selected?.address == office.address,
-                      onTap: () => _selectPreset(office),
+                if (!EnvConfig.apiEnabled) ...[
+                  const SizedBox(height: 20),
+                  const SectionHeader('SUGGESTED OFFICES'),
+                  const SizedBox(height: 10),
+                  ...DevOfficePresets.offices.map(
+                    (office) => Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: _OfficePresetTile(
+                        location: office,
+                        selected: _selected?.address == office.address,
+                        onTap: () => _selectPreset(office),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ],
             ),
           ),

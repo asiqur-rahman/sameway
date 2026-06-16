@@ -1,26 +1,23 @@
 import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:sameway/core/config/env_config.dart';
 
-/// OpenStreetMap — free tiles, no API key required.
-class MapConfig {
-  MapConfig._();
+/// Map display settings — tile URL and region come from [EnvConfig] / `dart_defines.json`.
+abstract final class MapConfig {
+  static String get tileUrl => EnvConfig.mapTileUrl;
 
-  static const String tileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-
-  /// OSM works on mobile, desktop, and web.
   static bool get useNativeMaps => true;
 
-  static const LatLng defaultCenter = LatLng(23.8103, 90.4254);
+  static LatLng get defaultCenter => EnvConfig.defaultMapCenter;
 
-  /// Demo commute corridor (Uttara → Motijheel).
-  static const LatLng defaultHome = LatLng(23.8759, 90.3795);
-  static const LatLng defaultOffice = LatLng(23.7330, 90.4172);
+  static LatLng get defaultHome => EnvConfig.defaultHome;
+
+  static LatLng get defaultOffice => EnvConfig.defaultOffice;
 
   static const double defaultZoom = 13;
   static const double routeZoom = 11.5;
   static const double pickerZoom = 15;
 
-  /// Required by OSM tile usage policy (flutter_map passes this as User-Agent).
   static String get userAgentPackageName {
     if (kIsWeb) return 'com.sameway.sameway.web';
     switch (defaultTargetPlatform) {

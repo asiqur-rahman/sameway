@@ -1,3 +1,7 @@
 {
-  "API_BASE_URL": "http://YOUR_LAN_IP:3000/api/v1"
+  "API_BASE_URL": "http://YOUR_LAN_IP:3000/api/v1",
+  "MAP_TILE_URL": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+  "DEFAULT_MAP_CENTER": "23.8103,90.4254",
+  "DEFAULT_HOME": "23.8759,90.3795",
+  "DEFAULT_OFFICE": "23.7330,90.4172"
 }

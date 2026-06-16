@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:sameway/core/api/api_config.dart';
+import 'package:sameway/core/config/env_config.dart';
 import 'package:sameway/core/api/api_exception.dart';
 import 'package:sameway/core/api/token_storage.dart';
 
@@ -19,7 +19,7 @@ class ApiClient {
     _onRefreshFailed = onRefreshFailed;
     _dio = Dio(
       BaseOptions(
-        baseUrl: ApiConfig.baseUrl,
+        baseUrl: EnvConfig.apiBaseUrl,
         connectTimeout: const Duration(seconds: 15),
         receiveTimeout: const Duration(seconds: 30),
         headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
@@ -65,7 +65,7 @@ class ApiClient {
       return false;
     }
     try {
-      final response = await Dio(BaseOptions(baseUrl: ApiConfig.baseUrl)).post(
+      final response = await Dio(BaseOptions(baseUrl: EnvConfig.apiBaseUrl)).post(
         '/auth/refresh',
         data: {'refreshToken': refresh},
       );
@@ -204,9 +204,8 @@ class ApiClient {
         e.type == DioExceptionType.sendTimeout ||
         e.type == DioExceptionType.receiveTimeout) {
       return ApiException(
-        'Could not reach the server at ${ApiConfig.baseUrl}. '
-        'Use the same Wi‑Fi as your PC, confirm `npm run dev` is running, '
-        'and allow port 3000 through Windows Firewall.',
+        'Could not reach the server at ${EnvConfig.apiBaseUrl}. '
+        'Check Wi‑Fi, confirm the backend is running, and firewall rules for your API port.',
         statusCode: e.response?.statusCode,
       );
     }

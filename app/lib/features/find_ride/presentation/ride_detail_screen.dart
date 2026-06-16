@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sameway/core/config/env_config.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_elevation.dart';
@@ -10,6 +11,7 @@ import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_ui_kit.dart';
 import 'package:sameway/core/session/app_data_store.dart';
+import 'package:sameway/dev/dev_find_ride_samples.dart';
 import 'package:sameway/features/find_ride/find_ride_flow.dart';
 import 'package:sameway/features/find_ride/presentation/widgets/find_ride_widgets.dart';
 import 'package:sameway/features/home/presentation/widgets/home_widgets.dart';
@@ -20,7 +22,34 @@ class RideDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final listing = FindRideFlow.instance.selectedRide ?? sampleFindRideListings.first;
+    final listing = FindRideFlow.instance.selectedRide ??
+        (!EnvConfig.apiEnabled && DevFindRideSamples.listings.isNotEmpty
+            ? DevFindRideSamples.listings.first
+            : null);
+    if (listing == null) {
+      return SamewayScreen(
+        child: Column(
+          children: [
+            const MobilePageHeader(
+              title: 'Ride Details',
+              backFallback: AppRoutes.searchResults,
+            ),
+            Expanded(
+              child: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.screenHorizontal),
+                  child: Text(
+                    'No ride selected. Go back and choose a ride from search results.',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.inter(fontSize: 15, color: AppColors.textSecondary),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     final seatsTaken = listing.coRiderName != null ? 1 : 0;
     final seatsAvailable = listing.seats;
 

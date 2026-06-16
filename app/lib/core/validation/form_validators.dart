@@ -1,13 +1,6 @@
 import 'package:sameway/core/session/user_profile.dart';
 
 abstract final class FormValidators {
-  static const allowedDomains = [
-    'grameenphone.com',
-    'banglalink.net',
-    'robidata.com',
-    'sameway.local',
-  ];
-
   static String? fullName(String? value) {
     final v = value?.trim() ?? '';
     if (v.length < 2) return 'Enter your full name';
@@ -38,13 +31,6 @@ abstract final class FormValidators {
   static String? requiredField(String? value, String label) {
     if (value == null || value.trim().isEmpty) return 'Enter $label';
     return null;
-  }
-
-  static bool isEmailDomainAutoVerified(String email) {
-    final domain = email.split('@').last.toLowerCase();
-    return domain == 'grameenphone.com' ||
-        domain == 'banglalink.net' ||
-        domain == 'sameway.local';
   }
 
   static String routeForPhase(OnboardingPhase phase) {

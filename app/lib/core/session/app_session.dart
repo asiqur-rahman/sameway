@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:sameway/core/session/app_data_store.dart';
 import 'package:sameway/core/maps/search_location_resolver.dart';
 import 'package:sameway/core/api/api_client.dart';
-import 'package:sameway/core/api/api_config.dart';
+import 'package:sameway/core/config/env_config.dart';
 import 'package:sameway/core/api/api_exception.dart';
 import 'package:sameway/core/api/repositories/auth_repository.dart';
 import 'package:sameway/core/api/repositories/users_repository.dart';
@@ -30,6 +30,8 @@ class AppSession extends ChangeNotifier {
   UserProfile? get currentUser => _currentUser;
 
   Future<void> initialize() async {
+    EnvConfig.ensureConfigured();
+
     ApiClient.instance.initialize(
       onRefreshFailed: () async {
         _currentUser = null;
@@ -37,7 +39,11 @@ class AppSession extends ChangeNotifier {
       },
     );
 
-    if (!ApiConfig.enabled) {
+    if (kDebugMode) {
+      debugPrint('[SameWay] API_BASE_URL=${EnvConfig.apiBaseUrl}');
+    }
+
+    if (!EnvConfig.apiEnabled) {
       _ready = true;
       notifyListeners();
       return;

@@ -6,33 +6,39 @@ Part of the Same Way monorepo. API lives in `../backend/`, browser admin in `../
 
 ## Run
 
+Edit **`dart_defines.json`** (API URL, map settings), then:
+
 ```bash
 flutter pub get
 flutter run
+```
+
+The app loads `dart_defines.json` automatically on startup — **no `--dart-define-from-file` needed**.
+
+After changing the file: **stop the app and run again** (hot reload does not reload config).
+
+```bash
 adb connect 192.168.31.68:42933
 flutter run -d 192.168.31.68:42933
-flutter run -d chrome --web-port=7357
 ```
 
 **QA navigation:** Open `/catalog` to jump to any screen.
 
 ## Backend API
 
-Start the API from `../backend/` (`npm run dev`). The app connects automatically:
+Start the API from `../backend/` (`npm run dev`). **All environment values live in `dart_defines.json`** — nothing is hardcoded in Dart:
 
-| Platform | Default base URL |
-|----------|------------------|
-| Android (physical device) | `http://192.168.31.47:3000/api/v1` |
-| Android emulator | `--dart-define=API_BASE_URL=http://10.0.2.2:3000/api/v1` |
-| iOS sim / web | `http://192.168.31.47:3000/api/v1` (or `localhost` on sim) |
-| Override | `--dart-define-from-file=dart_defines.json` or edit `dart_defines.json` |
+| Key | Example |
+|-----|---------|
+| `API_BASE_URL` | `http://192.168.31.47:3000/api/v1` (physical device) or `http://10.0.2.2:3000/api/v1` (emulator) |
+| `MAP_TILE_URL` | `https://tile.openstreetmap.org/{z}/{x}/{y}.png` |
+| `DEFAULT_MAP_CENTER` | `23.8103,90.4254` (`lat,lng`) |
+| `DEFAULT_HOME` | `23.8759,90.3795` |
+| `DEFAULT_OFFICE` | `23.7330,90.4172` |
+| `API_ENABLED` | `false` to run UI without backend (optional) |
+| `FCM_DEV_TOKEN` | dev push token (optional) |
 
-```bash
-# Physical device — uses dart_defines.json (same IP as backend Network URL)
-flutter run --dart-define-from-file=dart_defines.json
-```
-
-Disable API (offline UI only): `--dart-define=API_ENABLED=false`
+Copy `dart_defines.example.json` → `dart_defines.json` and set `API_BASE_URL` to your PC’s Network URL from `npm run dev`.
 
 ## Project structure
 
