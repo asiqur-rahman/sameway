@@ -12,6 +12,7 @@ import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/theme/app_typography.dart';
 import 'package:sameway/core/utils/commute_time_format.dart';
 import 'package:sameway/core/widgets/sameway_bottom_nav.dart';
+import 'package:sameway/core/widgets/sameway_banner.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_tab_switcher.dart';
@@ -477,9 +478,7 @@ class _FindTabContentState extends State<_FindTabContent> {
 
   void _syncToFlow() {
     if (_from.trim().isEmpty || _to.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Set both From and To before searching')),
-      );
+      SamewayBanner.showWarning(context, 'Set both From and To before searching');
       return;
     }
     final flow = FindRideFlow.instance;

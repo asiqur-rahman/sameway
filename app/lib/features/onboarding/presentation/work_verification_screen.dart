@@ -11,6 +11,7 @@ import 'package:sameway/core/api/repositories/uploads_repository.dart';
 import 'package:sameway/core/api/repositories/users_repository.dart';
 import 'package:sameway/core/session/app_session.dart';
 import 'package:sameway/core/session/user_profile.dart';
+import 'package:sameway/core/widgets/sameway_banner.dart';
 import 'package:sameway/core/widgets/onboarding_step_layout.dart';
 import 'package:sameway/core/widgets/sameway_text_field.dart';
 import 'package:sameway/core/widgets/sameway_ui_kit.dart';
@@ -86,9 +87,7 @@ class _WorkVerificationScreenState extends State<WorkVerificationScreen> {
 
   Future<void> _finish() async {
     if (_office == null || !_office!.isValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select your office address on the map')),
-      );
+      SamewayBanner.showWarning(context, 'Please select your office address on the map');
       return;
     }
     setState(() => _saving = true);

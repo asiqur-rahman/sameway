@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sameway/core/constants/app_brand.dart';
 import 'package:sameway/core/theme/app_theme.dart';
+import 'package:sameway/core/widgets/sameway_banner.dart';
 import 'package:sameway/router/app_router.dart';
 
 class SameWayApp extends StatelessWidget {
@@ -23,6 +24,9 @@ class SameWayApp extends StatelessWidget {
         ),
       ),
       routerConfig: appRouter,
+      builder: (context, child) => SamewayBannerHost(
+        child: child ?? const SizedBox.shrink(),
+      ),
     );
   }
 }

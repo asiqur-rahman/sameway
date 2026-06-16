@@ -7,6 +7,7 @@ import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_placeholders.dart';
 import 'package:sameway/core/utils/commute_time_format.dart';
 import 'package:sameway/core/widgets/commute_time_select_field.dart';
+import 'package:sameway/core/widgets/sameway_banner.dart';
 import 'package:sameway/core/widgets/sameway_text_field.dart';
 import 'package:sameway/core/widgets/sameway_ui_kit.dart';
 
@@ -66,22 +67,16 @@ class VehicleFormSectionState extends State<VehicleFormSection> {
 
   bool validate(BuildContext context) {
     if (makeModelController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter your vehicle make & model')),
-      );
+      SamewayBanner.showWarning(context, 'Enter your vehicle make & model');
       return false;
     }
     if (licensePlateController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter your license plate')),
-      );
+      SamewayBanner.showWarning(context, 'Enter your license plate');
       return false;
     }
     if (vehicleType == VehicleType.car &&
         (carSeats == null || carSeats! < 1 || carSeats! > 3)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Select available seats (1–3) for your car')),
-      );
+      SamewayBanner.showWarning(context, 'Select available seats (1–3) for your car');
       return false;
     }
     return true;

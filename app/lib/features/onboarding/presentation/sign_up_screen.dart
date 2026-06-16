@@ -11,6 +11,7 @@ import 'package:sameway/core/validation/form_validators.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_secondary_button.dart';
+import 'package:sameway/core/widgets/sameway_banner.dart';
 import 'package:sameway/core/widgets/sameway_text_field.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -46,7 +47,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
     if (!mounted) return;
     if (err != null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
+      SamewayBanner.showError(context, err);
       return;
     }
     context.push(AppRoutes.profileSetup);
@@ -169,12 +170,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     onPressed: loading
                         ? () {}
                         : () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'LinkedIn sign-up is not configured yet',
-                                ),
-                              ),
+                            SamewayBanner.showInfo(
+                              context,
+                              'LinkedIn sign-up is not configured yet',
                             );
                           },
                   ),

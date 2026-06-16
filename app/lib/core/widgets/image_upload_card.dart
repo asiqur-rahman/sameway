@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sameway/core/theme/app_colors.dart';
+import 'package:sameway/core/widgets/sameway_banner.dart';
 
 enum _ImagePickAction { camera, gallery, remove }
 
@@ -106,14 +107,11 @@ class _ImageUploadCardState extends State<ImageUploadCard> {
       widget.onImageChanged?.call(picked);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            source == ImageSource.camera
-                ? 'Could not open camera. Check permissions or try gallery.'
-                : 'Could not open gallery.',
-          ),
-        ),
+      SamewayBanner.showError(
+        context,
+        source == ImageSource.camera
+            ? 'Could not open camera. Check permissions or try gallery.'
+            : 'Could not open gallery.',
       );
     }
   }

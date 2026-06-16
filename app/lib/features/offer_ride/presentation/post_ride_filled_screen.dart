@@ -8,6 +8,7 @@ import 'package:sameway/core/session/app_session.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/theme/app_typography.dart';
 import 'package:sameway/core/utils/commute_time_format.dart';
+import 'package:sameway/core/widgets/sameway_banner.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_ui_kit.dart';
@@ -86,9 +87,7 @@ class _PostRideFilledScreenState extends State<PostRideFilledScreen> {
       context.go(AppRoutes.incomingRequests);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
+      SamewayBanner.showError(context, e);
     }
   }
 

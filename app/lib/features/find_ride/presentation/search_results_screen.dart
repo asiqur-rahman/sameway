@@ -6,6 +6,7 @@ import 'package:sameway/core/maps/search_location_resolver.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
+import 'package:sameway/core/widgets/sameway_banner.dart';
 import 'package:sameway/core/widgets/sameway_bottom_nav.dart';
 import 'package:sameway/core/widgets/sameway_loading.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
@@ -26,7 +27,6 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
   List<FindRideListing> _listings = [];
   bool _loading = true;
   bool _refreshing = false;
-  String? _error;
 
   List<FindRideListing> get _filtered {
     if (_vehicleFilter == 'Car') {
@@ -52,7 +52,6 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
       } else {
         _loading = true;
       }
-      _error = null;
     });
     final flow = FindRideFlow.instance;
     try {
@@ -96,11 +95,14 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = 'Could not search rides. Check locations have map coordinates and pull to retry.';
         _listings = [];
         _loading = false;
         _refreshing = false;
       });
+      SamewayBanner.showError(
+        context,
+        'Could not search rides. Check locations have map coordinates and pull to retry.',
+      );
     }
   }
 
@@ -141,14 +143,6 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
               ),
             ),
           ),
-          if (_error != null && !_loading)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
-              child: Text(
-                _error!,
-                style: GoogleFonts.inter(fontSize: 12, color: AppColors.textMuted),
-              ),
-            ),
           Expanded(
             child: RefreshIndicator(
               color: AppColors.primary,

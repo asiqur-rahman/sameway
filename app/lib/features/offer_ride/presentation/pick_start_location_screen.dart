@@ -10,6 +10,7 @@ import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_placeholders.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/theme/app_typography.dart';
+import 'package:sameway/core/widgets/sameway_banner.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_text_field.dart';
@@ -67,9 +68,7 @@ class _PickStartLocationScreenState extends State<PickStartLocationScreen> {
   Future<void> _confirm() async {
     final address = _searchController.text.trim();
     if (address.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Choose or enter a start location')),
-      );
+      SamewayBanner.showWarning(context, 'Choose or enter a start location');
       return;
     }
     await AppDataStore.instance.updatePostRideDraft((d) {

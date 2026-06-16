@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
+import 'package:sameway/core/widgets/sameway_banner.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/features/ride_day/ride_day_store.dart';
 
@@ -27,7 +28,7 @@ class _LetDriverKnowScreenState extends State<LetDriverKnowScreen> {
     try {
       await _store.updateMyStatus(status);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      SamewayBanner.showSuccess(context, message);
     } finally {
       if (mounted) setState(() => _updating = false);
     }

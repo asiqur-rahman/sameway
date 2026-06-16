@@ -7,6 +7,7 @@ import 'package:sameway/core/theme/app_typography.dart';
 import 'package:sameway/core/validation/form_validators.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
+import 'package:sameway/core/widgets/sameway_banner.dart';
 import 'package:sameway/core/widgets/sameway_text_field.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -36,7 +37,7 @@ class _SignInScreenState extends State<SignInScreen> {
     );
     if (!mounted) return;
     if (err != null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err)));
+      SamewayBanner.showError(context, err);
       return;
     }
     final route = AppSession.instance.onboardingRouteForCurrentUser() ??

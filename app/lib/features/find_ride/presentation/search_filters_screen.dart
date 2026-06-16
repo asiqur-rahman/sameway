@@ -5,6 +5,7 @@ import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_placeholders.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/theme/app_typography.dart';
+import 'package:sameway/core/widgets/sameway_banner.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_ui_kit.dart';
@@ -79,12 +80,9 @@ class _SearchFiltersScreenState extends State<SearchFiltersScreen> {
       context.push(AppRoutes.searchResults);
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Could not resolve map coordinates. Pick Home/Office or use Pin on map.',
-          ),
-        ),
+      SamewayBanner.showWarning(
+        context,
+        'Could not resolve map coordinates. Pick Home/Office or use Pin on map.',
       );
     } finally {
       if (mounted) setState(() => _searching = false);

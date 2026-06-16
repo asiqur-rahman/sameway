@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
+import 'package:sameway/core/widgets/sameway_banner.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_ui_kit.dart';
@@ -25,10 +26,9 @@ class _VehicleScreenState extends State<VehicleScreen> {
     if (!OnboardingState.instance.isDriver) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Vehicle details are only required if you drive. Riders skip this step.'),
-          ),
+        SamewayBanner.showInfo(
+          context,
+          'Vehicle details are only required if you drive. Riders skip this step.',
         );
         context.go(AppRoutes.commuteDetails);
       });

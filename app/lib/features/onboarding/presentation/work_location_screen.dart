@@ -5,6 +5,7 @@ import 'package:sameway/core/models/map_location.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_placeholders.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
+import 'package:sameway/core/widgets/sameway_banner.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_text_field.dart';
@@ -45,11 +46,7 @@ class _WorkLocationScreenState extends State<WorkLocationScreen> {
 
   void _continue() {
     if (_office == null || !_office!.isValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select your office address on the map'),
-        ),
-      );
+      SamewayBanner.showWarning(context, 'Please select your office address on the map');
       return;
     }
     context.push(AppRoutes.officeId);

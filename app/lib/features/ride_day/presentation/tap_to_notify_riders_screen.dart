@@ -5,6 +5,7 @@ import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
+import 'package:sameway/core/widgets/sameway_banner.dart';
 import 'package:sameway/core/widgets/sameway_ui_kit.dart';
 import 'package:sameway/features/ride_day/ride_day_store.dart';
 
@@ -28,9 +29,7 @@ class _TapToNotifyRidersScreenState extends State<TapToNotifyRidersScreen> {
     final count = await _store.notifyRiders();
     if (!mounted) return;
     if (count == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No active ride to notify')),
-      );
+      SamewayBanner.showWarning(context, 'No active ride to notify');
       return;
     }
     context.push(AppRoutes.afterHeadingOut);

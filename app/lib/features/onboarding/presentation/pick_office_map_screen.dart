@@ -9,6 +9,7 @@ import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_placeholders.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/theme/app_typography.dart';
+import 'package:sameway/core/widgets/sameway_banner.dart';
 import 'package:sameway/core/widgets/sameway_primary_button.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
 import 'package:sameway/core/widgets/sameway_text_field.dart';
@@ -75,11 +76,7 @@ class _PickOfficeMapScreenState extends State<PickOfficeMapScreen> {
   void _confirm() {
     final location = _selected;
     if (location == null || !location.isValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Select your office pin on the map to continue'),
-        ),
-      );
+      SamewayBanner.showWarning(context, 'Select your office pin on the map to continue');
       return;
     }
     context.pop(location);

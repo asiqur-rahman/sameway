@@ -10,6 +10,7 @@ import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_elevation.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/theme/app_typography.dart';
+import 'package:sameway/core/widgets/sameway_banner.dart';
 import 'package:sameway/core/widgets/sameway_ui_kit.dart';
 
 class SectionLabel extends StatelessWidget {
@@ -871,10 +872,9 @@ Future<SearchLocation?> showHomeLocationPicker(
                   if (ctx.mounted) Navigator.pop(ctx, resolved);
                 } catch (_) {
                   if (ctx.mounted) {
-                    ScaffoldMessenger.of(ctx).showSnackBar(
-                      const SnackBar(
-                        content: Text('Could not geocode address — use Pin on map'),
-                      ),
+                    SamewayBanner.showWarning(
+                      ctx,
+                      'Could not geocode address — use Pin on map',
                     );
                   }
                 }
