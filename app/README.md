@@ -22,13 +22,14 @@ Start the API from `../backend/` (`npm run dev`). The app connects automatically
 
 | Platform | Default base URL |
 |----------|------------------|
-| Android emulator | `http://10.0.2.2:3000/api/v1` |
-| iOS sim / web | `http://localhost:3000/api/v1` |
-| Physical device | `--dart-define=API_BASE_URL=http://<LAN-IP>:3000/api/v1` |
+| Android (physical device) | `http://192.168.31.47:3000/api/v1` |
+| Android emulator | `--dart-define=API_BASE_URL=http://10.0.2.2:3000/api/v1` |
+| iOS sim / web | `http://192.168.31.47:3000/api/v1` (or `localhost` on sim) |
+| Override | `--dart-define-from-file=dart_defines.json` or edit `dart_defines.json` |
 
 ```bash
-# Physical device example
-flutter run -d <device> --dart-define=API_BASE_URL=http://192.168.1.10:3000/api/v1
+# Physical device — uses dart_defines.json (same IP as backend Network URL)
+flutter run --dart-define-from-file=dart_defines.json
 ```
 
 Disable API (offline UI only): `--dart-define=API_ENABLED=false`

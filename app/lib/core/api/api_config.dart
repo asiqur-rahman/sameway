@@ -19,9 +19,10 @@ class ApiConfig {
     if (kIsWeb) return 'http://localhost:3000/api/v1';
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
-        return 'http://10.0.2.2:3000/api/v1';
+        // Dev machine on LAN (see `npm run dev` → Network URL). Emulator: --dart-define=API_BASE_URL=http://10.0.2.2:3000/api/v1
+        return 'http://192.168.31.47:3000/api/v1';
       default:
-        return 'http://localhost:3000/api/v1';
+        return 'http://192.168.31.47:3000/api/v1';
     }
   }
 }

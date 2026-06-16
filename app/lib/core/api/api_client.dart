@@ -199,6 +199,17 @@ class ApiClient {
         statusCode: e.response?.statusCode,
       );
     }
+    if (e.type == DioExceptionType.connectionError ||
+        e.type == DioExceptionType.connectionTimeout ||
+        e.type == DioExceptionType.sendTimeout ||
+        e.type == DioExceptionType.receiveTimeout) {
+      return ApiException(
+        'Could not reach the server at ${ApiConfig.baseUrl}. '
+        'Use the same Wi‑Fi as your PC, confirm `npm run dev` is running, '
+        'and allow port 3000 through Windows Firewall.',
+        statusCode: e.response?.statusCode,
+      );
+    }
     return ApiException(
       e.message ?? 'Network error',
       statusCode: e.response?.statusCode,

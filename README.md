@@ -17,8 +17,10 @@ Project_Sameway/
 cd app
 flutter pub get
 flutter run
-# Physical device:
-flutter run -d 192.168.31.68:39205
+# Physical device (backend on same Wi‑Fi — matches npm run dev Network URL):
+flutter run --dart-define-from-file=dart_defines.json
+# Android emulator instead:
+flutter run --dart-define=API_BASE_URL=http://10.0.2.2:3000/api/v1
 # Flutter web UI (user-facing):
 flutter run -d chrome --web-port=7357
 ```
