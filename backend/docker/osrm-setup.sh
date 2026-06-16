@@ -5,7 +5,7 @@
 # Downloads Bangladesh OpenStreetMap data from Geofabrik and preprocesses it
 # for OSRM routing using the MLD (Multi-Level Dijkstra) algorithm.
 #
-# Run this ONCE before starting the osrm service in docker-compose.yml.
+# Run this ONCE before starting OSRM (docker-compose.osrm.yml).
 #
 # Usage:
 #   chmod +x docker/osrm-setup.sh
@@ -26,8 +26,10 @@
 
 set -euo pipefail
 
-OSRM_IMAGE="osrm/osrm-backend:v5.27.1"
-VOLUME_NAME="sameway-backend_osrm_data"
+# Official images moved from Docker Hub to GitHub Container Registry.
+# See: https://github.com/Project-OSRM/osrm-backend/pkgs/container/osrm-backend
+OSRM_IMAGE="ghcr.io/project-osrm/osrm-backend:latest"
+VOLUME_NAME="sameway_osrm_data"
 OSM_URL="https://download.geofabrik.de/asia/bangladesh-latest.osm.pbf"
 OSM_FILE="bangladesh-latest.osm.pbf"
 OSRM_FILE="bangladesh-latest.osrm"
@@ -59,8 +61,8 @@ if [ "$ALREADY_DONE" = "yes" ]; then
   echo ""
   echo "✓ OSRM data already preprocessed. Nothing to do."
   echo ""
-  echo "To start OSRM, uncomment the osrm block in docker-compose.yml and run:"
-  echo "  docker compose up -d osrm"
+  echo "To start OSRM, run:"
+  echo "  docker compose -f docker-compose.osrm.yml up -d"
   exit 0
 fi
 
@@ -116,8 +118,9 @@ echo "Next steps:"
 echo "  1. Start OSRM with its dedicated compose file:"
 echo "       docker compose -f docker-compose.osrm.yml up -d"
 echo ""
-echo "  2. Add to your .env file:"
-echo "       OSRM_URL=http://osrm:5000"
+echo "  2. Add to your .env file (pick one):"
+echo "       OSRM_URL=http://localhost:5000              # API via npm run dev"
+echo "       OSRM_URL=http://host.docker.internal:5000   # API in Docker"
 echo ""
 echo "  3. Restart the API so it picks up the new variable:"
 echo "       docker compose up -d api"
