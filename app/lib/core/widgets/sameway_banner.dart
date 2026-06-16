@@ -229,10 +229,16 @@ class _FloatingBannerState extends State<_FloatingBanner>
     };
   }
 
+  bool get _isCompactMessage {
+    final text = widget.message.trim();
+    return text.length <= 52 && !text.contains('\n');
+  }
+
   @override
   Widget build(BuildContext context) {
     final style = _style;
     final top = MediaQuery.paddingOf(context).top + 8;
+    final compact = _isCompactMessage;
 
     return Positioned(
       top: top,
@@ -251,63 +257,32 @@ class _FloatingBannerState extends State<_FloatingBanner>
                 }
               },
               onTap: _dismiss,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.88),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: style.accent.withValues(alpha: 0.22)),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.08),
-                          blurRadius: 24,
-                          offset: const Offset(0, 8),
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: compact ? 360 : double.infinity,
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.88),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: style.accent.withValues(alpha: 0.22)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.08),
+                              blurRadius: 24,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: style.bg,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            alignment: Alignment.center,
-                            child: Icon(style.icon, color: style.accent, size: 20),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 2),
-                              child: Text(
-                                widget.message,
-                                style: GoogleFonts.inter(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  height: 1.35,
-                                  color: AppColors.textPrimary,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          GestureDetector(
-                            onTap: _dismiss,
-                            child: Icon(
-                              CupertinoIcons.xmark,
-                              size: 16,
-                              color: AppColors.textMuted.withValues(alpha: 0.8),
-                            ),
-                          ),
-                        ],
+                        child: compact
+                            ? _buildCompactContent(style)
+                            : _buildExpandedContent(style),
                       ),
                     ),
                   ),
@@ -315,6 +290,103 @@ class _FloatingBannerState extends State<_FloatingBanner>
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompactContent(({Color accent, Color bg, IconData icon}) style) {
+    return Stack(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 14, 40, 14),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: style.bg,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                alignment: Alignment.center,
+                child: Icon(style.icon, color: style.accent, size: 17),
+              ),
+              const SizedBox(width: 10),
+              Flexible(
+                child: Text(
+                  widget.message,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    height: 1.3,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Positioned(
+          top: 8,
+          right: 8,
+          child: _closeButton(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildExpandedContent(({Color accent, Color bg, IconData icon}) style) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: style.bg,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            alignment: Alignment.center,
+            child: Icon(style.icon, color: style.accent, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 2, right: 4),
+              child: Text(
+                widget.message,
+                textAlign: TextAlign.start,
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  height: 1.4,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
+          ),
+          _closeButton(),
+        ],
+      ),
+    );
+  }
+
+  Widget _closeButton() {
+    return GestureDetector(
+      onTap: _dismiss,
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: Icon(
+          CupertinoIcons.xmark,
+          size: 16,
+          color: AppColors.textMuted.withValues(alpha: 0.8),
         ),
       ),
     );

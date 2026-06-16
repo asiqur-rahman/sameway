@@ -3,10 +3,12 @@ import { TooManyRequestsError } from "@/lib/http/errors";
 import { checkEdgeRateLimit } from "@/lib/http/rate-limit-edge";
 import { ipKey, RateLimits } from "@/lib/http/rate-limit-presets";
 
-function corsOrigins(): string[] {
-  return (process.env.CORS_ORIGINS ?? "http://localhost:7357,http://localhost:3000")
-    .split(",")
-    .map((o) => o.trim());
+function applyCorsHeaders(headers: Headers): void {
+  // Dev convenience — tighten before production (use explicit CORS_ORIGINS list).
+  headers.set("Access-Control-Allow-Origin", "*");
+  headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+  headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  headers.set("Access-Control-Max-Age", "86400");
 }
 
 function rateLimitEnabled(): boolean {
@@ -63,17 +65,8 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const origin = request.headers.get("origin");
   const headers = new Headers();
-  const allowedOrigins = corsOrigins();
-
-  if (origin && allowedOrigins.includes(origin)) {
-    headers.set("Access-Control-Allow-Origin", origin);
-    headers.set("Access-Control-Allow-Credentials", "true");
-  }
-
-  headers.set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
-  headers.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  applyCorsHeaders(headers);
   headers.set("X-Content-Type-Options", "nosniff");
 
   if (request.method === "OPTIONS") {

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:sameway/core/config/env_config.dart';
 import 'package:sameway/core/api/api_exception.dart';
 import 'package:sameway/core/api/token_storage.dart';
@@ -203,9 +204,11 @@ class ApiClient {
         e.type == DioExceptionType.connectionTimeout ||
         e.type == DioExceptionType.sendTimeout ||
         e.type == DioExceptionType.receiveTimeout) {
+      final hint = kIsWeb
+          ? 'If you run Flutter on web/Edge, restart the backend after CORS updates.'
+          : 'On a phone, open ${EnvConfig.apiBaseUrl}/health in the browser first.';
       return ApiException(
-        'Could not reach the server at ${EnvConfig.apiBaseUrl}. '
-        'Check Wi‑Fi, confirm the backend is running, and firewall rules for your API port.',
+        'Could not reach the server at ${EnvConfig.apiBaseUrl}. $hint',
         statusCode: e.response?.statusCode,
       );
     }

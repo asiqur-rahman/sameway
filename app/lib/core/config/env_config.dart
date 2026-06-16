@@ -54,8 +54,9 @@ abstract final class EnvConfig {
     _defaultOffice = map['DEFAULT_OFFICE'] as String? ?? '';
   }
 
-  /// CI / release can still pass `--dart-define=API_BASE_URL=...` to override the file.
+  /// CI / release builds only — in debug, `dart_defines.json` always wins.
   static void _applyCompileTimeOverrides() {
+    if (kDebugMode) return;
     const api = String.fromEnvironment('API_BASE_URL');
     if (api.isNotEmpty) _apiBaseUrl = api;
 
