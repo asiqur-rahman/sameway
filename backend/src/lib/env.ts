@@ -24,6 +24,10 @@ const envSchema = z.object({
   UPLOAD_DIR: z.string().default("./uploads"),
   MAX_UPLOAD_SIZE_MB: z.coerce.number().default(5),
   GOOGLE_MAPS_API_KEY: z.string().optional(),
+  /** Free default — OpenStreetMap Nominatim (no API key). Set to `google` when billing is enabled. */
+  GEO_PROVIDER: z.enum(["nominatim", "google"]).default("nominatim"),
+  NOMINATIM_BASE_URL: z.string().url().default("https://nominatim.openstreetmap.org"),
+  NOMINATIM_USER_AGENT: z.string().default("SameWay/1.0 (dev; sameway@local)"),
   APP_URL: z.string().default("http://localhost:3000"),
   DB_POOL_MAX: z.coerce.number().int().min(1).max(200).default(25),
   DB_POOL_MIN: z.coerce.number().int().min(0).max(50).default(2),

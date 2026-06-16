@@ -63,36 +63,15 @@ Home (Find) → Search → Results → Detail → Request → Chat
 Bottom nav: Home | Rides | Chat | Profile
 ```
 
-## Google Maps (free mobile SDK)
+## Maps (free — OpenStreetMap)
 
-The app uses **Google Maps Mobile SDK** on Android/iOS via `google_maps_flutter`. The mobile SDK has **no per-map-load charge** (unlike the JavaScript API). You only need a free Google Cloud API key with billing optional for low usage.
+The app uses **flutter_map** with **OpenStreetMap** tiles. No Google Cloud account or API key is required.
 
-### 1. Create an API key
+- Pin office/home on the map → coordinates saved directly
+- Address labels come from the backend **Nominatim** geocoder (also free)
+- Works on Android, iOS, and web
 
-1. Open [Google Cloud Console](https://console.cloud.google.com/)
-2. Enable **Maps SDK for Android** and **Maps SDK for iOS**
-3. Create an API key and restrict it to your app package/bundle ID
-
-### 2. Android
-
-Add to `android/local.properties`:
-
-```properties
-GOOGLE_MAPS_API_KEY=your_key_here
-```
-
-Location permissions are declared in `AndroidManifest.xml`; the app requests permission when showing “my location”.
-
-### 3. iOS
-
-Set your key in `ios/Runner/Info.plist`:
-
-```xml
-<key>GMSApiKey</key>
-<string>your_key_here</string>
-```
-
-### 4. Run
+Location permissions are declared for “my location” when picking pins.
 
 ```bash
 flutter run --dart-define=API_BASE_URL=http://10.0.2.2:3000/api/v1
@@ -100,9 +79,6 @@ flutter run --dart-define=API_BASE_URL=http://10.0.2.2:3000/api/v1
 
 **Live markers:** Route maps animate a driver marker along the polyline. When the backend exposes GPS on `GET /rides/:id/live`, polling can replace the demo animation.
 
-Without a key (or on web/desktop), maps fall back to the painted `MapPlaceholder`.
-
 ## Next integration
 
-- **Chat:** Connect to backend chat endpoints or WebSocket
-- **Live GPS:** Poll ride live endpoint when driver coordinates are available
+- **Live GPS:** Poll ride live endpoint when driver coordinates are available (Phase 2b)

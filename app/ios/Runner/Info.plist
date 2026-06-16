@@ -72,7 +72,5 @@
 	<string>Same Way needs photo library access to choose your profile photo.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Same Way uses your location to show your commute on the map and pin pickup points.</string>
-	<key>GMSApiKey</key>
-	<string></string>
 </dict>
 </plist>

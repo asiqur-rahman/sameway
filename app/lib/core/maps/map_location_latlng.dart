@@ -1,4 +1,4 @@
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:sameway/core/models/map_location.dart';
 
 extension MapLocationLatLng on MapLocation {

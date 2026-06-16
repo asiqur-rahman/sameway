@@ -1,21 +1,15 @@
 import 'package:flutter/foundation.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-/// Google Maps configuration.
-///
-/// Mobile Maps SDK (Android/iOS) is free — no per-load charge.
-/// Create a key at https://console.cloud.google.com/ (enable Maps SDK for Android + iOS).
+import 'package:latlong2/latlong.dart';
+
+/// OpenStreetMap — free tiles, no API key required.
 class MapConfig {
   MapConfig._();
 
-  /// Pass via `--dart-define=GOOGLE_MAPS_API_KEY=...` and `android/local.properties`.
-  static const String apiKey = String.fromEnvironment('GOOGLE_MAPS_API_KEY');
+  static const String tileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
-  static bool get hasApiKey => apiKey.isNotEmpty;
+  /// OSM works on mobile, desktop, and web.
+  static bool get useNativeMaps => true;
 
-  /// Native GoogleMap works on Android/iOS (not web without extra setup).
-  static bool get useNativeMaps => !kIsWeb && (defaultTargetPlatform == TargetPlatform.android || defaultTargetPlatform == TargetPlatform.iOS);
-
-  /// Default map center — Dhaka.
   static const LatLng defaultCenter = LatLng(23.8103, 90.4254);
 
   /// Demo commute corridor (Uttara → Motijheel).
@@ -24,4 +18,18 @@ class MapConfig {
 
   static const double defaultZoom = 13;
   static const double routeZoom = 11.5;
+  static const double pickerZoom = 15;
+
+  /// Required by OSM tile usage policy (flutter_map passes this as User-Agent).
+  static String get userAgentPackageName {
+    if (kIsWeb) return 'com.sameway.sameway.web';
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 'com.sameway.sameway';
+      case TargetPlatform.iOS:
+        return 'com.sameway.sameway.ios';
+      default:
+        return 'com.sameway.sameway';
+    }
+  }
 }

@@ -39,7 +39,7 @@ Client → middleware (CORS + rate limit)
 |---------|----------------|
 | Ride search | Geo bbox DB pre-filter → cap 300 candidates → score → 30s TTL cache per user+corridor |
 | Search cache invalidation | Prefix `search:` only — geocode cache stays warm when new rides post |
-| Geocoding | Google API + **24h server cache** (shared across all users for same address) |
+| Geocoding | **Nominatim (OSM) by default** — free, 24h server cache; optional `GEO_PROVIDER=google` |
 | Rate limits | Per-IP + per-user on auth, search, chat — use Redis at multi-instance |
 | DB pool | Tunable `DB_POOL_MAX` (raise to 50–100 under load) |
 | Notifications | In-app row + `NotificationOutbox` for async FCM workers |
@@ -57,7 +57,9 @@ RATE_LIMIT_ENABLED=true
 REDIS_URL=redis://localhost:6379
 GEOCODE_CACHE_TTL_SEC=86400
 CACHE_MAX_ENTRIES=20000
-GOOGLE_MAPS_API_KEY=...
+GEO_PROVIDER=nominatim
+NOMINATIM_USER_AGENT=SameWay/1.0 (prod; ops@yourcompany.com)
+# GOOGLE_MAPS_API_KEY=...   # only when GEO_PROVIDER=google
 ```
 
 ## Scaling path

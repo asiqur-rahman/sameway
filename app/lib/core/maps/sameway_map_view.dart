@@ -1,7 +1,8 @@
-import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:sameway/core/maps/map_config.dart';
 import 'package:sameway/core/maps/map_location_latlng.dart';
 import 'package:sameway/core/maps/route_interpolator.dart';
@@ -9,7 +10,7 @@ import 'package:sameway/core/models/map_location.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 
-/// Native Google Map with optional route polyline and live moving markers.
+/// OpenStreetMap view with route polyline, pin picker, and live marker animation.
 class SamewayMapView extends StatefulWidget {
   const SamewayMapView({
     super.key,
@@ -48,7 +49,7 @@ class SamewayMapView extends StatefulWidget {
 
 class _SamewayMapViewState extends State<SamewayMapView>
     with SingleTickerProviderStateMixin {
-  GoogleMapController? _controller;
+  final MapController _mapController = MapController();
   LatLng? _pickerPosition;
   LatLng? _liveDriverPosition;
   AnimationController? _liveAnim;
@@ -85,11 +86,14 @@ class _SamewayMapViewState extends State<SamewayMapView>
     return MapConfig.defaultCenter;
   }
 
+  double get _initialZoom {
+    return widget.zoom ?? (widget.pickerMode ? MapConfig.pickerZoom : MapConfig.routeZoom);
+  }
+
   @override
   void initState() {
     super.initState();
-    _pickerPosition = widget.initialCenter?.toLatLng() ??
-        widget.start?.toLatLng();
+    _pickerPosition = widget.initialCenter?.toLatLng() ?? widget.start?.toLatLng();
     if (widget.showMyLocation) {
       _ensureLocationPermission();
     }
@@ -102,6 +106,12 @@ class _SamewayMapViewState extends State<SamewayMapView>
       _liveAnim!.addListener(_tickLiveMarker);
       _liveDriverPosition = _interpolator!.positionAt(0);
     }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!widget.pickerMode && _routePoints.length >= 2) {
+        _fitRoute();
+      }
+      if (mounted) setState(() => _mapReady = true);
+    });
   }
 
   @override
@@ -115,7 +125,7 @@ class _SamewayMapViewState extends State<SamewayMapView>
     }
     if (widget.pickerMode && widget.initialCenter != oldWidget.initialCenter) {
       _pickerPosition = widget.initialCenter?.toLatLng();
-      _moveCamera(_pickerPosition);
+      _mapController.move(_pickerPosition ?? _initialTarget, _mapController.camera.zoom);
     }
   }
 
@@ -124,6 +134,19 @@ class _SamewayMapViewState extends State<SamewayMapView>
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
     }
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      return;
+    }
+    try {
+      final pos = await Geolocator.getCurrentPosition();
+      if (widget.pickerMode && _pickerPosition == null) {
+        setState(() {
+          _pickerPosition = LatLng(pos.latitude, pos.longitude);
+        });
+        _mapController.move(_pickerPosition!, MapConfig.pickerZoom);
+      }
+    } catch (_) {}
   }
 
   void _tickLiveMarker() {
@@ -138,91 +161,19 @@ class _SamewayMapViewState extends State<SamewayMapView>
   @override
   void dispose() {
     _liveAnim?.dispose();
-    _controller?.dispose();
+    _mapController.dispose();
     super.dispose();
   }
 
-  Future<void> _moveCamera(LatLng? target) async {
-    if (target == null || _controller == null) return;
-    await _controller!.animateCamera(CameraUpdate.newLatLng(target));
-  }
-
-  Future<void> _fitRoute() async {
-    if (_controller == null || _routePoints.length < 2) return;
-    final bounds = _boundsFor(_routePoints);
-    await _controller!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 48));
-  }
-
-  LatLngBounds _boundsFor(List<LatLng> points) {
-    var minLat = points.first.latitude;
-    var maxLat = points.first.latitude;
-    var minLng = points.first.longitude;
-    var maxLng = points.first.longitude;
-    for (final p in points) {
-      minLat = minLat < p.latitude ? minLat : p.latitude;
-      maxLat = maxLat > p.latitude ? maxLat : p.latitude;
-      minLng = minLng < p.longitude ? minLng : p.longitude;
-      maxLng = maxLng > p.longitude ? maxLng : p.longitude;
-    }
-    return LatLngBounds(
-      southwest: LatLng(minLat, minLng),
-      northeast: LatLng(maxLat, maxLng),
+  void _fitRoute() {
+    if (_routePoints.length < 2) return;
+    final bounds = LatLngBounds.fromPoints(_routePoints);
+    _mapController.fitCamera(
+      CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(48)),
     );
   }
 
-  Set<Marker> _buildMarkers() {
-    final markers = <Marker>{};
-    final route = _routePoints;
-
-    if (!widget.pickerMode && route.isNotEmpty) {
-      markers.add(Marker(
-        markerId: const MarkerId('start'),
-        position: route.first,
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
-        infoWindow: InfoWindow(title: widget.start?.address ?? 'Start'),
-      ));
-    }
-
-    if (!widget.pickerMode && route.length > 1) {
-      markers.add(Marker(
-        markerId: const MarkerId('end'),
-        position: route.last,
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-        infoWindow: InfoWindow(title: widget.end?.address ?? 'End'),
-      ));
-    }
-
-    if (widget.liveMarkers && _liveDriverPosition != null) {
-      markers.add(Marker(
-        markerId: const MarkerId('driver_live'),
-        position: _liveDriverPosition!,
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
-        anchor: const Offset(0.5, 0.5),
-        infoWindow: const InfoWindow(title: 'Driver', snippet: 'En route'),
-        zIndexInt: 2,
-      ));
-    }
-
-    return markers;
-  }
-
-  Set<Polyline> _buildPolylines() {
-    if (widget.pickerMode || _routePoints.length < 2) return {};
-    return {
-      Polyline(
-        polylineId: const PolylineId('route'),
-        points: _routePoints,
-        color: AppColors.primary,
-        width: 5,
-        geodesic: true,
-        patterns: widget.liveMarkers
-            ? [PatternItem.dash(20), PatternItem.gap(10)]
-            : [],
-      ),
-    };
-  }
-
-  void _onCameraIdle() {
+  void _notifyPicker() {
     if (!widget.pickerMode || _pickerPosition == null) return;
     widget.onPickerChanged?.call(
       MapLocationLatLng.fromLatLng(
@@ -230,16 +181,62 @@ class _SamewayMapViewState extends State<SamewayMapView>
         address: widget.pickerAddress ?? 'Pinned location',
       ),
     );
-    setState(() {});
+  }
+
+  List<Marker> _buildMarkers() {
+    final markers = <Marker>[];
+    final route = _routePoints;
+
+    if (!widget.pickerMode && route.isNotEmpty) {
+      markers.add(_pointMarker(
+        route.first,
+        color: Colors.green,
+        label: widget.start?.address ?? 'Start',
+      ));
+    }
+
+    if (!widget.pickerMode && route.length > 1) {
+      markers.add(_pointMarker(
+        route.last,
+        color: Colors.red,
+        label: widget.end?.address ?? 'End',
+      ));
+    }
+
+    if (widget.liveMarkers && _liveDriverPosition != null) {
+      markers.add(_pointMarker(
+        _liveDriverPosition!,
+        color: AppColors.primary,
+        label: 'Driver',
+        icon: Icons.directions_car,
+      ));
+    }
+
+    return markers;
+  }
+
+  Marker _pointMarker(
+    LatLng point, {
+    required Color color,
+    required String label,
+    IconData icon = Icons.place,
+  }) {
+    return Marker(
+      point: point,
+      width: 36,
+      height: 36,
+      alignment: Alignment.center,
+      child: Tooltip(
+        message: label,
+        child: Icon(icon, color: color, size: 32),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!MapConfig.useNativeMaps) {
-      return _UnavailableMap(height: widget.height, message: 'Maps on mobile only');
-    }
-
     final radius = widget.borderRadius ?? AppRadius.md;
+    final route = _routePoints;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(radius),
@@ -248,51 +245,75 @@ class _SamewayMapViewState extends State<SamewayMapView>
         width: double.infinity,
         child: Stack(
           children: [
-            GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target: _initialTarget,
-                zoom: widget.zoom ?? (widget.pickerMode ? 15 : MapConfig.routeZoom),
+            FlutterMap(
+              mapController: _mapController,
+              options: MapOptions(
+                initialCenter: _initialTarget,
+                initialZoom: _initialZoom,
+                minZoom: 5,
+                maxZoom: 18,
+                interactionOptions: InteractionOptions(
+                  flags: widget.pickerMode || widget.showMyLocation
+                      ? InteractiveFlag.all
+                      : InteractiveFlag.pinchZoom | InteractiveFlag.drag,
+                ),
+                onMapEvent: (event) {
+                  if (widget.pickerMode && event is MapEventMoveEnd) {
+                    _pickerPosition = event.camera.center;
+                    _notifyPicker();
+                  }
+                },
               ),
-              onMapCreated: (c) async {
-                _controller = c;
-                setState(() => _mapReady = true);
-                if (!widget.pickerMode && _routePoints.length >= 2) {
-                  await Future<void>.delayed(const Duration(milliseconds: 300));
-                  await _fitRoute();
-                }
-              },
-              onCameraMove: (position) {
-                if (widget.pickerMode) {
-                  _pickerPosition = position.target;
-                }
-              },
-              onCameraIdle: _onCameraIdle,
-              markers: _buildMarkers(),
-              polylines: _buildPolylines(),
-              myLocationEnabled: widget.showMyLocation,
-              myLocationButtonEnabled: widget.showMyLocation,
-              zoomControlsEnabled: widget.pickerMode,
-              compassEnabled: false,
-              mapToolbarEnabled: false,
-              liteModeEnabled: false,
-            ),
-            if (widget.pickerMode)
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 36),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.location_on, color: AppColors.primary, size: 44),
-                      Container(
-                        width: 12,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(2),
-                        ),
+              children: [
+                TileLayer(
+                  urlTemplate: MapConfig.tileUrl,
+                  userAgentPackageName: MapConfig.userAgentPackageName,
+                ),
+                if (!widget.pickerMode && route.length >= 2)
+                  PolylineLayer(
+                    polylines: [
+                      Polyline(
+                        points: route,
+                        color: AppColors.primary,
+                        strokeWidth: 4,
+                        pattern: widget.liveMarkers
+                            ? StrokePattern.dashed(segments: const [12, 8])
+                            : const StrokePattern.solid(),
                       ),
                     ],
+                  ),
+                if (_buildMarkers().isNotEmpty) MarkerLayer(markers: _buildMarkers()),
+                RichAttributionWidget(
+                  alignment: AttributionAlignment.bottomLeft,
+                  showFlutterMapAttribution: false,
+                  attributions: [
+                    TextSourceAttribution(
+                      '© OpenStreetMap contributors',
+                      onTap: () {},
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            if (widget.pickerMode)
+              IgnorePointer(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 36),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.location_on, color: AppColors.primary, size: 44),
+                        Container(
+                          width: 12,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -305,12 +326,6 @@ class _SamewayMapViewState extends State<SamewayMapView>
                   decoration: BoxDecoration(
                     color: AppColors.primary,
                     borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.35),
-                        blurRadius: 8,
-                      ),
-                    ],
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -340,7 +355,7 @@ class _SamewayMapViewState extends State<SamewayMapView>
               Positioned(
                 left: 12,
                 right: 12,
-                bottom: 12,
+                bottom: 28,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
@@ -369,38 +384,12 @@ class _SamewayMapViewState extends State<SamewayMapView>
   }
 }
 
-class _UnavailableMap extends StatelessWidget {
-  const _UnavailableMap({required this.height, required this.message});
-
-  final double height;
-  final String message;
+/// OSM attribution — always shown (required by tile license).
+class MapAttributionBanner extends StatelessWidget {
+  const MapAttributionBanner({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: height,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: const Color(0xFFE8EDF2),
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Text(
-        message,
-        style: GoogleFonts.inter(fontSize: 13, color: AppColors.textMuted),
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
-}
-
-/// Shown when no API key is configured.
-class MapKeyBanner extends StatelessWidget {
-  const MapKeyBanner({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    if (MapConfig.hasApiKey) return const SizedBox.shrink();
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: 8),
@@ -411,9 +400,12 @@ class MapKeyBanner extends StatelessWidget {
         border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
       ),
       child: Text(
-        'Add GOOGLE_MAPS_API_KEY to android/local.properties (free mobile SDK).',
+        'Maps © OpenStreetMap — free, no API key required.',
         style: GoogleFonts.inter(fontSize: 11, color: AppColors.textSecondary),
       ),
     );
   }
 }
+
+/// Kept for backwards compatibility — use [MapAttributionBanner].
+typedef MapKeyBanner = MapAttributionBanner;

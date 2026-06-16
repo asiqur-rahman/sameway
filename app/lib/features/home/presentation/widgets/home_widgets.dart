@@ -471,7 +471,7 @@ class FindRideMapPreview extends StatelessWidget {
             Positioned(
               left: 10,
               bottom: 8,
-              child: _GoogleMapsBadge(),
+              child: _OsmMapsBadge(),
             ),
           ],
         ),
@@ -507,7 +507,7 @@ class FindRideMapPreview extends StatelessWidget {
             Positioned(
               left: 10,
               bottom: 8,
-              child: _GoogleMapsBadge(),
+              child: _OsmMapsBadge(),
             ),
           ],
         ),
@@ -516,7 +516,7 @@ class FindRideMapPreview extends StatelessWidget {
   }
 }
 
-class _GoogleMapsBadge extends StatelessWidget {
+class _OsmMapsBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -532,12 +532,12 @@ class _GoogleMapsBadge extends StatelessWidget {
             width: 12,
             height: 12,
             decoration: const BoxDecoration(
-              color: Color(0xFF4285F4),
+              color: Color(0xFF7EBC6F),
               shape: BoxShape.circle,
             ),
             alignment: Alignment.center,
             child: const Text(
-              'G',
+              'O',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 8,
@@ -547,7 +547,7 @@ class _GoogleMapsBadge extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 5),
-          Text('Google Maps', style: AppTypography.caption),
+          Text('OpenStreetMap', style: AppTypography.caption),
         ],
       ),
     );

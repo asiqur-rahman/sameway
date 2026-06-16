@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sameway/core/api/repositories/places_repository.dart';
 import 'package:sameway/core/maps/sameway_map_view.dart';
 import 'package:sameway/core/models/map_location.dart';
 import 'package:sameway/core/routes/app_routes.dart';
@@ -49,11 +50,26 @@ class _PickOfficeMapScreenState extends State<PickOfficeMapScreen> {
     });
   }
 
-  void _onMapPicked(MapLocation location) {
+  Future<void> _onMapPicked(MapLocation location) async {
     setState(() {
       _selected = location;
       _searchController.text = location.address;
     });
+    try {
+      final resolved = await PlacesRepository.instance.reverseGeocode(
+        lat: location.lat,
+        lng: location.lng,
+      );
+      if (!mounted) return;
+      setState(() {
+        _selected = MapLocation(
+          address: resolved.address,
+          lat: resolved.lat,
+          lng: resolved.lng,
+        );
+        _searchController.text = resolved.address;
+      });
+    } catch (_) {}
   }
 
   void _confirm() {

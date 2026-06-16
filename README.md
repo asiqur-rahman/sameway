@@ -74,11 +74,28 @@ See `app/README.md` for Flutter structure and flows.
 Designed for real commute-hour load, not demo-only:
 
 - **Search:** DB geo pre-filter, 300 candidate cap, 30s result cache per corridor
-- **Geocode:** 24h shared server cache (same address geocoded once for all users)
-- **Redis:** Set `REDIS_URL` in `backend/.env` when running multiple API instances
+- **Geocode:** OpenStreetMap Nominatim by default (free) + 24h server cache
+- **Redis:** Set `REDIS_URL` in `backend/.env` when running multiple API instances (optional for dev)
 - **User coords:** Stored in `Place` table (HOME/OFFICE) — one row per user per label
 
 See `backend/ARCHITECTURE.md` and `backend/.env.example` for tuning.
+
+## Zero-cost local dev (no paid APIs)
+
+Everything below runs without Google Cloud billing or map API keys:
+
+| Service | Default | Cost |
+|---------|---------|------|
+| Map tiles | OpenStreetMap via `flutter_map` | Free |
+| Geocoding | Nominatim (`GEO_PROVIDER=nominatim`) | Free |
+| Database | PostgreSQL local | Free |
+| File uploads | Local disk (`./uploads`) | Free |
+| Push (FCM) | Optional — outbox logs without Firebase creds | Free until you configure |
+| Redis | In-memory fallback when `REDIS_URL` unset | Free |
+
+**Recommended workflow:** pin office/home on the map (coords from pin, not typed address). Optional home text field uses server geocoding when needed.
+
+To switch to Google later: set `GEO_PROVIDER=google` and `GOOGLE_MAPS_API_KEY` in backend `.env`.
 
 ## Integration status
 
