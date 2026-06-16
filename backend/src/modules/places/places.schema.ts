@@ -12,3 +12,7 @@ export const geocodeQuerySchema = z.object({
 export const autocompleteQuerySchema = z.object({
   q: z.string().min(1).max(200),
 });
+
+export const placeDetailsQuerySchema = z.object({
+  placeId: z.string().min(1).max(300),
+});

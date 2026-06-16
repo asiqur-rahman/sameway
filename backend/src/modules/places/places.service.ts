@@ -144,3 +144,44 @@ export async function autocompletePlaces(query: string) {
   const data = await res.json();
   return data;
 }
+
+export async function placeDetails(placeId: string): Promise<ResolvedPlace> {
+  assertMapsKey();
+
+  const cacheKey = `geo:details:${placeId}`;
+  const cache = getCacheStore();
+  const hit = await cache.get<ResolvedPlace>(cacheKey);
+  if (hit) return hit;
+
+  const url = new URL("https://maps.googleapis.com/maps/api/place/details/json");
+  url.searchParams.set("place_id", placeId);
+  url.searchParams.set("fields", "formatted_address,geometry,place_id");
+  url.searchParams.set("key", env.GOOGLE_MAPS_API_KEY!);
+
+  const res = await fetch(url);
+  const data = (await res.json()) as {
+    status: string;
+    result?: {
+      formatted_address: string;
+      place_id: string;
+      geometry: { location: { lat: number; lng: number } };
+    };
+  };
+
+  if (data.status !== "OK" || !data.result) {
+    throw new ValidationError({
+      formErrors: ["Place not found"],
+      fieldErrors: {},
+    });
+  }
+
+  const result: ResolvedPlace = {
+    address: data.result.formatted_address,
+    lat: data.result.geometry.location.lat,
+    lng: data.result.geometry.location.lng,
+    placeId: data.result.place_id,
+  };
+
+  await cache.set(cacheKey, result, env.GEOCODE_CACHE_TTL_SEC * 1000);
+  return result;
+}

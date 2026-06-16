@@ -39,6 +39,9 @@ const envSchema = z.object({
   REDIS_URL: z.string().url().optional(),
   GEOCODE_CACHE_TTL_SEC: z.coerce.number().int().min(60).max(604_800).default(86_400),
   CACHE_MAX_ENTRIES: z.coerce.number().int().min(1000).max(500_000).default(20_000),
+  FIREBASE_PROJECT_ID: z.string().optional(),
+  FIREBASE_CLIENT_EMAIL: z.string().optional(),
+  FIREBASE_PRIVATE_KEY: z.string().optional(),
 });
 
 function loadEnv() {

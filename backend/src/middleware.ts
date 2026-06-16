@@ -18,37 +18,37 @@ function rateLimitResponse(error: TooManyRequestsError): NextResponse {
   );
 }
 
-function applyRateLimit(request: NextRequest): void {
+async function applyRateLimit(request: NextRequest): Promise<void> {
   if (!env.RATE_LIMIT_ENABLED) return;
 
   const path = request.nextUrl.pathname;
 
   if (path.endsWith("/auth/signup") && request.method === "POST") {
-    checkRateLimit(request, RateLimits.signup);
+    await checkRateLimit(request, RateLimits.signup);
     return;
   }
   if (path.endsWith("/auth/signin") && request.method === "POST") {
-    checkRateLimit(request, RateLimits.auth);
+    await checkRateLimit(request, RateLimits.auth);
     return;
   }
   if (path.endsWith("/auth/refresh") && request.method === "POST") {
-    checkRateLimit(request, RateLimits.auth);
+    await checkRateLimit(request, RateLimits.auth);
     return;
   }
   if (path.endsWith("/rides/search") && request.method === "POST") {
-    checkRateLimit(request, RateLimits.search);
+    await checkRateLimit(request, RateLimits.search);
     return;
   }
 
   if (request.method !== "GET" && request.method !== "HEAD" && request.method !== "OPTIONS") {
-    checkRateLimit(request, {
+    await checkRateLimit(request, {
       ...RateLimits.general,
       key: (r) => ipKey(r, "write"),
     });
   }
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   if (!request.nextUrl.pathname.startsWith("/api")) {
     return NextResponse.next();
   }
@@ -70,7 +70,7 @@ export function middleware(request: NextRequest) {
   }
 
   try {
-    applyRateLimit(request);
+    await applyRateLimit(request);
   } catch (error) {
     if (error instanceof TooManyRequestsError) {
       const res = rateLimitResponse(error);

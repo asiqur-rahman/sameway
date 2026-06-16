@@ -1,7 +1,7 @@
 import type { Prisma } from "@/generated/prisma/client";
 import { NotificationType, ParticipantStatus, RideStatus } from "@/generated/prisma/client";
 import { container } from "@/application/container";
-import { toRideDetailDto } from "@/application/mappers/ride.mapper";
+import { toLiveRideDto, toRideDetailDto, toTodayRideSummary } from "@/application/mappers/ride.mapper";
 import { db } from "@/lib/db";
 import { ForbiddenError, NotFoundError, ConflictError } from "@/lib/http/errors";
 import { getSystemConfig } from "@/lib/system-config";
@@ -272,11 +272,54 @@ export async function driverHeadingOut(rideId: string, driverId: string) {
   return { notified: riders.length };
 }
 
-export async function getLiveRide(rideId: string) {
-  return db.ride.findUnique({
+export async function getLiveRide(rideId: string, viewerUserId: string) {
+  const ride = await db.ride.findUnique({
     where: { id: rideId },
-    include: { participants: { include: { user: { select: { id: true, fullName: true, photoUrl: true } } } } },
+    include: {
+      vehicle: true,
+      driver: { select: { id: true, fullName: true, photoUrl: true, rating: true, rideCount: true, verificationStatus: true, gender: true, companyDomain: true } },
+      participants: {
+        include: { user: { select: { id: true, fullName: true, photoUrl: true } } },
+      },
+    },
   });
+  if (!ride) throw new NotFoundError("Ride");
+
+  const isParticipant = ride.participants.some((p) => p.userId === viewerUserId);
+  if (!isParticipant && ride.driverId !== viewerUserId) {
+    throw new ForbiddenError("Not a participant on this ride");
+  }
+
+  return toLiveRideDto(ride as Parameters<typeof toLiveRideDto>[0], viewerUserId);
+}
+
+export async function getTodayRide(userId: string) {
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(startOfDay);
+  endOfDay.setDate(endOfDay.getDate() + 1);
+
+  const ride = await db.ride.findFirst({
+    where: {
+      status: { in: ["OPEN", "FULL", "IN_PROGRESS"] },
+      departureAt: { gte: startOfDay, lt: endOfDay },
+      OR: [
+        { driverId: userId },
+        { participants: { some: { userId, role: "RIDER" } } },
+      ],
+    },
+    include: {
+      vehicle: true,
+      driver: { select: { id: true, fullName: true, photoUrl: true, rating: true, rideCount: true, verificationStatus: true, gender: true, companyDomain: true } },
+      participants: {
+        include: { user: { select: { id: true, fullName: true, photoUrl: true } } },
+      },
+    },
+    orderBy: { departureAt: "asc" },
+  });
+
+  if (!ride) return null;
+  return toTodayRideSummary(ride as Parameters<typeof toTodayRideSummary>[0], userId);
 }
 
 export async function listRegularRoutes(userId: string) {

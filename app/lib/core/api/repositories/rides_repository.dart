@@ -1,5 +1,6 @@
 import 'package:sameway/core/api/api_client.dart';
 import 'package:sameway/features/find_ride/find_ride_flow.dart';
+import 'package:sameway/features/ride_day/ride_day_models.dart';
 
 class RidesRepository {
   RidesRepository._();
@@ -85,5 +86,26 @@ class RidesRepository {
   Future<List<Map<String, dynamic>>> getMyDriverRides() async {
     final rows = await _client.getList('/rides');
     return rows.cast<Map<String, dynamic>>();
+  }
+
+  Future<TodayRideSummary?> getTodayRide() async {
+    final data = await _client.get('/rides/today');
+    final ride = data['ride'];
+    if (ride == null) return null;
+    return TodayRideSummary.fromJson(ride as Map<String, dynamic>);
+  }
+
+  Future<LiveRide> getLiveRide(String rideId) async {
+    final data = await _client.get('/rides/$rideId/live');
+    return LiveRide.fromJson(data);
+  }
+
+  Future<int> headingOut(String rideId) async {
+    final data = await _client.post('/rides/$rideId/heading-out');
+    return data['notified'] as int? ?? 0;
+  }
+
+  Future<void> updateParticipantStatus(String rideId, String userId, String status) async {
+    await _client.patch('/rides/$rideId/participants/$userId/status', data: {'status': status});
   }
 }

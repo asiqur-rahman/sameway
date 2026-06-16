@@ -10,7 +10,7 @@ export const POST = apiRoute(async (request) => {
   const session = await requireAuth(request);
 
   if (env.RATE_LIMIT_ENABLED) {
-    checkRateLimit(request, {
+    await checkRateLimit(request, {
       ...RateLimits.searchPerUser(session.id),
       key: () => `user:${session.id}:search`,
     });

@@ -26,7 +26,7 @@ export const GET = apiRoute(async (request, { params }) => {
 export const POST = apiRoute(async (request, { params }) => {
   const session = await requireAuth(request);
   if (env.RATE_LIMIT_ENABLED) {
-    checkRateLimit(request, {
+    await checkRateLimit(request, {
       ...RateLimits.chatSend(session.id),
       key: () => `user:${session.id}:chat`,
     });

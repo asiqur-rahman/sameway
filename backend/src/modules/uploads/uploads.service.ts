@@ -1,10 +1,16 @@
-import { mkdir, writeFile } from "fs/promises";
 import path from "path";
+import { mkdir, writeFile } from "fs/promises";
 import { randomUUID } from "crypto";
 import { env } from "@/lib/env";
 import { ForbiddenError } from "@/lib/http/errors";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+
+export function toPublicUploadUrl(relativePath: string): string {
+  const base = env.APP_URL.replace(/\/$/, "");
+  const rel = relativePath.startsWith("/") ? relativePath : `/${relativePath}`;
+  return `${base}${rel}`;
+}
 
 export async function saveUpload(
   file: File,
@@ -27,5 +33,5 @@ export async function saveUpload(
   const buffer = Buffer.from(await file.arrayBuffer());
   await writeFile(path.join(dir, filename), buffer);
 
-  return `/uploads/${subdir}/${filename}`;
+  return toPublicUploadUrl(`/uploads/${subdir}/${filename}`);
 }

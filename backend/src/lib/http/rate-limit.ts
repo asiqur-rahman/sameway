@@ -1,12 +1,6 @@
 import { NextRequest } from "next/server";
+import { getRateLimitStore } from "@/infrastructure/rate-limit/create-rate-limit-store";
 import { TooManyRequestsError } from "./errors";
-
-type Bucket = { count: number; resetAt: number };
-
-const buckets = new Map<string, Bucket>();
-
-/** Max tracked keys — evict oldest when exceeded (DoS guard). */
-const MAX_BUCKETS = 50_000;
 
 export type RateLimitOptions = {
   /** Window length in seconds. */
@@ -31,41 +25,16 @@ export function userKey(userId: string, suffix: string): string {
   return `user:${userId}:${suffix}`;
 }
 
-function pruneBuckets() {
-  if (buckets.size <= MAX_BUCKETS) return;
-  const now = Date.now();
-  for (const [key, bucket] of buckets) {
-    if (bucket.resetAt <= now) buckets.delete(key);
-    if (buckets.size <= MAX_BUCKETS * 0.8) break;
-  }
-  if (buckets.size > MAX_BUCKETS) {
-    const toDrop = buckets.size - MAX_BUCKETS;
-    const keys = buckets.keys();
-    for (let i = 0; i < toDrop; i++) {
-      const next = keys.next();
-      if (next.done) break;
-      buckets.delete(next.value);
-    }
-  }
-}
-
-export function checkRateLimit(request: NextRequest, options: RateLimitOptions): void {
-  const now = Date.now();
-  const windowMs = options.windowSec * 1000;
+export async function checkRateLimit(request: NextRequest, options: RateLimitOptions): Promise<void> {
   const id = options.key(request);
-  let bucket = buckets.get(id);
+  const result = await getRateLimitStore().consume({
+    key: id,
+    windowSec: options.windowSec,
+    max: options.max,
+  });
 
-  if (!bucket || bucket.resetAt <= now) {
-    bucket = { count: 0, resetAt: now + windowMs };
-    buckets.set(id, bucket);
-  }
-
-  bucket.count += 1;
-  pruneBuckets();
-
-  if (bucket.count > options.max) {
-    const retryAfterSec = Math.ceil((bucket.resetAt - now) / 1000);
-    throw new TooManyRequestsError(retryAfterSec);
+  if (!result.allowed) {
+    throw new TooManyRequestsError(result.retryAfterSec ?? options.windowSec);
   }
 }
 

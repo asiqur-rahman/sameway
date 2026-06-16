@@ -120,6 +120,105 @@ export type BookingRideDto = {
   chatThreadId: string | null;
 };
 
+export type LiveParticipantDto = {
+  userId: string;
+  name: string;
+  photoUrl: string | null;
+  role: "DRIVER" | "RIDER";
+  status: string;
+};
+
+export type LiveRideDto = {
+  id: string;
+  status: string;
+  route: string;
+  from: string;
+  to: string;
+  departureAt: string;
+  minutesUntilDeparture: number;
+  isDriver: boolean;
+  driver: LiveParticipantDto | null;
+  riders: LiveParticipantDto[];
+  participants: LiveParticipantDto[];
+  vehicleLabel: string;
+};
+
+export function toLiveRideDto(
+  ride: RideWithDriver & {
+    participants: Array<{
+      userId: string;
+      role: string;
+      status: string;
+      user: { id: string; fullName: string; photoUrl: string | null };
+    }>;
+  },
+  viewerUserId: string,
+): LiveRideDto {
+  const participants: LiveParticipantDto[] = ride.participants.map((p) => ({
+    userId: p.userId,
+    name: p.user.fullName,
+    photoUrl: p.user.photoUrl,
+    role: p.role as "DRIVER" | "RIDER",
+    status: p.status,
+  }));
+
+  const driver = participants.find((p) => p.role === "DRIVER") ?? null;
+  const riders = participants.filter((p) => p.role === "RIDER");
+  const isDriver = driver?.userId === viewerUserId;
+  const isBike = ride.vehicle.type === "BIKE";
+  const vehicleEmoji = isBike ? "🏍" : "🚗";
+
+  const msUntil = ride.departureAt.getTime() - Date.now();
+  const minutesUntilDeparture = Math.max(0, Math.round(msUntil / 60_000));
+
+  return {
+    id: ride.id,
+    status: ride.status,
+    route: `${ride.startAddress} → ${ride.endAddress}`,
+    from: ride.startAddress,
+    to: ride.endAddress,
+    departureAt: ride.departureAt.toISOString(),
+    minutesUntilDeparture,
+    isDriver,
+    driver,
+    riders,
+    participants,
+    vehicleLabel: `${vehicleEmoji} ${ride.vehicle.makeModel}`,
+  };
+}
+
+export type TodayRideSummaryDto = {
+  rideId: string;
+  role: "DRIVER" | "RIDER";
+  route: string;
+  departureAt: string;
+  minutesUntilDeparture: number;
+  riderCount: number;
+  status: string;
+};
+
+export function toTodayRideSummary(
+  ride: RideWithDriver & {
+    participants: Array<{ userId: string; role: string; status: string }>;
+  },
+  viewerUserId: string,
+): TodayRideSummaryDto {
+  const myPart = ride.participants.find((p) => p.userId === viewerUserId);
+  const role = (myPart?.role ?? "RIDER") as "DRIVER" | "RIDER";
+  const riders = ride.participants.filter((p) => p.role === "RIDER");
+  const msUntil = ride.departureAt.getTime() - Date.now();
+
+  return {
+    rideId: ride.id,
+    role,
+    route: `${shortPlace(ride.startAddress)} → ${shortPlace(ride.endAddress)}`,
+    departureAt: ride.departureAt.toISOString(),
+    minutesUntilDeparture: Math.max(0, Math.round(msUntil / 60_000)),
+    riderCount: riders.length,
+    status: ride.status,
+  };
+}
+
 export function toDriverBookingDto(ride: {
   id: string;
   startAddress: string;

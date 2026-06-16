@@ -3,9 +3,8 @@ import { ok } from "@/lib/http/response";
 import { requireAuth } from "@/lib/auth/session";
 import * as ridesService from "@/modules/rides/rides.service";
 
-export const GET = apiRoute(async (request, { params }) => {
+export const GET = apiRoute(async (request) => {
   const session = await requireAuth(request);
-  const { id } = await params;
-  const live = await ridesService.getLiveRide(id, session.id);
-  return ok(live);
+  const today = await ridesService.getTodayRide(session.id);
+  return ok({ ride: today });
 });

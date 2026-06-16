@@ -1,104 +1,99 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_spacing.dart';
 import 'package:sameway/core/widgets/sameway_screen.dart';
+import 'package:sameway/features/ride_day/ride_day_store.dart';
 
-class NotificationCentreScreen extends StatelessWidget {
+class NotificationCentreScreen extends StatefulWidget {
   const NotificationCentreScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return SamewayScreen(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Container(
-            height: 56,
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
-            decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: AppColors.border)),
-            ),
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'Notifications',
-              style: GoogleFonts.inter(
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-                letterSpacing: -0.5,
-              ),
-            ),
-          ),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.screenHorizontal,
-                16,
-                AppSpacing.screenHorizontal,
-                24,
-              ),
-              children: [
-                _SectionHeader(label: 'TODAY'),
-                _NotificationTile(
-                  icon: '🚗',
-                  title: 'Karim is on the way',
-                  body: 'ETA to your pickup: 6 min',
-                  time: '8:22 AM',
-                  unread: true,
-                ),
-                _NotificationTile(
-                  icon: '✅',
-                  title: 'Ride confirmed for tomorrow',
-                  body: 'Uttara → Motijheel · 8:30 AM',
-                  time: '7:45 AM',
-                ),
-                _NotificationTile(
-                  icon: '💬',
-                  title: 'New message from Karim',
-                  body: 'I\'ll be at the pickup point at 8:25',
-                  time: '7:30 AM',
-                ),
-                const SizedBox(height: 16),
-                _SectionHeader(label: 'YESTERDAY'),
-                _NotificationTile(
-                  icon: '⭐',
-                  title: 'Rate your ride',
-                  body: 'How was your commute with Karim?',
-                  time: '6:15 PM',
-                ),
-                _NotificationTile(
-                  icon: '🎉',
-                  title: 'Ride completed',
-                  body: 'Uttara → Motijheel · ৳80',
-                  time: '9:45 AM',
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  State<NotificationCentreScreen> createState() => _NotificationCentreScreenState();
 }
 
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.label});
+class _NotificationCentreScreenState extends State<NotificationCentreScreen> {
+  final _store = RideDayStore.instance;
 
-  final String label;
+  @override
+  void initState() {
+    super.initState();
+    _store.refreshNotifications();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Text(
-        label,
-        style: GoogleFonts.inter(
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 1.2,
-          color: AppColors.textMuted,
-        ),
-      ),
+    return ListenableBuilder(
+      listenable: _store,
+      builder: (context, _) {
+        final page = _store.notifications;
+        final items = page?.items ?? [];
+
+        return SamewayScreen(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(
+                height: 56,
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenHorizontal),
+                decoration: const BoxDecoration(
+                  border: Border(bottom: BorderSide(color: AppColors.border)),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Notifications',
+                        style: GoogleFonts.inter(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                    ),
+                    if ((page?.unreadCount ?? 0) > 0)
+                      TextButton(
+                        onPressed: () => _store.refreshNotifications(),
+                        child: const Text('Refresh'),
+                      ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: _store.loadingNotifications && items.isEmpty
+                    ? const Center(child: CircularProgressIndicator())
+                    : items.isEmpty
+                        ? Center(
+                            child: Text(
+                              'No notifications yet',
+                              style: GoogleFonts.inter(color: AppColors.textMuted),
+                            ),
+                          )
+                        : ListView.builder(
+                            padding: const EdgeInsets.fromLTRB(
+                              AppSpacing.screenHorizontal,
+                              16,
+                              AppSpacing.screenHorizontal,
+                              24,
+                            ),
+                            itemCount: items.length,
+                            itemBuilder: (context, index) {
+                              final n = items[index];
+                              return _NotificationTile(
+                                icon: n.icon,
+                                title: n.title,
+                                body: n.body,
+                                time: DateFormat.jm().format(n.createdAt.toLocal()),
+                                unread: !n.read,
+                              );
+                            },
+                          ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

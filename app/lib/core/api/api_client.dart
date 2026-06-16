@@ -166,6 +166,29 @@ class ApiClient {
     }
   }
 
+  /// Multipart file upload — returns unwrapped `{ url: "..." }`.
+  Future<Map<String, dynamic>> postMultipart(
+    String path, {
+    required String filePath,
+    required String fieldName,
+    Map<String, String>? fields,
+  }) async {
+    try {
+      final formData = FormData.fromMap({
+        ...?fields,
+        fieldName: await MultipartFile.fromFile(filePath),
+      });
+      final response = await _dio.post(
+        path,
+        data: formData,
+        options: Options(contentType: 'multipart/form-data'),
+      );
+      return _unwrap(response.data);
+    } on DioException catch (e) {
+      throw _fromDio(e);
+    }
+  }
+
   ApiException _fromDio(DioException e) {
     final body = e.response?.data;
     if (body is Map<String, dynamic> && body['error'] is Map<String, dynamic>) {

@@ -7,6 +7,7 @@ import 'package:sameway/core/models/map_location.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/theme/app_colors.dart';
 import 'package:sameway/core/theme/app_placeholders.dart';
+import 'package:sameway/core/api/repositories/uploads_repository.dart';
 import 'package:sameway/core/api/repositories/users_repository.dart';
 import 'package:sameway/core/session/app_session.dart';
 import 'package:sameway/core/session/user_profile.dart';
@@ -92,6 +93,18 @@ class _WorkVerificationScreenState extends State<WorkVerificationScreen> {
     }
     setState(() => _saving = true);
     try {
+      String? idImageUrl;
+      if (_idCardPath != null && !_idCardPath!.startsWith('http')) {
+        try {
+          idImageUrl = await UploadsRepository.instance.uploadImage(
+            _idCardPath!,
+            type: 'verification',
+          );
+        } catch (_) {}
+      } else if (_idCardPath != null && _idCardPath!.startsWith('http')) {
+        idImageUrl = _idCardPath;
+      }
+
     await AppSession.instance.updateCurrent((user) {
       user.companyName = _companyController.text.trim();
       user.officeAddress = _office!.address;
@@ -128,6 +141,7 @@ class _WorkVerificationScreenState extends State<WorkVerificationScreen> {
     try {
       await UsersRepository.instance.submitVerification(
         verificationMethod: 'SELF_VERIFY',
+        employeeIdImageUrl: idImageUrl,
       );
       await AppSession.instance.refreshMe();
     } catch (_) {}

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sameway/core/api/repositories/uploads_repository.dart';
 import 'package:sameway/core/routes/app_routes.dart';
 import 'package:sameway/core/session/app_session.dart';
 import 'package:sameway/core/session/user_profile.dart';
@@ -56,9 +57,17 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _saving = true);
     try {
+      String? photoUrl = _photoPath;
+      if (photoUrl != null && !photoUrl.startsWith('http')) {
+        try {
+          photoUrl = await UploadsRepository.instance.uploadImage(photoUrl, type: 'profiles');
+        } catch (_) {}
+      }
+
       await AppSession.instance.updateCurrent((user) {
         user.fullName = _nameController.text.trim();
         user.commuteType = _commuteType;
+        if (photoUrl != null) user.photoUrl = photoUrl;
         user.phase = OnboardingPhase.profileDone;
       });
       if (!mounted) return;

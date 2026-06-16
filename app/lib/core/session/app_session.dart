@@ -7,9 +7,11 @@ import 'package:sameway/core/api/api_exception.dart';
 import 'package:sameway/core/api/repositories/auth_repository.dart';
 import 'package:sameway/core/api/repositories/users_repository.dart';
 import 'package:sameway/core/api/user_mapper.dart';
+import 'package:sameway/core/push/push_service.dart';
 import 'package:sameway/core/session/user_profile.dart';
 import 'package:sameway/core/validation/form_validators.dart';
 import 'package:sameway/features/onboarding/onboarding_state.dart';
+import 'package:sameway/features/ride_day/ride_day_store.dart';
 
 /// Auth + onboarding session backed by the Same Way API.
 class AppSession extends ChangeNotifier {
@@ -85,6 +87,8 @@ class AppSession extends ChangeNotifier {
       );
       _syncOnboardingState();
       await AppDataStore.instance.refreshAll();
+      await RideDayStore.instance.refreshAll();
+      await PushService.instance.registerToken();
       notifyListeners();
       return null;
     } on ApiException catch (e) {
@@ -110,6 +114,8 @@ class AppSession extends ChangeNotifier {
       );
       _syncOnboardingState();
       await AppDataStore.instance.refreshAll();
+      await RideDayStore.instance.refreshAll();
+      await PushService.instance.registerToken();
       notifyListeners();
       return null;
     } on ApiException catch (e) {
@@ -127,6 +133,7 @@ class AppSession extends ChangeNotifier {
     _currentUser = null;
     SearchLocationResolver.clearSessionCache();
     AppDataStore.instance.clearOnSignOut();
+    RideDayStore.instance.clearOnSignOut();
     OnboardingState.instance.reset();
     notifyListeners();
   }
@@ -150,6 +157,7 @@ class AppSession extends ChangeNotifier {
       await UsersRepository.instance.updateProfile({
         if (user.fullName.isNotEmpty) 'fullName': user.fullName,
         'commuteType': UserMapper.commuteTypeToApi(user.commuteType),
+        if (user.photoUrl != null && user.photoUrl!.startsWith('http')) 'photoUrl': user.photoUrl,
         if (user.companyName != null) 'companyName': user.companyName,
         if (user.designation != null) 'designation': user.designation,
         'idVisibility': user.idVisibility == IdVisibility.publicToRiders

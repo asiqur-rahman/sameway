@@ -1,4 +1,6 @@
 import 'package:sameway/core/api/api_client.dart';
+import 'package:sameway/core/api/models/reminder_settings.dart';
+import 'package:sameway/core/api/repositories/uploads_repository.dart';
 import 'package:sameway/core/api/user_mapper.dart';
 import 'package:sameway/core/session/user_profile.dart';
 
@@ -57,7 +59,23 @@ class UsersRepository {
   }
 
   Future<String> uploadFile(String filePath, {String type = 'profiles'}) async {
-    // Multipart upload — use Dio directly for file upload
-    throw UnimplementedError('File upload requires multipart — call from screen with dio FormData');
+    return UploadsRepository.instance.uploadImage(filePath, type: type);
+  }
+
+  Future<ReminderSettings> getReminderSettings() async {
+    final result = await _client.get('/users/me/reminder-settings');
+    return ReminderSettings.fromJson(result);
+  }
+
+  Future<ReminderSettings> updateReminderSettings(ReminderSettings settings) async {
+    final result = await _client.patch('/users/me/reminder-settings', data: settings.toJson());
+    return ReminderSettings.fromJson(result);
+  }
+
+  Future<void> registerDeviceToken({required String token, required String platform}) async {
+    await _client.post('/users/me/device-tokens', data: {
+      'token': token,
+      'platform': platform,
+    });
   }
 }
