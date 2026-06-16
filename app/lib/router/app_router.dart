@@ -15,6 +15,7 @@ import 'package:sameway/features/match/presentation/chat_conversation_screen.dar
 import 'package:sameway/features/match/presentation/chat_list_screen.dart';
 import 'package:sameway/features/match/presentation/my_profile_screen.dart';
 import 'package:sameway/features/match/presentation/my_rides_screen.dart';
+import 'package:sameway/features/match/presentation/rate_ride_screen.dart';
 import 'package:sameway/features/match/presentation/regular_routes_screen.dart';
 import 'package:sameway/features/match/presentation/request_sent_screen.dart';
 import 'package:sameway/features/offer_ride/presentation/add_stop_screen.dart';
@@ -135,6 +136,18 @@ final appRouter = GoRouter(
     }),
     GoRoute(path: AppRoutes.myProfile, builder: (_, _) => const MyProfileScreen()),
     GoRoute(path: AppRoutes.regularRoutes, builder: (_, _) => const RegularRoutesScreen()),
+    GoRoute(
+      path: AppRoutes.rateRide,
+      builder: (_, state) {
+        final extra = state.extra as Map<String, dynamic>? ?? {};
+        return RateRideScreen(
+          rideId: extra['rideId'] as String? ?? '',
+          targetUserId: extra['targetUserId'] as String? ?? '',
+          targetName: extra['targetName'] as String? ?? 'your ride partner',
+          isDriver: extra['isDriver'] as bool? ?? true,
+        );
+      },
+    ),
     GoRoute(path: AppRoutes.reminderSettings, builder: (_, _) => const ReminderSettingsScreen()),
     GoRoute(path: AppRoutes.departureIn, builder: (_, _) => const DepartureInScreen()),
     GoRoute(path: AppRoutes.tapToNotify, builder: (_, _) => const TapToNotifyRidersScreen()),

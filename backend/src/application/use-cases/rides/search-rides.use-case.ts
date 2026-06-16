@@ -13,6 +13,7 @@ import {
 import {
   scoreRouteMatch,
   walkingMinutes,
+  pickupWalkMeters,
   type RouteSegment,
 } from "@/modules/matching/matching.service";
 import type { searchRidesSchema } from "@/modules/rides/rides.schema";
@@ -99,9 +100,8 @@ export class SearchRidesUseCase {
       .map((ride) => {
         const segments = (ride.segments as unknown as RouteSegment[]) ?? [];
         const matchScore = scoreRouteMatch({ riderFrom, riderTo, driverSegments: segments });
-        const walkMin = walkingMinutes(
-          Math.hypot(fromLat - ride.startLat, fromLng - ride.startLng) * 111_000,
-        );
+        // Use the nearest point on the actual route polyline, not the driver's home.
+        const walkMin = walkingMinutes(pickupWalkMeters(riderFrom, segments));
         return { ...ride, matchScore, walkMin };
       })
       .filter((r) => {

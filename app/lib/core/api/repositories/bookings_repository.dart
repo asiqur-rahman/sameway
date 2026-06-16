@@ -38,6 +38,7 @@ class BookingsRepository {
       detail: json['detail'] as String? ?? '',
       status: _mapStatus(json['status'] as String?),
       driverName: json['driverName'] as String?,
+      driverUserId: json['driverUserId'] as String?,
       isDriver: false,
       chatThreadId: json['chatThreadId'] as String?,
     );

@@ -54,6 +54,7 @@ export async function getMyBookings(userId: string, status?: "upcoming" | "compl
       detail: `Driver: ${r.ride.driver.fullName} · ${r.ride.availableSeats} seats`,
       status: r.status.toLowerCase(),
       driverName: r.ride.driver.fullName,
+      driverUserId: r.ride.driver.id,
       isDriver: false,
       chatThreadId: r.ride.conversations[0]?.id ?? null,
     })),

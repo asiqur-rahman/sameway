@@ -389,8 +389,10 @@ class FindRideResultCard extends StatelessWidget {
               runSpacing: 6,
               children: [
                 _SmallTag(label: '⏰ ${listing.departTime}'),
-                _SmallTag(label: '${listing.seats} seats'),
+                _SmallTag(label: '${listing.seats} seat${listing.seats == 1 ? '' : 's'}'),
                 _SmallTag(label: '${listing.overlap}% match', accent: true),
+                if (listing.suggestedFareBDT > 0)
+                  _SmallTag(label: '৳${listing.suggestedFareBDT} share', fare: true),
               ],
             ),
           ],
@@ -401,28 +403,45 @@ class FindRideResultCard extends StatelessWidget {
 }
 
 class _SmallTag extends StatelessWidget {
-  const _SmallTag({required this.label, this.accent = false});
+  const _SmallTag({required this.label, this.accent = false, this.fare = false});
 
   final String label;
   final bool accent;
+  final bool fare;
 
   @override
   Widget build(BuildContext context) {
+    final Color bg;
+    final Color borderColor;
+    final Color textColor;
+
+    if (fare) {
+      bg = const Color(0xFFECFDF5);
+      borderColor = const Color(0xFF10B981).withValues(alpha: 0.25);
+      textColor = const Color(0xFF065F46);
+    } else if (accent) {
+      bg = AppColors.primaryTint7;
+      borderColor = AppColors.primary.withValues(alpha: 0.2);
+      textColor = AppColors.primary;
+    } else {
+      bg = AppColors.surface;
+      borderColor = AppColors.border;
+      textColor = AppColors.textSecondary;
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: accent ? AppColors.primaryTint7 : AppColors.surface,
+        color: bg,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: accent ? AppColors.primary.withValues(alpha: 0.2) : AppColors.border,
-        ),
+        border: Border.all(color: borderColor),
       ),
       child: Text(
         label,
         style: GoogleFonts.inter(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: accent ? AppColors.primary : AppColors.textSecondary,
+          color: textColor,
         ),
       ),
     );

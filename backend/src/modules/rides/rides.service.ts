@@ -11,6 +11,7 @@ import {
   scoreRouteMatch,
 } from "@/modules/matching/matching.service";
 import type { RouteSegment } from "@/modules/matching/matching.service";
+import { fetchRoadSegments } from "@/lib/routing/osrm.client";
 import type { GeoPoint } from "@/lib/shared";
 import type { createRideSchema, rideRequestSchema, searchRidesSchema } from "./rides.schema";
 import type { z } from "zod";
@@ -32,7 +33,13 @@ export async function createRide(userId: string, input: z.infer<typeof createRid
   const vehicle = await db.vehicle.findFirst({ where: { id: input.vehicleId, userId } });
   if (!vehicle) throw new NotFoundError("Vehicle");
 
-  const segments = buildSegments(input.start, input.end, input.stops);
+  // Fetch road-snapped polyline from OSRM; fall back to straight-line segments
+  // if OSRM is not configured or temporarily unavailable.
+  const waypoints = [input.start, ...input.stops, input.end];
+  const roadSegments = await fetchRoadSegments(waypoints);
+  const segments = roadSegments.length >= 1
+    ? roadSegments
+    : buildSegments(input.start, input.end, input.stops);
 
   const ride = await db.ride.create({
     data: {

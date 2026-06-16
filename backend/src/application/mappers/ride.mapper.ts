@@ -1,4 +1,5 @@
 import type { RideWithDriver } from "@/domain/repositories/ride.repository";
+import { distanceMeters } from "@/modules/matching/matching.service";
 import type { RouteSegment } from "@/modules/matching/matching.service";
 
 /** Stable API shape aligned with Flutter `FindRideListing`. */
@@ -27,6 +28,15 @@ export type RideListingDto = {
   kudos: string[];
   matchScore: number;
   walkMinutes: number;
+  /** Straight-line route distance in kilometres (start → end). */
+  distanceKm: number;
+  /**
+   * Suggested fair-share cost in Bangladeshi Taka.
+   * Formula: distanceKm × 15 BDT/km, rounded up to the nearest 5 BDT.
+   * Reflects petrol cost only — a fair split between driver and rider.
+   * Displayed as a guide; actual amount is agreed between both parties.
+   */
+  suggestedFareBDT: number;
 };
 
 function shortName(fullName: string): string {
@@ -47,12 +57,29 @@ function formatTime(date: Date): string {
   return `${hour12}:${m} ${period}`;
 }
 
+/** Round n up to the nearest multiple of step. */
+function roundUpTo(n: number, step: number): number {
+  return Math.ceil(n / step) * step;
+}
+
 export function toRideListingDto(
   ride: RideWithDriver & { matchScore: number; walkMin: number },
 ): RideListingDto {
   const isBike = ride.vehicle.type === "BIKE";
   const vehicleEmoji = isBike ? "🏍" : "🚗";
   const initial = ride.driver.fullName.trim()[0]?.toUpperCase() ?? "?";
+
+  const distanceKm =
+    distanceMeters(
+      { lat: ride.startLat, lng: ride.startLng },
+      { lat: ride.endLat, lng: ride.endLng },
+    ) / 1_000;
+
+  // 15 BDT/km covers petrol cost only — a fair rider share for Dhaka distances.
+  // Rounded up to nearest 5 BDT so the amount feels like a natural conversation starter.
+  const suggestedFareBDT = roundUpTo(Math.max(10, Math.round(distanceKm * 15)), 5);
+
+  const fareNote = `Suggested share: ৳${suggestedFareBDT} (${Math.round(distanceKm)} km · fuel only)`;
 
   return {
     id: ride.id,
@@ -72,13 +99,15 @@ export function toRideListingDto(
     vehicleDetail: `${ride.vehicle.color ?? "—"} · ${ride.vehicle.availableSeats + 1} seats`,
     pickupLabel: `Your pickup (${ride.walkMin} min walk)`,
     pickupDetail: shortPlace(ride.startAddress),
-    driverNote: '"Coordinate pickup and cost split directly."',
+    driverNote: fareNote,
     isBike,
     coRiderName: null,
     coRiderInitial: null,
     kudos: ["🚗 Smooth driver", "⏰ Punctual", "💬 Good chat"],
     matchScore: ride.matchScore,
     walkMinutes: ride.walkMin,
+    distanceKm: Math.round(distanceKm * 10) / 10,
+    suggestedFareBDT,
   };
 }
 

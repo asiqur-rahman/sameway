@@ -79,6 +79,7 @@ class UserRide {
     required this.detail,
     required this.status,
     this.driverName,
+    this.driverUserId,
     this.isDriver = false,
     this.chatThreadId,
   });
@@ -91,6 +92,7 @@ class UserRide {
   final String detail;
   RideStatus status;
   final String? driverName;
+  final String? driverUserId;
   final bool isDriver;
   final String? chatThreadId;
 
@@ -106,6 +108,7 @@ class UserRide {
         'detail': detail,
         'status': status.name,
         'driverName': driverName,
+        'driverUserId': driverUserId,
         'isDriver': isDriver,
         'chatThreadId': chatThreadId,
       };
@@ -119,6 +122,7 @@ class UserRide {
         detail: json['detail'] as String,
         status: RideStatus.values.byName(json['status'] as String? ?? 'pending'),
         driverName: json['driverName'] as String?,
+        driverUserId: json['driverUserId'] as String?,
         isDriver: json['isDriver'] as bool? ?? false,
         chatThreadId: json['chatThreadId'] as String?,
       );

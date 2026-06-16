@@ -46,6 +46,13 @@ const envSchema = z.object({
   FIREBASE_PROJECT_ID: z.string().optional(),
   FIREBASE_CLIENT_EMAIL: z.string().optional(),
   FIREBASE_PRIVATE_KEY: z.string().optional(),
+  /**
+   * Self-hosted OSRM routing engine base URL.
+   * Used to fetch road-snapped polylines at ride creation time.
+   * Example: http://osrm:5000 (Docker) or http://localhost:5000 (local dev).
+   * When unset the system falls back to straight-line segments.
+   */
+  OSRM_URL: z.string().url().optional(),
 });
 
 function loadEnv() {

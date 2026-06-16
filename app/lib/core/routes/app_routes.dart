@@ -41,6 +41,7 @@ abstract final class AppRoutes {
   static const chatConversation = '/chat/conversation';
   static const myProfile = '/my-profile';
   static const regularRoutes = '/regular-routes';
+  static const rateRide = '/rate-ride';
 
   // Ride day
   static const reminderSettings = '/reminders';

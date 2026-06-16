@@ -1,0 +1,92 @@
+# =============================================================================
+# Sameway — OSRM self-hosted routing engine
+# =============================================================================
+#
+# Runs independently of the main stack. Exposes OSRM on port 5000.
+# The main API reads OSRM_URL=http://osrm:5000 when both stacks share
+# the same Docker network (sameway-backend_default).
+#
+# Prerequisites
+# ─────────────
+# Run the one-time data setup script first:
+#
+#   bash docker/osrm-setup.sh
+#
+# That script downloads the Bangladesh OSM file from Geofabrik (~200 MB)
+# and runs osrm-extract / osrm-partition / osrm-customize into the
+# named volume  sameway-backend_osrm_data  (created automatically).
+#
+# Quick start
+# ───────────
+#   1. Run the setup script (once):
+#        bash docker/osrm-setup.sh
+#
+#   2. Start OSRM:
+#        docker compose -f docker-compose.osrm.yml up -d
+#
+#   3. Add to your .env:
+#        OSRM_URL=http://osrm:5000
+#
+#   4. Restart the main stack so the API picks up the variable:
+#        docker compose up -d api
+#
+# To stop OSRM:
+#   docker compose -f docker-compose.osrm.yml down
+#
+# To update OSM data (e.g. monthly refresh):
+#   docker compose -f docker-compose.osrm.yml down
+#   docker volume rm sameway-backend_osrm_data
+#   bash docker/osrm-setup.sh
+#   docker compose -f docker-compose.osrm.yml up -d
+# =============================================================================
+
+name: sameway-osrm
+
+services:
+  osrm:
+    image: osrm/osrm-backend:v5.27.1
+    restart: unless-stopped
+    volumes:
+      - osrm_data:/data
+    command:
+      - "osrm-routed"
+      - "--algorithm"
+      - "mld"
+      # Generous table size for future matrix/isochrone features
+      - "--max-table-size"
+      - "2000"
+      - "--max-trip-size"
+      - "200"
+      - "/data/bangladesh-latest.osrm"
+    ports:
+      # Expose on host so the main api container (on sameway-backend_default
+      # network) can reach it via http://osrm:5000 inside Docker,
+      # or http://localhost:5000 from the host machine.
+      - "5000:5000"
+    networks:
+      - sameway-backend_default
+      - default
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:5000/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  # Shared with the setup script. Name must match the volume created by
+  # docker/osrm-setup.sh (sameway-backend_osrm_data).
+  osrm_data:
+    external: true
+    name: sameway-backend_osrm_data
+
+networks:
+  # Attach to the main app network so the api service can resolve 'osrm'
+  # by hostname without extra configuration.
+  sameway-backend_default:
+    external: true

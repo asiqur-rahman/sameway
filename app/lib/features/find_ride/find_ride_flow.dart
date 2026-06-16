@@ -185,6 +185,10 @@ class FindRideListing {
     this.coRiderName,
     this.coRiderInitial,
     this.kudos = const ['🚗 Smooth driver', '⏰ Punctual', '💬 Good chat'],
+    this.matchScore = 0,
+    this.walkMinutes = 0,
+    this.distanceKm = 0,
+    this.suggestedFareBDT = 0,
   });
 
   final String id;
@@ -209,6 +213,18 @@ class FindRideListing {
   final String? coRiderName;
   final String? coRiderInitial;
   final List<String> kudos;
+
+  /// Raw match score 0–100 returned by the backend matching algorithm.
+  final int matchScore;
+
+  /// Estimated walking minutes from the rider's pickup to the nearest route point.
+  final int walkMinutes;
+
+  /// Straight-line distance between driver's start and end in kilometres.
+  final double distanceKm;
+
+  /// Suggested fair-share cost in BDT (petrol only, 15 BDT/km, rounded to ৳5).
+  final int suggestedFareBDT;
 
   factory FindRideListing.fromJson(Map<String, dynamic> json) => FindRideListing(
         id: json['id'] as String,
@@ -236,6 +252,10 @@ class FindRideListing {
                 ?.map((e) => e as String)
                 .toList() ??
             const ['🚗 Smooth driver', '⏰ Punctual', '💬 Good chat'],
+        matchScore: (json['matchScore'] as num?)?.toInt() ?? 0,
+        walkMinutes: (json['walkMinutes'] as num?)?.toInt() ?? 0,
+        distanceKm: (json['distanceKm'] as num?)?.toDouble() ?? 0,
+        suggestedFareBDT: (json['suggestedFareBDT'] as num?)?.toInt() ?? 0,
       );
 }
 
